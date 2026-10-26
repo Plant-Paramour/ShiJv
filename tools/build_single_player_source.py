@@ -26,6 +26,7 @@ FILES = {
     'tools/build_environment_tool.py', 'tools/EnvironmentDeployer.cs',
     'tools/build_single_player_source.py',
     'deploy/environment-tool/model.json', 'deploy/environment-tool/recommended-plan.json',
+    'deploy/environment-tool/small-models.json', 'tests/test_cpu_inference_support.py',
     'deploy/managed-runtime/windows-qwen35-bnb4-wheels.json',
     'docs/single-player-launcher.html', 'docs/environment-tool-user.md',
     'tests/test_single_player_runtime.py', 'tests/test_single_local_identity.py',
@@ -37,7 +38,7 @@ PUBLIC_HOSTS = {
     '127.0.0.1', 'localhost', '::1', 'testserver', 'www.w3.org', 'www.nvidia.com',
     'modelscope.cn', 'www.modelscope.cn', 'api.nuget.org', 'pypi.org',
     'files.pythonhosted.org', 'download.pytorch.org', 'download-r2.pytorch.org',
-    'docs.conda.io', 'pytorch.org', 'github.com', 'www.python.org',
+    'docs.conda.io', 'pytorch.org', 'github.com', 'www.python.org', 'huggingface.co',
 }
 
 

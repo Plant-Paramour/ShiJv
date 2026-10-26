@@ -91,10 +91,11 @@ class ModelRunner:
         self._tokenizer = AutoTokenizer.from_pretrained(name, **{k: v for k, v in common.items() if k not in {"device_map"}})
         self.load_telemetry["tokenizer_load_seconds"] = time.perf_counter() - stage_started
         stage_started = time.perf_counter()
+        dtype = torch.float16 if torch.cuda.is_available() else torch.float32
         if quantization in {"none", "fp16", "float16", ""}:
             self._model = model_class.from_pretrained(
                 name,
-                torch_dtype=torch.float16,
+                torch_dtype=dtype,
                 **common,
             )
         elif quantization in {"8bit", "int8", "8"}:

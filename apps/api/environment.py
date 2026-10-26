@@ -101,9 +101,15 @@ def assess_model(model, environment):
     size = max((json.loads(p.read_text(encoding="utf-8")).get("metadata", {}).get("total_size", 0) for p in indexes), default=0)
     if not size:
         size = sum(p.stat().st_size for p in path.glob("*.safetensors")) or sum(p.stat().st_size for p in path.glob("pytorch_model*.bin"))
-    free = environment.get("gpu", {}).get("free_bytes", 0)
     reserve = 1536 * 1024**2
     options = environment.get("quantization", [])
+    if environment.get("cuda") is False:
+        free = environment.get("cpu_memory_available_bytes") or 0
+        if "none" in options and size * 2.6 + reserve < free:
+            return {"quantization": "none", "label": "CPU FP32（原始权重）",
+                    "estimated": True, "note": "CPU 内存估算仅供参考；必须通过实际加载和短推理后才会就绪"}
+        raise ValueError("系统可用内存不足以估算运行此模型所需空间，请关闭其他程序或选择更小模型。")
+    free = environment.get("gpu", {}).get("free_bytes", 0)
     if "none" in options and size * 1.3 + reserve < free:
         precision = "none"
     elif "4bit" in options and size * .35 + reserve < free:

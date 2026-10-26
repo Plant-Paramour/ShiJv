@@ -46,7 +46,18 @@ def probe(mode="core"):
             import torch
             result["cuda"] = torch.cuda.is_available()
             if not result["cuda"]:
-                result["errors"].append("当前本地生成引擎需要 NVIDIA CUDA；未检测到可用 CUDA，仍可使用对话服务")
+                with torch.inference_mode():
+                    operand = torch.ones((32, 32), device="cpu", dtype=torch.float32)
+                    product = operand @ operand
+                    if not bool(torch.all(product == 32).item()):
+                        raise RuntimeError("CPU FP32 矩阵运算结果不正确")
+                result["cpu_operation"] = "fp32_matmul_passed"
+                result["quantization"] = ["none"]
+                try:
+                    import psutil
+                    result["cpu_memory_available_bytes"] = psutil.virtual_memory().available
+                except Exception:
+                    result["cpu_memory_available_bytes"] = None
             else:
                 free, total = torch.cuda.mem_get_info()
                 result["gpu"] = {"name": torch.cuda.get_device_name(0), "free_bytes": free,

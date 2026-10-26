@@ -471,12 +471,12 @@
         </section>
         <form id="local-generator-form" class="profile-panel">
           <h2>本地诗词生成模型</h2>
-          <p class="field-hint">本地生成支持 Qwen3 / Qwen3.5 原始浮点权重，具体取决于所选推理环境能否实际导入对应模型类。需要 NVIDIA CUDA，暂不支持预量化或 GGUF。扫描会列出发现的模型及不可用原因；权重加载、有效输出及约束生成全部通过后才会就绪。</p>
+          <p class="field-hint">本地生成支持 Qwen3 / Qwen3.5 原始浮点权重。可用 CPU FP32 推理，建议使用较小模型；也可使用 NVIDIA CUDA，按显存采用 FP16 或 4bit。暂不支持预量化或 GGUF。扫描会列出发现的模型及不可用原因；权重加载、有效输出及约束生成全部通过后才会就绪。</p>
           <label class="field"><span>扫描目录（留空扫描项目和常用模型缓存）</span><input id="local-model-scan-root" placeholder="例如 D:\Models"></label>
           <button id="local-model-scan" class="quiet-button" type="button">扫描本地模型</button>
           <label class="field"><span>已发现的本地模型</span><select id="local-model-choice"><option value="">请扫描或直接填写目录</option></select></label>
           <label class="field"><span>模型目录</span><input id="local-model-path" placeholder="例如 D:\Models\Qwen3-4B"></label>
-          <p class="field-hint" id="local-model-plan">运行方式由环境、模型与显存检测自动决定，不需要手动选择精度。通过真实调用与约束生成验收后才会标记为就绪。</p>
+          <p class="field-hint" id="local-model-plan">运行方式由环境、模型与硬件检测自动决定，不需要手动选择精度。CPU 推理速度较慢；通过真实调用与约束生成验收后才会标记为就绪。</p>
           <label for="local-model-idle">任务结束后的模型驻留时间</label>
           <select id="local-model-idle"><option value="60">1 分钟</option><option value="300">5 分钟（推荐）</option><option value="600">10 分钟</option><option value="1800">30 分钟</option><option value="0">始终保留，直到停止软件</option></select>
           <p class="field-hint">空闲超时才释放权重；驻留期间复用模型，释放后新任务会自动重新加载。运行中的任务不会被中断。</p>

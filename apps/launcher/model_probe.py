@@ -108,13 +108,14 @@ def main():
             if args.precision == 'none' and result['plan']['quantization'] != 'none':
                 raise ValueError('当前可用显存不足以执行 FP16 验收；未尝试加载，也未宣称 FP16 通过')
             result['plan']['quantization'] = args.precision
-            result['plan']['label'] = '指定 FP16' if args.precision == 'none' else '指定 BNB 4bit'
+            result['plan']['label'] = ('指定 CPU FP32' if not environment.get('cuda') else '指定 FP16') if args.precision == 'none' else '指定 BNB 4bit'
         report('environment', '依赖、CUDA 与模型架构', 'passed', result['plan']['label'])
         from shiju.generation.model_runner import ModelRunner
         from shiju.generation.result import ModelSettings
         from shiju.generation.engine import GenerationEngine
         import torch
-        torch.cuda.reset_peak_memory_stats()
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
         runner = ModelRunner(ModelSettings(str(model), quantization=result['plan']['quantization'], local_files_only=True))
         check_runner(runner, GenerationEngine(runner), report)
         result['ok'] = True
@@ -130,8 +131,8 @@ def main():
                 import psutil
                 import torch
                 memory = psutil.Process().memory_info()
-                result['measurements'] = dict(cuda_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
-                    cuda_peak_reserved_bytes=torch.cuda.max_memory_reserved(), rss_bytes=memory.rss,
+                result['measurements'] = dict(cuda_peak_allocated_bytes=torch.cuda.max_memory_allocated() if torch.cuda.is_available() else None,
+                    cuda_peak_reserved_bytes=torch.cuda.max_memory_reserved() if torch.cuda.is_available() else None, rss_bytes=memory.rss,
                     peak_working_set_bytes=getattr(memory, 'peak_wset', None),
                     elapsed_seconds=time.time() - result['started_at'])
             except Exception as exc:

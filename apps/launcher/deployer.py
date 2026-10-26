@@ -18,7 +18,6 @@ import sys
 import threading
 import time
 import urllib.request
-from urllib.parse import urlencode
 import uuid
 import zipfile
 
@@ -62,8 +61,14 @@ def wheels():
     return read(ROOT / 'deploy/managed-runtime/windows-qwen35-bnb4-wheels.json')
 
 
-def official_model():
-    return read(POLICY / 'model.json')
+def official_model(model_id='Qwen/Qwen3.5-4B'):
+    if model_id == 'Qwen/Qwen3.5-4B':
+        return read(POLICY / 'model.json')
+    models = read(POLICY / 'small-models.json')
+    try:
+        return models[model_id]
+    except KeyError as exc:
+        raise ValueError('请选择工具支持的官方模型') from exc
 
 
 def model_bytes(spec):
@@ -250,12 +255,15 @@ def discover_models(data_directory):
 
 def inspect_selected_model(directory):
     """Existing official weights keep official identity only after full hashing."""
-    try:
-        verify_model(directory, official_model())
-        return dict(route='official', model=official_model(), label='已核验的官方 Qwen3.5-4B，可直接复用')
-    except (OSError, ValueError):
-        spec = local_model(directory)
-        return dict(route='local', model=spec, label=WARNING)
+    for model_id in ('Qwen/Qwen3.5-4B', 'Qwen/Qwen3.5-2B', 'Qwen/Qwen3.5-0.8B'):
+        spec = official_model(model_id)
+        try:
+            verify_model(directory, spec)
+            return dict(route='official', model=spec, label=f'已核验的官方 {model_id.rsplit("-", 1)[-1]}，可直接复用')
+        except (OSError, ValueError):
+            pass
+    spec = local_model(directory)
+    return dict(route='local', model=spec, label=WARNING)
 
 
 def verify_model(model, spec):
@@ -271,8 +279,8 @@ def verify_model(model, spec):
     return root
 
 
-def download_model(directory, operation):
-    spec = official_model()
+def download_model(directory, operation, model_id='Qwen/Qwen3.5-4B'):
+    spec = official_model(model_id)
     directory = Path(directory).resolve()
     missing = sum(v['bytes'] for n, v in spec['files'].items()
                   if not (directory / n).is_file() or (directory / n).stat().st_size != v['bytes']
@@ -281,7 +289,7 @@ def download_model(directory, operation):
     for name, item in spec['files'].items():
         relative_path(name)
         operation.update('下载官方模型', file=name)
-        url = 'https://modelscope.cn/api/v1/models/Qwen/Qwen3.5-4B/repo?' + urlencode(dict(Revision=spec['revision'], FilePath=name))
+        url = f"https://huggingface.co/{spec['model_id']}/resolve/{spec['revision']}/{name}?download=true"
         operation.download(url, directory / name, item['sha256'], item['bytes'])
     operation.update('核验完整模型')
     verify_model(directory, spec)
@@ -332,10 +340,10 @@ def compatibility(host, rules):
     return devices[0]
 
 
-def make_plan(model, route):
+def make_plan(model, route, model_id='Qwen/Qwen3.5-4B'):
     if route not in {'official', 'local'}:
         raise ValueError('未知模型路线')
-    spec = official_model() if route == 'official' else local_model(model)
+    spec = official_model(model_id) if route == 'official' else local_model(model)
     verify_model(model, spec)
     return dict(schema_version=1, kind='shiju-environment-plan', route=route,
                 warning=WARNING if route == 'local' else '官方固定模型；环境仍须在本机真实验证',
@@ -356,7 +364,7 @@ def validate_plan(plan):
     if not isinstance(model, dict) or not isinstance(model.get('files'), dict) or not model['files']:
         raise ValueError('模型文件清单无效')
     if plan.get('route') == 'official':
-        if model != official_model():
+        if model != official_model(model.get('model_id')):
             raise ValueError('官方模型清单与内置固定修订不符')
     elif plan.get('route') == 'local':
         if set(model) != {'model_id', 'revision', 'source_url', 'model_type', 'files'} or model['model_type'] not in {'qwen3', 'qwen3_5'} or model['source_url'] != 'local':
@@ -571,6 +579,7 @@ def main():
     parser.add_argument('action', choices=['inspect', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'diagnostics'])
     parser.add_argument('--model')
     parser.add_argument('--route', choices=['official', 'local'], default='official')
+    parser.add_argument('--model-id', default='Qwen/Qwen3.5-4B')
     parser.add_argument('--plan')
     parser.add_argument('--target')
     parser.add_argument('--cache')
@@ -588,10 +597,10 @@ def main():
             operation.update('检查已有模型文件，请稍候')
             result = inspect_selected_model(args.model)
         elif args.action == 'download':
-            result = dict(model=download_model(args.model, operation))
+            result = dict(model=download_model(args.model, operation, args.model_id))
         elif args.action == 'plan':
             operation.update('核验模型并生成清单')
-            result = make_plan(args.model, args.route)
+            result = make_plan(args.model, args.route, args.model_id)
             compatibility(inspect_host(args.target or args.data_dir), result['hardware'])
             save(args.plan, result)
         elif args.action == 'import':
