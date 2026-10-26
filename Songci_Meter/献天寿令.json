@@ -1,0 +1,43 @@
+{
+  "name": "献天寿令",
+  "aliases": [],
+  "description": "调见《高丽史·乐志》。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 666,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 666,
+      "length_category": "short",
+      "variants_description": "此高丽献仙桃舞队曲也，因所用唐乐，故采之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平平/仄仄/平平",
+          "平平/平仄/仄/平平",
+          "平仄/平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平平仄",
+          "平仄仄、仄仄/仄平",
+          "平平/平仄/仄平平",
+          "平仄/仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

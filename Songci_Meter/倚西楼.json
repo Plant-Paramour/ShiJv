@@ -1,0 +1,42 @@
+{
+  "name": "倚西楼",
+  "aliases": [],
+  "description": "调见《苕溪诗话》，因词有“西楼萧瑟有谁知”句，取以为名。",
+  "default_variant": "韦彦温",
+  "default_variant_source_id": 851,
+  "variants": [
+    {
+      "name": "韦彦温",
+      "source_id": 851,
+      "length_category": "short",
+      "variants_description": "调近《玉楼春》，惟后段结句多两字耳，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "平仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/平仄平",
+          "仄仄/平平/平仄仄",
+          "平平/平仄/仄平平",
+          "平仄/仄仄/仄平/仄仄仄"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "赏松菊",
+  "aliases": [],
+  "description": "调见曹勛《松隐集》。",
+  "default_variant": "曹勛",
+  "default_variant_source_id": 1443,
+  "variants": [
+    {
+      "name": "曹勛",
+      "source_id": 1443,
+      "length_category": "long",
+      "variants_description": "此词系曹勛自度腔，无别首可校。换头“席”字，用中原韵。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/仄平/平仄",
+          "仄/平仄仄",
+          "仄/平平/平仄",
+          "仄仄/平平/仄仄",
+          "仄平仄、平平/仄仄",
+          "仄平平",
+          "仄/平平/仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "仄仄/平平/仄仄",
+          "仄平平、仄平平/平仄",
+          "仄仄/仄平仄",
+          "仄平平/平仄",
+          "仄仄/平平/仄仄",
+          "仄平仄、平平/仄仄",
+          "仄平平",
+          "仄平平",
+          "平/仄仄仄"
+        ]
+      }
+    }
+  ]
+}

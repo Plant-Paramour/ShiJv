@@ -1,0 +1,45 @@
+{
+  "name": "双鸂鶒",
+  "aliases": [],
+  "description": "调见朱敦儒《樵歌词》，因词有“一对双飞鸂鶒”句，故名。元高拭词注“正宫”。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 479,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 479,
+      "length_category": "short",
+      "variants_description": "此调无宋词可校，平仄当遵之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "仄仄/平平/平仄",
+          "平仄/仄平/平仄",
+          "平平/平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄/仄平/平仄",
+          "仄仄/平平/平仄",
+          "平平/平仄/平仄"
+        ]
+      }
+    }
+  ]
+}

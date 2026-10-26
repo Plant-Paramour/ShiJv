@@ -1,0 +1,239 @@
+{
+  "name": "卜算子",
+  "aliases": [],
+  "description": "元高拭词注“仙吕调”。苏轼词有“缺月挂疏桐”句，名《缺月挂疏桐》。秦湛词有“极目烟中百尺楼”句，名《百尺楼》。僧皎词有“目断楚天遥”句，名《楚天遥》。无名氏词有“蹙破眉峰碧”句，名《眉峰碧》。",
+  "default_variant": "苏轼",
+  "default_variant_source_id": 316,
+  "variants": [
+    {
+      "name": "苏轼",
+      "source_id": 316,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若石词之多押两韵，徐、黄、张、杜四词之添字，皆变体也。苏词别首前段第二句“长忆吴山好”，“长”字平声。谱内据之，其余可平可仄，\n悉参下词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "中中/中中平",
+          "中仄/平平仄",
+          "中仄/平平/中中中",
+          "中仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "中中/中中平",
+          "中仄/平平仄",
+          "中仄/平平/中中中",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "石孝友",
+      "source_id": 317,
+      "length_category": "short",
+      "variants_description": "此与苏词同，惟前后段两起句各用韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄仄/平平仄",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄仄/平平仄",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "徐俯",
+      "source_id": 318,
+      "length_category": "short",
+      "variants_description": "此亦苏词体，惟后段起句用韵，结句添一字作折腰句法异。《古杭杂纪》无名氏词前结“把定纤纤手”，后结“瞒不得、桥头柳”，正与此同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄平",
+          "仄仄/平平仄",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "平仄/平平仄",
+          "平仄/平平/仄仄平",
+          "平仄仄、平平仄"
+        ]
+      }
+    },
+    {
+      "name": "黄公度",
+      "source_id": 319,
+      "length_category": "short",
+      "variants_description": "此亦苏词体，惟前段结句作六字折腰句法异。《古今词话》无名氏词前结“终不似、伊家好”，后结“满目围芳草”正与此同。\n按，黄童和此词前段结句“奚止朝朝暮暮”句法又异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "仄仄/平平仄",
+          "平仄/平平/仄仄平",
+          "仄平仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄/平平仄",
+          "平仄/平平/仄仄平",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "张先",
+      "source_id": 320,
+      "length_category": "short",
+      "variants_description": "此亦苏词体，惟前后段两结句俱六字异。杜安世“尊前一曲”词正与此同。\n按黄庭坚此调词前后段两起句“要见不得见，要近不得近”，“禁止不得泪，忍管不得闷”，“见”字、“泪”字俱仄声，连用四“不得”字，皆以入替平之法，因嚯词不入。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平仄平",
+          "仄仄/平平仄",
+          "平仄/平平/仄仄平",
+          "仄仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "平仄/平平仄",
+          "平仄/平平/平仄平",
+          "仄仄仄、平平仄"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 321,
+      "length_category": "short",
+      "variants_description": "此与张词同，惟前后段起句俱用韵异。\n按《玉照新志》“蹙破眉峰”词正与此同，但此词前后段第三句第七字仄声，各家则用平声也。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "仄仄/平平仄",
+          "仄仄/平平/平平仄",
+          "仄仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄平仄",
+          "仄仄/平平仄",
+          "仄仄/平平/仄平仄",
+          "仄仄仄、平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 322,
+      "length_category": "short",
+      "variants_description": "此词见《花草粹编》，《本清湖三塔记》，亦苏词体，惟后段结句七字，添二衬字异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄平",
+          "仄仄/平平仄",
+          "平仄/平平/仄仄平",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "仄仄/平平仄",
+          "仄仄/平平/仄仄平",
+          "平平/仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

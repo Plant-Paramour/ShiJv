@@ -1,0 +1,43 @@
+{
+  "name": "江亭怨",
+  "aliases": [],
+  "description": "《花庵词选》名《清平乐令》。按《冷斋夜话》云：“黄鲁直登荆州亭，见亭柱间有 此词，夜梦一女子云‘有感而作’，鲁直惊悟曰：‘此必吴城小龙女也。’因又名《荆州亭》。”",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 388,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 388,
+      "length_category": "short",
+      "variants_description": "此词无他首可校，平仄亦遵之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/仄仄",
+          "平仄/仄平/平仄",
+          "仄仄/仄平/平",
+          "平仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平/仄仄",
+          "仄仄/平平/平仄",
+          "平仄/仄平平",
+          "仄仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

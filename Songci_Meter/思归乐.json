@@ -1,0 +1,45 @@
+{
+  "name": "思归乐",
+  "aliases": [],
+  "description": "《乐章集》注“林钟商”。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 812,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 812,
+      "length_category": "short",
+      "variants_description": "《词律》误从汲古阁本，后段结句脱一字，今从《花草粹编》校正，平仄无他首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平/平仄仄",
+          "平仄仄、平平/平仄",
+          "仄仄/仄平/平仄仄",
+          "仄仄仄、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄仄、仄平/平仄",
+          "仄仄/仄平/平仄仄",
+          "仄仄平、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

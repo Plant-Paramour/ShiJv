@@ -1,0 +1,40 @@
+{
+  "name": "醉吟商",
+  "aliases": [],
+  "description": "姜夔自序云：“石湖老人为予言，琵琶有四曲，今不传矣，曰《濩索·凉州》、《转关·绿腰》、《醉吟商·胡渭州》、《历絃·薄媚》也。予每念之。辛亥夏，谒杨廷秀于金陵邸中，遇琵琶工，解作《醉吟商·胡渭州》，因求",
+  "default_variant": "姜夔",
+  "default_variant_source_id": 89,
+  "variants": [
+    {
+      "name": "姜夔",
+      "source_id": 89,
+      "length_category": "short",
+      "variants_description": "此调平仄无他首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄仄/平平/平仄",
+          "平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

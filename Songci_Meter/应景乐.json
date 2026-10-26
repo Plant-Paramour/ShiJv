@@ -1,0 +1,54 @@
+{
+  "name": "应景乐",
+  "aliases": [],
+  "description": "词见《花草粹编》。",
+  "default_variant": "萧回",
+  "default_variant_source_id": 1181,
+  "variants": [
+    {
+      "name": "萧回",
+      "source_id": 1181,
+      "length_category": "medium",
+      "variants_description": "此词《花草粹编》所载，疑有脱误，今从蕉雪堂钞本。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          8
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄仄/平平、仄仄/平仄仄",
+          "平平仄",
+          "平平/仄平仄",
+          "仄平平/仄仄",
+          "平仄/仄仄",
+          "仄仄/平平/平仄",
+          "平平/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平仄/仄平仄",
+          "仄仄仄、仄仄/平平",
+          "仄仄/仄仄仄",
+          "平仄/平仄",
+          "平仄/平平",
+          "平仄/平仄",
+          "平仄/仄平平",
+          "平仄/仄平仄"
+        ]
+      }
+    }
+  ]
+}

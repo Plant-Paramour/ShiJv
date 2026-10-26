@@ -1,0 +1,44 @@
+{
+  "name": "落梅风",
+  "aliases": [],
+  "description": "调见《梅苑》。按《梅苑》别有《落梅风》长调二首，俱一百六字，因《花草粹编》名《落梅》，亦名《落梅慢》，另编一体，不为类列。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 387,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 387,
+      "length_category": "short",
+      "variants_description": "此词见《梅苑》，字多脱误，今照《词鹄》订定，其平仄无别首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "平平/仄仄/平平",
+          "仄平/仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平平/仄仄/平平",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

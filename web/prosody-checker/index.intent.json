@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "sourcePrompt": "在前端对话中以诗词生成进度承载可展开的候选详情；成稿与个人中心复用卷轴视觉，并根据诗句横向自然宽度在横卷与竖卷间切换。",
+  "brief": "面向中文诗词创作者的应用界面；以可检查的候选生成过程和易读的成稿卷轴为重点；卷轴方向由内容宽度决定，竖卷保留两侧空白；采用当代宋韵式转译、song 主题和视觉强度 1。",
+  "intent": {
+    "keywords": ["quiet", "restrained", "chinese-inspired"],
+    "confidence": "high",
+    "rationale": "用户明确要求简约、适量使用中国风视觉语言，并强调切莫过犹不及。"
+  },
+  "interpretation": {
+    "intensity": 1,
+    "mode": "contemporary-chinese-inspired"
+  },
+  "constraints": {
+    "hard": [
+      {
+        "id": "intensity-cap",
+        "metric": "visualIntensity",
+        "operator": "lte",
+        "value": 1,
+        "reason": "克制方向不应进入强装饰或戏剧化表达。"
+      },
+      {
+        "id": "accent-family-cap",
+        "metric": "accentColorFamilies",
+        "operator": "lte",
+        "value": 1,
+        "reason": "朱红是唯一品牌装饰强调，避免多种强调色争夺注意力。"
+      },
+      {
+        "id": "entry-motion-off",
+        "metric": "entryAnimations",
+        "operator": "eq",
+        "value": 0,
+        "reason": "不使用入场或滚动揭示动画，保持页面安静稳定。"
+      }
+    ],
+    "soft": [
+      "宣纸大面、墨色结构与少量朱红应形成清晰主次。",
+      "书法联想字体只用于品牌和短标题，应用正文保持易读。",
+      "传统装饰不得遮挡或削弱注册、对话、检测与论坛的主要任务。",
+      "先计算横向排版所需的自然宽度与可用宽度之比；超过 2:3 时使用竖卷，否则唐诗优先每行并列两句。竖卷在两侧保留明显留白。",
+      "卷轴标题、评分与检查按钮共用紧凑页眉；正文句间不添加额外网格间距，页脚仅保留操作和时间所需高度。",
+      "对话完成结果与个人中心作品复用同一套响应式卷轴结构。"
+    ]
+  }
+}

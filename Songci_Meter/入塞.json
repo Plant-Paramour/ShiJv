@@ -1,0 +1,108 @@
+{
+  "name": "入塞",
+  "aliases": [],
+  "description": "古乐府横吹曲有《入塞辞》，调名本此。",
+  "default_variant": "程垓",
+  "default_variant_source_id": 640,
+  "variants": [
+    {
+      "name": "程垓",
+      "source_id": 640,
+      "length_category": "short",
+      "variants_description": "《书舟词》只此一词，宋词亦无别首可校。\n前后段两结句俱押叠韵，当是体例，填者遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "仄平平、仄仄平",
+          "仄/平平/仄仄",
+          "仄仄/仄/平平",
+          "平仄平",
+          "仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/平平/仄仄平",
+          "仄仄平、平仄/仄平",
+          "平平/平仄/仄平平",
+          "平仄平",
+          "仄仄平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                6,
+                2
+              ],
+              "end": [
+                6,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                4,
+                2
+              ],
+              "end": [
+                4,
+                3
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

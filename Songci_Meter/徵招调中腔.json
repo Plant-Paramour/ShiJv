@@ -1,0 +1,44 @@
+{
+  "name": "徵招调中腔",
+  "aliases": [],
+  "description": "唐段安节《乐府杂录》云，徵音有其声而无其字。宋《大晟乐府》始补《徵招》调。凡曲有歌头，有中腔，此《徵招》调之中腔也。",
+  "default_variant": "王安中",
+  "default_variant_source_id": 782,
+  "variants": [
+    {
+      "name": "王安中",
+      "source_id": 782,
+      "length_category": "short",
+      "variants_description": "按宋姜夔制《征招》调，今周密、张炎集中有之，然与此词不同，故不类列。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄仄、平平/平仄",
+          "仄仄/仄平/仄平平",
+          "仄仄平",
+          "仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄仄、平平/平仄",
+          "仄仄/仄平/仄平平",
+          "平仄/仄仄/仄平仄"
+        ]
+      }
+    }
+  ]
+}

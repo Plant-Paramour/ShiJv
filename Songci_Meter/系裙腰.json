@@ -1,0 +1,129 @@
+{
+  "name": "系裙腰",
+  "aliases": [],
+  "description": "调见张先词集。宋媛魏氏词名《芳草渡》。",
+  "default_variant": "张先",
+  "default_variant_source_id": 901,
+  "variants": [
+    {
+      "name": "张先",
+      "source_id": 901,
+      "length_category": "medium",
+      "variants_description": "此词前后段第三句及换头句，俱用仄声字住，不押韵。其第四句俱作四字句，各用一衬字，不独后段第五句多一“问”字为衬字也。\n按此调宋词甚少，故此词平仄即参刘、魏二词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平/中仄/仄平平",
+          "平中仄、仄平平",
+          "平平/中仄/中平中",
+          "仄/中中平",
+          "仄中仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "仄中/中中/中中中",
+          "平中仄、仄平平",
+          "中平/中仄/中平中",
+          "仄仄/中平",
+          "仄中/中仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "刘儗",
+      "source_id": 902,
+      "length_category": "medium",
+      "variants_description": "此与张词同，惟前后段第三句及换头句用韵，第四句各减一字异。至后段第三句“遭逢著”三字亦衬字也，减此三字即与前“风儿”句同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          6
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平平仄、仄平平",
+          "平平/仄仄/平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/仄仄/仄平平",
+          "平平仄、仄平平",
+          "平平仄、仄平/仄仄/平平",
+          "仄平平",
+          "仄平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "宋媛魏氏",
+      "source_id": 903,
+      "length_category": "short",
+      "variants_description": "此词句读整齐，惟前后段第四句不用韵，与前两词异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平仄仄、仄平平",
+          "平平/平仄/仄平平",
+          "平仄仄",
+          "仄平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "仄平/仄仄/仄平平",
+          "平仄仄、仄平平",
+          "仄平/平仄/仄平平",
+          "仄仄仄",
+          "仄仄仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

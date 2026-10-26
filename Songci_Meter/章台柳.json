@@ -1,0 +1,84 @@
+{
+  "name": "章台柳",
+  "aliases": [],
+  "description": "唐韩翃制，以首句为调名。",
+  "default_variant": "韩翃",
+  "default_variant_source_id": 54,
+  "variants": [
+    {
+      "name": "韩翃",
+      "source_id": 54,
+      "length_category": "short",
+      "variants_description": "起二句亦可不用叠句，观柳氏作可见。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平中仄",
+          "平平仄",
+          "仄仄/平平/中中仄",
+          "仄仄/平平/仄仄平",
+          "仄中/平中/中平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "唐妓柳氏",
+      "source_id": 55,
+      "length_category": "short",
+      "variants_description": "此词起句不用韵。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄平",
+          "平平仄",
+          "仄仄/平平/仄平仄",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平/仄平仄"
+        ]
+      }
+    }
+  ]
+}

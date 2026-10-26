@@ -1,0 +1,380 @@
+{
+  "name": "东坡引",
+  "aliases": [],
+  "description": "此调前后段两结，宋人类用叠句，惟曹冠、袁去华词二首独无，旧谱遗之，今并增定。",
+  "default_variant": "曹冠",
+  "default_variant_source_id": 474,
+  "variants": [
+    {
+      "name": "曹冠",
+      "source_id": 474,
+      "length_category": "short",
+      "variants_description": "此调采词五体，无叠句者两体，有叠句者三体。曹词换头第三句六字折腰。袁词七字折腰。赵词换头与曹词同。辛词换头一首与曹词同而起句多一字，一首与袁词同而句法不作上三下四，其余则无不同也。故此词可平可仄即校后词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/平仄仄",
+          "平中/中平仄",
+          "平平/仄仄/平平仄",
+          "中平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "中中/中仄",
+          "中中仄、平平仄",
+          "中平/仄仄/平平仄",
+          "平平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "袁去华",
+      "source_id": 475,
+      "length_category": "short",
+      "variants_description": "此与曹词同，惟后段第三句添一字作七字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄仄",
+          "平平/仄平仄",
+          "平平/仄仄/平平仄",
+          "平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄/平仄、平仄/平仄",
+          "平平/仄仄/平平仄",
+          "平平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "赵师侠",
+      "source_id": 476,
+      "length_category": "short",
+      "variants_description": "此词前后段两结俱有叠句。汲古阁本于前段脱一叠句，《词律》因之，今从《花草粹编》校定。\n赵词凡三首，字句悉同，平仄亦如一。辛弃疾“君如梁上燕”词，赵长卿“茅斋无客”词正与此同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "平平/仄平仄",
+          "平平/仄仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平仄/平仄",
+          "仄仄仄、平平仄",
+          "平平/仄仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                5
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                1
+              ],
+              "end": [
+                6,
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "辛弃疾",
+      "source_id": 477,
+      "length_category": "medium",
+      "variants_description": "此与赵词同，惟后段起句五字异。《图谱》于“夜深拜半”点句者误。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/平仄仄",
+          "平平/仄平仄",
+          "平平/仄仄/平平仄",
+          "仄平/平仄仄",
+          "仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平/仄仄仄",
+          "仄平/平仄",
+          "仄仄仄、平平仄",
+          "仄平/仄仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                5
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                1
+              ],
+              "end": [
+                6,
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "辛弃疾",
+      "source_id": 478,
+      "length_category": "medium",
+      "variants_description": "此亦与赵词同，惟后段第三句七字异。或疑此词前段第二句平仄小异，按赵长卿词“冰砚冻寒泚”正与此同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "平仄/平平仄",
+          "平平/仄仄/平平仄",
+          "仄平/平仄仄",
+          "仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平/平平/仄平仄",
+          "平平/仄仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                5
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                5
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                1
+              ],
+              "end": [
+                6,
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

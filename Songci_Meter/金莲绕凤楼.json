@@ -1,0 +1,45 @@
+{
+  "name": "金莲绕凤楼",
+  "aliases": [],
+  "description": "调见《花草粹编》。此宋徽宗观灯词也，故名《金莲绕凤楼》。",
+  "default_variant": "宋徽宗",
+  "default_variant_source_id": 760,
+  "variants": [
+    {
+      "name": "宋徽宗",
+      "source_id": 760,
+      "length_category": "short",
+      "variants_description": "前后段字句整齐，惟后段起句较前段起句减一字，所谓换头者，非添字即减字也。平仄无别词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平平仄",
+          "平/仄仄、平平/平仄",
+          "仄平/平仄/平平仄",
+          "仄/平平、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄平/仄仄",
+          "平仄仄、平平/仄仄",
+          "仄平/平仄/平平仄",
+          "平平平、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

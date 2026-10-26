@@ -1,0 +1,100 @@
+{
+  "name": "倒垂柳",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "杨无咎",
+  "default_variant_source_id": 1199,
+  "variants": [
+    {
+      "name": "杨无咎",
+      "source_id": 1199,
+      "length_category": "medium",
+      "variants_description": "此调惟《逃禅集》有词二首，无别首宋词可校，平仄参下“南州初会”词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "中平/平仄仄",
+          "仄平平、中仄仄",
+          "中/中平/中仄",
+          "平仄/仄平仄",
+          "中平/中中仄",
+          "中仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄/中仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平平/中仄",
+          "仄仄/平平/平仄仄",
+          "仄仄/仄平平",
+          "仄仄/仄平仄",
+          "平中/仄中",
+          "平仄/平中仄",
+          "平平/平仄",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "杨无咎",
+      "source_id": 1200,
+      "length_category": "medium",
+      "variants_description": "此与“晓来烟露”词同，惟前段起句用韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "仄平平、仄仄仄",
+          "平平/平平仄",
+          "平仄/仄平仄",
+          "仄平/平仄仄",
+          "仄仄/平平仄",
+          "平平/平仄仄",
+          "平平/平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄仄/平平/平仄仄",
+          "仄仄/仄平平",
+          "仄仄/仄平仄",
+          "平平/仄仄",
+          "平仄/平平仄",
+          "平平/平仄",
+          "仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

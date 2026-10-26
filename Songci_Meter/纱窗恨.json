@@ -1,0 +1,79 @@
+{
+  "name": "纱窗恨",
+  "aliases": [],
+  "description": "唐教坊曲名。毛文锡词有“月照纱窗，恨依依”句，取以为名。",
+  "default_variant": "毛文锡",
+  "default_variant_source_id": 257,
+  "variants": [
+    {
+      "name": "毛文锡",
+      "source_id": 257,
+      "length_category": "short",
+      "variants_description": "此词前段起句乃间入仄韵，非本韵也。《词律》于第二句注“换平”者误。谱内可平可仄参校下词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平",
+          "仄平/中仄/平平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平仄、仄/中平仄",
+          "中中中、中仄/平平",
+          "仄仄/平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "毛文锡",
+      "source_id": 258,
+      "length_category": "short",
+      "variants_description": "此词后段第三句较前词多一字，宋词谓之添字，元曲谓之衬字。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平",
+          "仄平/仄仄/平平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平仄、仄/平平仄",
+          "仄仄平、平仄/平平",
+          "仄仄/平平仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

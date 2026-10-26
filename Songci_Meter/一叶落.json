@@ -1,0 +1,66 @@
+{
+  "name": "一叶落",
+  "aliases": [],
+  "description": "《五代史》云：“后唐庄宗能自度曲。”此其一也。取首句为调名。",
+  "default_variant": "后唐庄宗",
+  "default_variant_source_id": 106,
+  "variants": [
+    {
+      "name": "后唐庄宗",
+      "source_id": 106,
+      "length_category": "short",
+      "variants_description": "此词第六句，即叠字第五句，亦是和声，填者宜遵之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "仄仄仄",
+          "平平仄",
+          "仄平/仄仄/仄平仄",
+          "仄平/仄仄平",
+          "平平/平平仄",
+          "平平仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠字",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                5,
+                5
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                6,
+                1
+              ],
+              "end": [
+                6,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

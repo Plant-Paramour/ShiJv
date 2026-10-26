@@ -1,0 +1,203 @@
+{
+  "name": "锦帐春",
+  "aliases": [],
+  "description": "调见《稼轩集》。因词有“春色难留”及“重帘不卷，翠屏天远”句，故名。",
+  "default_variant": "辛弃疾",
+  "default_variant_source_id": 885,
+  "variants": [
+    {
+      "name": "辛弃疾",
+      "source_id": 885,
+      "length_category": "medium",
+      "variants_description": "此调以辛词、程词为正体，若戴词、丘词之减字，皆变体也。但宋词只此四首，故此词可平可仄即参后列三词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "lines": [
+          "中仄/平平",
+          "中平/中仄",
+          "仄中仄/平平/中仄",
+          "仄平平",
+          "平仄仄",
+          "仄中平/中仄",
+          "中平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄中仄/中平/中仄",
+          "仄平平",
+          "平仄仄",
+          "仄中平/中仄",
+          "中平/中仄"
+        ]
+      }
+    },
+    {
+      "name": "程珌",
+      "source_id": 886,
+      "length_category": "medium",
+      "variants_description": "此与辛词同，惟前后段第六句俱不押韵异。\n汲古阁本此词误刻《锦堂春》，《词律》犹沿其误，类列《锦堂春》后，今从《花草粹编》校正。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          7
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄仄仄、平平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄仄仄、平平/仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄仄平/仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                7
+              ],
+              "end": [
+                3,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                5,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "戴复古",
+      "source_id": 887,
+      "length_category": "short",
+      "variants_description": "此亦与辛词同，惟前后段第四、五句作五字一句，各减去一字异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平平/仄仄",
+          "仄平仄/平平/平仄",
+          "仄仄平/平仄",
+          "仄仄平/平仄",
+          "平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄仄仄、仄平/平仄",
+          "仄平平/仄仄",
+          "仄仄平平/仄",
+          "仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "邱崈",
+      "source_id": 888,
+      "length_category": "short",
+      "variants_description": "此亦与辛词同，惟前后段第四、五句减去一字，第六句又各减去一字异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄平仄、平平/仄仄",
+          "仄平平/平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄仄仄、平平/仄仄",
+          "仄平平/仄仄",
+          "仄平/平仄",
+          "平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

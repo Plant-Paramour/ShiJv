@@ -1,0 +1,51 @@
+{
+  "name": "拾翠羽",
+  "aliases": [],
+  "description": "《洛神赋》：“或拾翠羽”，调名取此。",
+  "default_variant": "张孝祥",
+  "default_variant_source_id": 1021,
+  "variants": [
+    {
+      "name": "张孝祥",
+      "source_id": 1021,
+      "length_category": "medium",
+      "variants_description": "此词见《于湖集》，无宋人别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/仄平/平仄",
+          "仄平平、仄平/平仄",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄仄",
+          "平仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平仄/仄平/平仄",
+          "仄平平、仄平/平仄",
+          "平平/平仄",
+          "仄平/平仄",
+          "平仄平",
+          "平仄/仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

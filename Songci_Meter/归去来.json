@@ -1,0 +1,81 @@
+{
+  "name": "归去来",
+  "aliases": [],
+  "description": "调见《乐章集》词二首。因词有“歌筵舞、且归去”、“休惆怅、好归去”句，取以为名。四十九字者自注“正平调”，五十二字者自注“中吕宫”。按《唐书·乐志》， 仲吕羽为正平调，夹钟羽为中吕调，燕乐七羽之二也。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 491,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 491,
+      "length_category": "short",
+      "variants_description": "此调祇有柳词二首，无宋元词可校。虽前段第三、四句，后段第二、三、四句，两调相同，但自注宫调，恐乖律吕，不必参校平仄。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平/平仄",
+          "平仄/平/平仄",
+          "平仄/平平/平平仄",
+          "平平仄、仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "平平仄、仄平/平仄",
+          "平平/仄仄/平平仄",
+          "平平仄、仄平仄"
+        ]
+      }
+    },
+    {
+      "name": "柳永",
+      "source_id": 492,
+      "length_category": "short",
+      "variants_description": "此即前词体，惟前段起句减一字作五字句，第二句添二字作上三下四七字句，后段起句添二字作七字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "平平仄、仄平/平仄",
+          "平平/仄仄/平平仄",
+          "仄平平、平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平仄、仄平/平仄",
+          "平平/仄仄/平平仄",
+          "平平仄、仄平仄"
+        ]
+      }
+    }
+  ]
+}

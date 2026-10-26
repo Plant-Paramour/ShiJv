@@ -1,0 +1,38 @@
+{
+  "name": "蕃女怨",
+  "aliases": [],
+  "description": "唐温庭筠二词，俱咏蕃女之怨，故词中有“雁门沙碛”诸语。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 105,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 105,
+      "length_category": "short",
+      "variants_description": "此调四仄韵，结换二平韵，温词二首并同。其起句“已”字，第二句“雨”字，例用仄声。温词别首“碛南沙上惊雁起，飞雪千里”，“雁”字、“雪”字俱仄声，旧谱注“可平”者误，惟第二句“飞雪千里”，“飞”字，第五句“年年爭战”，上“年” 字，可用平声也。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "rhyme_2_positions": [
+          6,
+          7
+        ],
+        "lines": [
+          "仄平/平仄/平仄仄",
+          "中仄/平仄",
+          "仄平平",
+          "平仄仄",
+          "中平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

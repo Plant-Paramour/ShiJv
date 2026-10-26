@@ -1,0 +1,45 @@
+{
+  "name": "朝天子",
+  "aliases": [],
+  "description": "唐教坊曲名。《阳春集》名《思越人》。",
+  "default_variant": "晁补之",
+  "default_variant_source_id": 378,
+  "variants": [
+    {
+      "name": "晁补之",
+      "source_id": 378,
+      "length_category": "short",
+      "variants_description": "此调祇有杨无咎词可校。杨词前段第二句“占螺浦、山川夷旷”，“占”字仄声，“螺”字、“山”字俱平声。第三句“千奇万状”，“奇”字平声。第四句“见云烟收放”，“云”字平声。后段第四句“徙倚抚、危阑吟望”，“倚”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "中中仄、中平/平仄",
+          "平中/仄仄",
+          "仄中平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄仄、平平/平仄仄",
+          "仄仄/平平/平仄仄",
+          "平仄仄",
+          "仄中仄、平平/平仄"
+        ]
+      }
+    }
+  ]
+}

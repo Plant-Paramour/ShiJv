@@ -1,0 +1,30 @@
+{
+  "name": "采莲子",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "皇甫松",
+  "default_variant_source_id": 77,
+  "variants": [
+    {
+      "name": "皇甫松",
+      "source_id": 77,
+      "length_category": "short",
+      "variants_description": "此亦七言绝句。其“举棹”、“年少”乃歌时相和之声，与《竹枝》体同。但《竹枝》以“竹枝”二字和于句中，“女儿”二字和于句尾，此则一句一和声耳。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          7
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄平/仄仄/平平仄",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

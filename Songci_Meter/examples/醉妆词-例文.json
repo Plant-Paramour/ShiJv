@@ -1,0 +1,105 @@
+{
+  "name": "醉妆词",
+  "variants": [
+    {
+      "name": "王衍",
+      "source_id": 14,
+      "stanza1": {
+        "lines": [
+          "者边走",
+          "那边走",
+          "只是/寻花柳",
+          "那边走",
+          "者边走",
+          "莫厌/金杯酒"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "name": "盐角儿",
+  "aliases": [],
+  "description": "《碧鸡漫志》云：“始教坊家人市盐，于纸角中，得一曲谱，翻之，遂以为名，今双调《盐角儿令》是也。”",
+  "default_variant": "晁补之",
+  "default_variant_source_id": 561,
+  "variants": [
+    {
+      "name": "晁补之",
+      "source_id": 561,
+      "length_category": "short",
+      "variants_description": "此调只晁补之一词，无别可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄平/仄仄",
+          "平平/平仄",
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄平平",
+          "平平仄",
+          "平平/仄平平/平仄",
+          "仄平仄、平平/仄仄",
+          "平仄/仄平/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                4
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

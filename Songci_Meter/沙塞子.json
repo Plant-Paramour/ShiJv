@@ -1,0 +1,145 @@
+{
+  "name": "沙塞子",
+  "aliases": [],
+  "description": "唐教坊曲名。一名《沙碛子》。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 281,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 281,
+      "length_category": "short",
+      "variants_description": "此词前后段字句相同，朱词二首皆然。《花草粹编》刻此词，后段第二句落一“远” 字，今从《词纬》增定。\n朱词别首后段第二句“莫作楚囚相泣”，“楚”字仄声。第二句“倾银汉”，“银” 字平声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄仄/仄平/平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/中平/平仄",
+          "平中仄",
+          "仄平平",
+          "平仄/平平/平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "葛立方",
+      "source_id": 282,
+      "length_category": "short",
+      "variants_description": "《词律》于前段第三句，脱去“涧”字，今从《词纬》增定。按此词两起句用韵，第二句以下较朱词各添一字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平",
+          "仄仄仄、平平/仄平",
+          "平仄仄、仄平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄仄仄、平平/仄平",
+          "平平仄、仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "周紫芝",
+      "source_id": 283,
+      "length_category": "short",
+      "variants_description": "此词前起作七字句，比葛词多一字，周紫芝二首皆然。\n周词别首前段第一句“秋云微淡月微羞”，“秋”字平声。第二句“云黯黯月彩难留”，“云”字平声，“黯”字、“月”字俱仄声。第三句“只应是嫦娥心里”，“嫦”字平声。后段第二句“人共月同上南楼”，“人”字平声。第三句 “却重听画阑西角”，“却”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/平仄/仄平平",
+          "中中仄、中仄/平平",
+          "仄平仄、中平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "中仄仄、平仄/平平",
+          "中平仄、仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "赵彦端",
+      "source_id": 284,
+      "length_category": "short",
+      "variants_description": "此词用仄韵，其字句与葛立方平韵词同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄仄仄、平平/仄仄",
+          "仄平平、仄仄/平平",
+          "平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平仄仄",
+          "仄平仄、平平/仄仄",
+          "仄平平、仄平/平仄",
+          "平平/平仄"
+        ]
+      }
+    }
+  ]
+}

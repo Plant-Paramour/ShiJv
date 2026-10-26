@@ -1,0 +1,53 @@
+{
+  "name": "南州春色",
+  "aliases": [],
+  "description": "调见元陶豰《辍耕录》，因词中有“管取南州春色”句，取以为名。",
+  "default_variant": "汪梅溪",
+  "default_variant_source_id": 1231,
+  "variants": [
+    {
+      "name": "汪梅溪",
+      "source_id": 1231,
+      "length_category": "medium",
+      "variants_description": "《花草粹编》有此词，采之《辍耕录》，为汪梅溪作，元人也。其名无考，其平仄亦无别词可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "平平仄",
+          "仄平平",
+          "平平/平仄",
+          "仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "仄仄/仄平平",
+          "仄仄/平平/仄仄",
+          "平平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6,
+          8
+        ],
+        "lines": [
+          "仄仄/平平/仄仄",
+          "平平/仄仄",
+          "平仄/平平",
+          "平仄/平平",
+          "平平/平仄",
+          "平仄仄、平仄/平平",
+          "仄仄/平平平仄",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

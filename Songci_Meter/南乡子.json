@@ -1,0 +1,308 @@
+{
+  "name": "南乡子",
+  "aliases": [],
+  "description": "唐教坊曲名。此词有单调、双调。单调者始自欧阳炯词，冯延巳、李珣俱本此添字。双调者始自冯延巳词。《太和正音谱》注“越调”。欧阳修本此减字，王之道、黄机、赵长卿俱本此添字也。",
+  "default_variant": "欧阳炯",
+  "default_variant_source_id": 58,
+  "variants": [
+    {
+      "name": "欧阳炯",
+      "source_id": 58,
+      "length_category": "short",
+      "variants_description": "此词单遍，平仄两韵，与宋人两段全押平韵者异。其可平可仄，即参谱内诸词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平",
+          "中中/中中/仄中平",
+          "中仄/中平/平中仄",
+          "平仄",
+          "中仄/中平/中仄仄"
+        ]
+      }
+    },
+    {
+      "name": "欧阳炯",
+      "source_id": 59,
+      "length_category": "short",
+      "variants_description": "此与“画舸停桡”词同，惟第四句添一字。欧词六首，与此悉同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "平平仄",
+          "仄仄/平平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 60,
+      "length_category": "short",
+      "variants_description": "此与欧阳炯“画舸停桡”词同，惟起句添一字。按《阳春集》冯词二首悉同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平仄/仄平/平仄仄",
+          "平仄",
+          "仄仄/平平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "李珣",
+      "source_id": 61,
+      "length_category": "short",
+      "variants_description": "此亦与欧阳炯“路入南中”词同，惟起作三字两句异。唐人知音律，类能添字，此即宋词衬字所自出也。\n按《花间集》李词十首，其别首第一句“栊云髻”，“栊”字仄声，“云”字平声。第四句“回塘深处遥相见”，“回”、“塘”二字俱平声，“处”字仄声，“相”字平声。第五句“爭窈窕”，“窈”字仄声，又“送春浦”，“送”字仄声，结句“缓唱棹歌极浦去”，“缓”字、“极”字俱仄声，谱内可平可仄据此。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "中中仄",
+          "仄平平",
+          "仄平/平仄/仄平平",
+          "中中/平中/平中仄",
+          "中中仄",
+          "中仄/仄平/中仄仄"
+        ]
+      }
+    },
+    {
+      "name": "欧阳修",
+      "source_id": 62,
+      "length_category": "short",
+      "variants_description": "此即欧阳炯“画舸停桡”词体再加一叠，惟第四、五句仍用平韵耳。按欧集三词悉同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平/平仄仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/平平/仄仄平",
+          "平仄/仄平/平仄仄",
+          "平平",
+          "平仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 63,
+      "length_category": "short",
+      "variants_description": "此即“细雨湿秋风”词体再加一叠，只第四、五句仍用平韵耳。宋元人俱如此填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平仄/仄平/平仄仄",
+          "平平",
+          "平仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/仄平/平仄仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "王之道",
+      "source_id": 64,
+      "length_category": "short",
+      "variants_description": "此即“细雨湿流光”词体，惟前后段第三、四句作四字一句、五字一句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平仄/平平",
+          "平仄/仄平平",
+          "仄仄平/平仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/仄平",
+          "平仄/仄平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "黄机",
+      "source_id": 65,
+      "length_category": "short",
+      "variants_description": "此亦“细雨湿流光”词体，惟前后段第三句添一字，作四字两句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平仄/仄平",
+          "平平/仄仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/仄平",
+          "平平/仄仄",
+          "平平",
+          "平仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "赵长卿",
+      "source_id": 66,
+      "length_category": "short",
+      "variants_description": "此亦“细雨湿流光”词体，惟前后段第二句添一字，作四字两句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "平平/仄仄",
+          "平仄/平平",
+          "仄仄/平平/平仄仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平平/仄仄",
+          "仄仄/平平",
+          "平仄/仄平/平仄仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

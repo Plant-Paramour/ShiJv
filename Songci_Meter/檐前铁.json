@@ -1,0 +1,49 @@
+{
+  "name": "檐前铁",
+  "aliases": [],
+  "description": "调见《古今词话》。因词中有“檐前铁马戛叮噹”句，故名。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 1054,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 1054,
+      "length_category": "medium",
+      "variants_description": "此见宋杨湜《古今词话》，无别首宋词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "仄平平",
+          "仄仄/平平",
+          "平平/仄仄",
+          "仄平平、仄仄/仄平平",
+          "平仄/仄平/平仄",
+          "平平仄",
+          "平平仄",
+          "仄仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "平平仄、仄平平",
+          "仄仄/平平/平仄",
+          "平平仄、仄平/平仄/平平仄",
+          "仄仄/平平",
+          "仄仄/仄平平",
+          "平仄仄"
+        ]
+      }
+    }
+  ]
+}

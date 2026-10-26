@@ -1,0 +1,52 @@
+{
+  "name": "惜琼花",
+  "aliases": [],
+  "description": "调见张先词集，为吴兴守时所赋也。",
+  "default_variant": "张先",
+  "default_variant_source_id": 868,
+  "variants": [
+    {
+      "name": "张先",
+      "source_id": 868,
+      "length_category": "medium",
+      "variants_description": "《花草粹编》后段第三、四句“任轻似叶，计归得”，脱“身”字、“何”字，今从本集校正。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          7
+        ],
+        "lines": [
+          "平平仄",
+          "平仄仄",
+          "仄平/平仄仄",
+          "平仄/平仄",
+          "仄平/平仄/平平仄",
+          "平仄/平平",
+          "平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5,
+          7
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄平/平仄仄",
+          "平仄/平仄",
+          "仄平/平仄/平平仄",
+          "平仄/平平",
+          "平仄/平仄"
+        ]
+      }
+    }
+  ]
+}

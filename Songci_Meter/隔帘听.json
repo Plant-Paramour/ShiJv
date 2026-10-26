@@ -1,0 +1,56 @@
+{
+  "name": "隔帘听",
+  "aliases": [],
+  "description": "唐教坊曲名。《乐章集》注“林钟商”。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 1091,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 1091,
+      "length_category": "medium",
+      "variants_description": "坊刻与“梳妆早”句分段，今照《花草粹编》校正，其平仄无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "仄仄/平平仄",
+          "平平/仄仄/平平仄",
+          "仄仄仄/平平",
+          "仄平/仄仄",
+          "仄仄仄",
+          "仄平平、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8
+        ],
+        "lines": [
+          "平平仄",
+          "平平/平仄",
+          "仄仄/平平仄",
+          "平平/仄仄/平平仄",
+          "仄仄平/平仄",
+          "仄平/平仄",
+          "仄平仄",
+          "平平仄、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

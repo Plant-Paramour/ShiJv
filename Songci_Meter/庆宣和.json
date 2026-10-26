@@ -1,0 +1,33 @@
+{
+  "name": "庆宣和",
+  "aliases": [],
+  "description": "元张可久《小山乐府》自注“双调”。按《唐书·礼乐志》，双调乃夹钟之商声也。",
+  "default_variant": "张可久",
+  "default_variant_source_id": 15,
+  "variants": [
+    {
+      "name": "张可久",
+      "source_id": 15,
+      "length_category": "short",
+      "variants_description": "此元人小令，亦名《叶儿乐府》。即元曲所自始也。因仿明杨慎《词林万选》例，择其尤雅者，采入以备一体。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄仄/平平",
+          "仄仄/平平/仄平平",
+          "仄仄",
+          "仄仄"
+        ]
+      }
+    }
+  ]
+}

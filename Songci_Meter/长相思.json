@@ -1,0 +1,363 @@
+{
+  "name": "长相思",
+  "aliases": [],
+  "description": "唐教坊曲名。林逋词有“吴山青”句，名《吴山青》。张辑词有“江南山渐青”句， 名《山渐青》。王行词名《青山相送迎》。《乐府雅词》名《长相思令》，又名《相思令》。",
+  "default_variant": "白居易",
+  "default_variant_source_id": 158,
+  "variants": [
+    {
+      "name": "白居易",
+      "source_id": 158,
+      "length_category": "short",
+      "variants_description": "此调以此词及欧词为正体，其余押韵异同，皆变格也。\n此词前后段起二句俱用叠韵，如冯延巳词之“红满枝，绿满枝”、“忆归期，数归期”，张辑词之“山无情，水无情”、“拟行行，重行行”皆照此填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中中平",
+          "仄中平",
+          "平仄/平平/仄仄平",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平平",
+          "中平平",
+          "仄仄/平平/平仄平",
+          "仄平/平仄平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "白居易",
+      "source_id": 159,
+      "length_category": "short",
+      "variants_description": "此词后段起句不用韵。如李煜词之“菊花开，菊花残”、欧阳修词之“长江东，长江西”皆照此填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄平",
+          "仄仄平",
+          "平仄/平平/平仄平",
+          "平平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平平",
+          "中平平",
+          "仄仄/平平/平仄平",
+          "平平/仄仄平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "晏几道",
+      "source_id": 160,
+      "length_category": "short",
+      "variants_description": "此词前后段起叠用“长相思”四句，又与各家不同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平平",
+          "平平平",
+          "仄仄/平平/仄仄平",
+          "平平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平平",
+          "平平平",
+          "仄仄/平平/仄仄平",
+          "仄平/平仄平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "欧阳修",
+      "source_id": 161,
+      "length_category": "short",
+      "variants_description": "此词前后段起二句不作叠韵，如周邦彦词之“沙棠舟，小棹游”、“烟云愁，箫鼓休”，万俟咏词之“一声声，一更更”、“梦难成，恨难平”，曾觌词之“清夜长，泛玉觞”、“围艳妆，留醉乡”，俱照此填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中中平",
+          "仄中平",
+          "平仄/平平/平仄平",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中中平",
+          "中中平",
+          "平仄/平平/仄仄平",
+          "平平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "刘光祖",
+      "source_id": 162,
+      "length_category": "short",
+      "variants_description": "此词后段平韵另换，与各家异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平平",
+          "仄平平",
+          "仄仄/平平/平仄平",
+          "平平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平平",
+          "仄平平",
+          "仄仄/平平/平仄平",
+          "平平/平仄平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                3
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                3
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

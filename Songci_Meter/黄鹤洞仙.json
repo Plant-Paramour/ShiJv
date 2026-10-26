@@ -1,0 +1,47 @@
+{
+  "name": "黄鹤洞仙",
+  "aliases": [],
+  "description": "调见元彭致中《鸣鹤余音》词。",
+  "default_variant": "马钰",
+  "default_variant_source_id": 581,
+  "variants": [
+    {
+      "name": "马钰",
+      "source_id": 581,
+      "length_category": "short",
+      "variants_description": "此亦元人小令也，重押两“马”字、两“也”字韵，想其体例应尔，惜无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄/平平/仄",
+          "仄仄/平平/仄仄平",
+          "平仄仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "仄仄/平平仄",
+          "仄仄/平平/仄仄平",
+          "仄仄仄",
+          "重",
+          "平仄/平平仄",
+          "重"
+        ]
+      }
+    }
+  ]
+}

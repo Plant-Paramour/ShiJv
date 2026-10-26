@@ -1,0 +1,55 @@
+{
+  "name": "红芍药",
+  "aliases": [],
+  "description": "蒋氏《九宫谱目》入南吕调。",
+  "default_variant": "王观",
+  "default_variant_source_id": 1371,
+  "variants": [
+    {
+      "name": "王观",
+      "source_id": 1371,
+      "length_category": "long",
+      "variants_description": "此词无他首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄仄/平仄",
+          "仄平/仄平/平平仄",
+          "仄仄平/平仄",
+          "平平/仄仄仄",
+          "仄仄仄、仄平/平仄",
+          "仄/仄仄/仄仄/平平",
+          "平平/平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄/平平/仄仄",
+          "仄仄/平平/平仄仄",
+          "仄/仄平/平仄",
+          "仄仄/仄平仄",
+          "平平仄、仄平/平仄",
+          "仄平平、仄仄/平平",
+          "仄仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

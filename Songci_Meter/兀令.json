@@ -1,0 +1,57 @@
+{
+  "name": "兀令",
+  "aliases": [],
+  "description": "调见《东山集》。",
+  "default_variant": "贺铸",
+  "default_variant_source_id": 1300,
+  "variants": [
+    {
+      "name": "贺铸",
+      "source_id": 1300,
+      "length_category": "medium",
+      "variants_description": "此调亦仅见此词，无别首宋词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "平仄/平平/平仄仄",
+          "仄平/平仄",
+          "平仄/平平仄",
+          "仄平仄/平平",
+          "仄仄/平平仄",
+          "平仄/仄仄/平平",
+          "仄仄/平平仄",
+          "仄仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平/平仄",
+          "平仄/平平仄",
+          "仄仄仄/平平",
+          "仄仄/平平仄",
+          "仄仄/平仄/平平",
+          "平仄/平平仄",
+          "仄仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

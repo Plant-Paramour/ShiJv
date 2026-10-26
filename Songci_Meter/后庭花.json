@@ -1,0 +1,151 @@
+{
+  "name": "后庭花",
+  "aliases": [],
+  "description": "唐教坊曲名。张先词名《玉树后庭花》。《碧鸡漫志》云：“《玉树后庭花》，陈后主造，其诗皆以配声律，遂取一句为曲名。讹蜀时，孙光宪、毛熙震、李珣有《后庭花曲》， 皆赋后主故事，不著宫调，两段各四句，似令也",
+  "default_variant": "毛熙震",
+  "default_variant_source_id": 308,
+  "variants": [
+    {
+      "name": "毛熙震",
+      "source_id": 308,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若孙词之添字，张词之少押一韵、摊破句法，皆变体也。\n按毛词别首后段第三句“爭不教人长相见”，或作拗句，间一为之，不必从。谱内可平可仄，详见下词，故不复注。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "仄平/平仄",
+          "中中/平中/平中仄",
+          "仄中/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "仄平/平仄",
+          "中中/中中/平中仄",
+          "仄中/平仄"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 309,
+      "length_category": "short",
+      "variants_description": "此与毛词同，惟后段起句添一字作八字句，第二句添一字作五字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平/平仄",
+          "平平/平仄/平平仄",
+          "仄仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄仄、平平仄",
+          "仄/仄平/平仄",
+          "平平/仄仄/平平仄",
+          "仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 310,
+      "length_category": "short",
+      "variants_description": "此亦与毛词同，惟后段起句添二字作九字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平/平仄",
+          "仄仄/平平/平仄仄",
+          "仄仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄仄、仄平平仄",
+          "仄平/平仄",
+          "仄仄/平平/平仄仄",
+          "仄仄/平仄"
+        ]
+      }
+    },
+    {
+      "name": "张先",
+      "source_id": 311,
+      "length_category": "short",
+      "variants_description": "此亦毛词体，惟前后段第三句减一字，作六字句，不押韵。第四句添一字，作上一下四句法。张集三首，平仄如一。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平/平仄",
+          "平平/仄仄/平平",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平/平仄",
+          "仄平/平仄/平平",
+          "仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

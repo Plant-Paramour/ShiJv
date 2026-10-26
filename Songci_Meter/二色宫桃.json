@@ -1,0 +1,43 @@
+{
+  "name": "二色宫桃",
+  "aliases": [],
+  "description": "调见《梅苑》。其句读近《玉阑干》，而平仄不同。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 827,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 827,
+      "length_category": "short",
+      "variants_description": "此与《玉阑干》异者，在前段起句平仄全异，及第二句上三下四句法耳。填此体者辨之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄仄、平平/平仄",
+          "平仄/仄平/仄仄平",
+          "平平仄、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平、仄平/平仄",
+          "仄仄/仄平/仄仄平",
+          "平平仄、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

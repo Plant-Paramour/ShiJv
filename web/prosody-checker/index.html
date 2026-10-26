@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/web/prosody-checker/">
+  <meta name="description" content="诗矩：面向中文诗词创作、对话与格律检查的前端原型。">
+  <title>诗矩 · 中文诗词创作空间</title>
+  <link rel="stylesheet" href="./han/han-scoped.css">
+  <link rel="stylesheet" href="./styles.css?v=96">
+  <link rel="stylesheet" href="./prosody-workbook.css?v=17">
+</head>
+<body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
+  <a class="han-skip-link" href="#main-content">跳到主要内容</a>
+
+  <header class="site-header han-navbar" data-han-navbar>
+    <div class="site-header__inner han-navbar__inner">
+      <button class="nav-toggle han-navbar__toggle" type="button" aria-expanded="false" aria-controls="site-nav site-left-drawer" aria-label="打开主菜单">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <a class="site-brand han-navbar__brand" href="#home" data-route-link="home" id="home-brand-link" aria-label="诗矩首页">
+        <span class="site-brand__name">诗矩</span>
+        <span class="site-brand__seal" aria-hidden="true">矩</span>
+      </a>
+
+      <nav class="site-nav-shell" aria-label="主导航">
+        <ul class="site-nav han-navbar__menu" id="site-nav">
+          <li class="han-navbar__item han-navbar__item--active"><a href="#home" data-route-link="home" id="home-nav-link" aria-current="page">首页</a></li>
+          <li class="han-navbar__item"><a href="#chat" data-route-link="chat">AI 对话</a></li>
+          <li class="han-navbar__item"><a href="#prosody" data-route-link="prosody">格律检测</a></li>
+          <li class="han-navbar__item"><a href="#sentence-search" data-route-link="sentence-search">佳句检索</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-actions">
+        <button class="account-entry" type="button" id="login-button" aria-label="打开用户菜单">
+          <span class="header-avatar user-avatar" id="header-avatar" aria-hidden="true">诗</span>
+          <span class="account-entry__label" id="account-entry-label">本地档案</span>
+          <span class="notification-badge" id="header-notification-badge" hidden>0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="site-drawer site-drawer--left" id="site-left-drawer" aria-label="主菜单" aria-hidden="true">
+    <header class="site-drawer__header">
+      <div><p class="eyebrow">诗矩</p><h2>探索</h2></div>
+      <button class="drawer-close" type="button" data-drawer-close aria-label="关闭主菜单">×</button>
+    </header>
+    <nav class="drawer-menu" aria-label="功能导航">
+      <a href="#chat" data-drawer-route="chat"><span class="drawer-menu__icon" aria-hidden="true">谈</span><span>AI 对话</span></a>
+      <a href="#prosody" data-drawer-route="prosody"><span class="drawer-menu__icon" aria-hidden="true">律</span><span>格律检测</span></a>
+      <a href="#sentence-search" data-drawer-route="sentence-search"><span class="drawer-menu__icon" aria-hidden="true">句</span><span>佳句检索</span></a>
+    </nav>
+    <div class="site-drawer__hint">在这里开始创作、校验与交流。</div>
+  </aside>
+  <aside class="site-drawer site-drawer--right" id="site-right-drawer" aria-label="用户菜单" aria-hidden="true">
+    <header class="site-drawer__header site-drawer__header--account">
+      <div class="drawer-account">
+        <span class="header-avatar user-avatar" id="drawer-avatar" aria-hidden="true">诗</span>
+        <div><strong id="drawer-user-name">本地档案</strong><small id="drawer-user-handle">仅保存在这台电脑</small></div>
+      </div>
+      <button class="drawer-close" type="button" data-drawer-close aria-label="关闭用户菜单">×</button>
+    </header>
+    <nav class="drawer-menu drawer-menu--account" aria-label="个人中心导航">
+      <button type="button" data-profile-drawer-tab="account"><span class="drawer-menu__icon" aria-hidden="true">我</span><span>我的信息</span></button>
+      <button type="button" data-profile-drawer-tab="poems"><span class="drawer-menu__icon" aria-hidden="true">作</span><span>我的作品</span></button>
+      <button type="button" data-profile-drawer-tab="favorites"><span class="drawer-menu__icon" aria-hidden="true">藏</span><span>收藏作品</span></button>
+      <button type="button" data-profile-drawer-tab="archive"><span class="drawer-menu__icon" aria-hidden="true">档</span><span>归档对话</span></button>
+      <a href="#settings" data-drawer-route="settings"><span class="drawer-menu__icon" aria-hidden="true">设</span><span>模型与运行设置</span></a>
+    </nav>
+    <section class="drawer-notifications" aria-labelledby="drawer-notifications-title" hidden>
+      <div class="drawer-section-heading"><h3 id="drawer-notifications-title">你的通知</h3><a href="#notifications" data-drawer-route="notifications">查看全部</a></div>
+      <div id="drawer-notification-list"><p class="drawer-empty">暂无新通知</p></div>
+    </section>
+    <footer class="site-drawer__footer">
+    </footer>
+  </aside>
+  <aside class="site-drawer site-drawer--right meter-drawer" id="meter-drawer" aria-label="词牌格律详情" aria-hidden="true">
+    <header class="site-drawer__header"><div><p class="eyebrow">词牌格律</p><h2 id="meter-drawer-title">格律详情</h2></div><button class="drawer-close" type="button" data-meter-drawer-close aria-label="关闭格律详情">×</button></header>
+    <div class="meter-drawer__body" id="meter-drawer-content"></div>
+  </aside>
+
+  <main id="main-content" tabindex="-1">
+    <section class="app-view home-view" data-view="home" aria-labelledby="home-title">
+      <section class="home-hero" aria-labelledby="home-title">
+        <canvas id="ink-landscape" class="ink-landscape" aria-hidden="true"></canvas>
+        <div class="paper-veil" aria-hidden="true"></div>
+        <div class="hero-shell">
+          <div class="hero-copy">
+            <p class="eyebrow">中文诗词创作空间</p>
+            <h1 id="home-title">诗矩</h1>
+            <p class="hero-lead">〔产品核心介绍文案占位〕</p>
+            <p class="hero-note">〔一句简短的产品价值说明占位〕</p>
+            <div class="hero-actions">
+              <a class="primary-button primary-button--large" href="#chat">进入对话</a>
+              <a class="text-link" href="#prosody">查看格律工具</a>
+            </div>
+          </div>
+
+          <aside class="register-panel" id="register" aria-labelledby="register-title">
+            <div class="register-panel__heading">
+              <div>
+                <p class="eyebrow">本地创作档案</p>
+                <h2 id="register-title">开始使用诗矩</h2>
+              </div>
+              <span class="register-mark" aria-hidden="true">矩</span>
+            </div>
+
+
+
+          </aside>
+        </div>
+      </section>
+
+      <section class="product-band" aria-labelledby="product-heading">
+        <div class="content-shell">
+          <header class="section-heading">
+            <p class="eyebrow">关于诗矩</p>
+            <h2 id="product-heading">〔产品介绍标题占位〕</h2>
+            <p>〔此处后续补充产品缘起、使用对象与核心能力。当前仅用于确认信息层级与版式节奏。〕</p>
+          </header>
+          <div class="product-pillars">
+            <article><span>一</span><h3>〔能力一占位〕</h3><p>〔简短说明占位〕</p></article>
+            <article><span>二</span><h3>〔能力二占位〕</h3><p>〔简短说明占位〕</p></article>
+            <article><span>三</span><h3>〔能力三占位〕</h3><p>〔简短说明占位〕</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="journey-band" aria-labelledby="journey-heading">
+        <div class="content-shell journey-layout">
+          <div class="journey-intro">
+            <p class="eyebrow">先搭骨架，再添血肉</p>
+            <h2 id="journey-heading">四处入口，一套气韵</h2>
+            <p>当前版本先统一导航、页面密度与交互语言，业务能力将在后续迭代中逐步接入。</p>
+          </div>
+          <div class="journey-links">
+            <a href="#chat"><span>01</span><strong>AI 对话</strong><small>创作与推敲的主界面</small></a>
+            <a href="#prosody"><span>02</span><strong>格律检测</strong><small>保留现有检测能力</small></a>
+            <a href="#profile"><span>03</span><strong>个人作品</strong><small>整理和回看创作记录</small></a>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="app-view chat-view" data-view="chat" aria-labelledby="chat-title" hidden>
+      <div class="chat-layout">
+        <aside class="chat-sidebar" aria-label="对话列表">
+          <div class="chat-sidebar__masthead">
+            <span class="chat-sidebar__seal" aria-hidden="true">矩</span><span>诗词创作空间</span><span class="chat-sidebar__rule" aria-hidden="true"></span>
+          </div>
+          <div class="chat-sidebar__action-row">
+            <label class="conversation-search" id="conversation-search" hidden>
+              <span class="han-visually-hidden">搜索历史对话</span>
+              <input id="conversation-search-input" type="search" placeholder="搜索对话名称">
+            </label>
+            <button class="new-chat-button" type="button" id="new-chat">新建对话</button>
+            <div class="chat-sidebar__tools">
+              <button class="chat-sidebar__tool" type="button" id="conversation-search-toggle" aria-label="搜索历史对话" title="搜索历史对话">⌕</button>
+              <button class="chat-sidebar__tool" type="button" id="chat-sidebar-toggle" aria-label="收起历史对话栏" aria-expanded="true" title="收起历史对话栏">‹</button>
+            </div>
+          </div>
+          <nav class="conversation-list" id="conversation-list" aria-label="历史对话">
+            <div class="conversation-empty"><span class="conversation-empty__mark" aria-hidden="true">卷</span><strong>尚无对话记录</strong><span>开始一段新对话，创作与推敲将留存在这台电脑。</span><button type="button" id="empty-new-chat">新建对话</button></div>
+          </nav>
+
+        </aside>
+
+        <div class="chat-main">
+          <header class="chat-header">
+            <button class="chat-sidebar-reopen" type="button" id="chat-sidebar-reopen" aria-label="展开历史对话栏" aria-expanded="false" title="展开历史对话栏">›</button>
+            <h1 id="chat-title" title="与诗矩对谈">与诗矩对谈</h1>
+            <span class="model-label" id="agent-status" role="status">待连接</span>
+
+          </header>
+
+          <div class="chat-thread-scroll" id="chat-thread-scroll">
+            <div class="chat-thread" id="chat-thread" aria-live="polite">
+              <section class="chat-welcome" id="chat-welcome" aria-labelledby="chat-welcome-title">
+                <div class="chat-welcome__avatar"><img src="./ai-avatar.svg" alt="诗矩 AI"></div>
+                <p class="eyebrow">诗矩 AI 诗词助手</p>
+                <h2 id="chat-welcome-title">从一句诗意开始</h2>
+                <p class="chat-welcome__lead">告诉我你的意象、情绪或残稿，我会陪你推敲格律、寻找韵脚，慢慢把诗写完整。</p>
+                <div class="prompt-suggestions" aria-label="示例提问">
+                  <button type="button" data-prompt="请用中华新韵查询“春”和“山”的平仄与韵部">查询韵书</button>
+                  <button type="button" data-prompt="请直接生成一首秋江夜泊的七言绝句">生成一首</button>
+                  <button type="button" data-prompt="请告诉我浣溪沙的格律">查询词牌</button>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <form class="chat-composer" id="chat-form">
+            <label class="han-visually-hidden" for="chat-input">输入消息</label>
+            <textarea id="chat-input" rows="1" placeholder="写下你的想法……"></textarea>
+            <div class="chat-composer__toolbar">
+              <label class="chat-model-picker" title="选择模型"><select id="chat-model" aria-label="选择模型"><option value="">请先配置模型</option></select></label>
+              <div class="chat-composer__actions">
+                <button class="chat-prompt-button" type="button" id="chat-prompt-button" title="打开创作提示词" aria-label="打开创作提示词"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5z"></path><path d="M8.5 8h7M8.5 12h7M8.5 16h4"></path></svg></button>
+                <label class="chat-attach-button" for="chat-attachment" title="添加图片" aria-label="添加图片"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 4.2-4.2 3.2-2.2 5.4 5.2"></path></svg></label>
+                <input id="chat-attachment" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+                <button class="chat-cancel-button" type="button" id="chat-cancel" title="取消发送" aria-label="取消发送" hidden>取消</button>
+                <button class="chat-send-button" type="submit" title="发送" aria-label="发送"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"></path></svg></button>
+              </div>
+            </div>
+            <div class="chat-attachment-preview" id="chat-attachment-preview" hidden></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-view profile-view" data-view="profile" aria-labelledby="profile-title" hidden>
+      <div class="tool-shell profile-shell">
+        <header class="profile-heading">
+          <div class="profile-heading__title"><p class="eyebrow">诗人小笺</p><h1 id="profile-title">个人中心</h1></div>
+          <a class="quiet-button profile-settings-link" href="#settings">模型与运行设置 <span aria-hidden="true">↗</span></a>
+        </header>
+        <div class="profile-layout">
+          <nav class="profile-sidebar" aria-label="个人中心导航">
+            <button type="button" class="profile-tab is-active" data-profile-tab="account" aria-current="page"><span class="profile-tab__mark" aria-hidden="true">笺</span><span>我的信息</span></button>
+            <button type="button" class="profile-tab" data-profile-tab="poems" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">作</span><span>我的作品</span></button>
+            <button type="button" class="profile-tab" data-profile-tab="favorites" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">藏</span><span>我的收藏</span></button>
+            <button type="button" class="profile-tab" data-profile-tab="archive" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">卷</span><span>归档对话</span></button>
+          </nav>
+          <div class="profile-content">
+            <section class="profile-panel" data-profile-panel="account">
+              <div class="profile-panel__heading"><div><p class="eyebrow">账户</p><h2>我的信息</h2></div></div>
+              <div class="account-settings-grid">
+                <form class="account-form account-form--profile" id="profile-form" aria-labelledby="profile-info-heading">
+                  <div class="account-form__heading"><div><h3 id="profile-info-heading">本机档案</h3><p>昵称、头像与简介保存在本地</p></div></div>
+                  <div class="avatar-editor"><div id="profile-avatar-preview" class="user-avatar user-avatar--large" aria-label="当前头像"></div><div><label class="quiet-button avatar-upload-button" for="profile-avatar-input">上传头像</label><input id="profile-avatar-input" type="file" accept="image/jpeg,image/png,image/webp" hidden><small>支持 JPG、PNG、WebP，最大 2MB</small></div></div>
+                  <div class="account-form__fields">
+                    <label class="field"><span>昵称</span><input type="text" id="profile-display-name" maxlength="80" autocomplete="name"></label>
+                    <label class="field account-form__field--wide"><span>个人简介</span><textarea id="profile-bio" rows="3" maxlength="500" placeholder="为自己留下一句创作备注"></textarea></label>
+                  </div>
+                  <p class="form-status" id="profile-status" role="status"></p>
+                  <div class="profile-form-actions"><button class="primary-button" type="submit">保存资料</button></div>
+                </form>
+
+
+              </div>
+            </section>
+            <section class="profile-panel" data-profile-panel="poems" hidden>
+              <div class="profile-panel__heading"><div><p class="eyebrow">作品库</p><h2>我的作品</h2></div><div class="profile-filters"><label>分类<select id="profile-work-type"><option value="">全部</option><option>唐诗</option><option>律诗</option><option>宋词</option><option>汉俳</option><option>其他</option></select></label></div></div>
+              <div class="profile-grid" id="poem-list"><p class="empty-state">暂无诗作记录。</p></div>
+              <div class="profile-poem-pagination"><button type="button" class="quiet-button" id="poem-list-load-more" hidden>加载更多作品</button><small id="poem-list-pagination-status" role="status"></small></div>
+            </section>
+            <section class="profile-panel" data-profile-panel="favorites" hidden><div class="profile-panel__heading"><div><p class="eyebrow">收藏</p><h2>我的收藏</h2></div></div><details class="favorite-section favorite-section--works" open><summary><h3>收藏的作品</h3></summary><button type="button" class="quiet-button favorite-section-manage" data-manage-collections="poem">管理合集</button><div id="collection-list" class="favorite-collections"><p class="empty-state">正在加载合集……</p></div></details></section>
+            <section class="profile-panel" data-profile-panel="archive" hidden><div class="profile-panel__heading"><div><p class="eyebrow">对话管理</p><h2>归档对话</h2></div></div><div class="folder-list" id="archive-list"><p class="empty-state">暂无归档对话。</p></div></section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-view prosody-view" data-view="prosody" aria-labelledby="prosody-title" hidden>
+      <div class="tool-shell">
+        <header class="tool-heading">
+          <div><p class="eyebrow">平仄 · 句式 · 押韵</p><h1 id="prosody-title">诗词格律检测</h1></div>
+          <p>选择韵书，推敲平仄。在检查结果中，也可以直接修改诗句。</p>
+        </header>
+
+        <div id="workspace" class="workspace prosody-workbook" data-page="input">
+          <nav class="workbook-nav" aria-label="格律检查页面">
+            <button type="button" class="workbook-arrow" id="prosody-prev" aria-label="上一页：编辑诗词" disabled>‹</button>
+            <div class="workbook-tabs" role="tablist" aria-label="作品与结果">
+              <button type="button" id="prosody-input-tab" role="tab" aria-controls="prosody-input-page" aria-selected="true">编辑诗词</button>
+              <button type="button" id="prosody-result-tab" role="tab" aria-controls="result-panel" aria-selected="false" tabindex="-1" disabled>检查结果</button>
+            </div>
+            <button type="button" class="workbook-arrow" id="prosody-next" aria-label="下一页：检查结果" disabled>›</button>
+          </nav>
+          <section id="prosody-input-page" class="workbook-page input-panel" role="tabpanel" aria-labelledby="prosody-input-tab">
+            <h2 id="input-heading" class="han-visually-hidden">输入作品</h2>
+            <form id="checker-form">
+              <fieldset class="type-switch">
+                <legend>体裁</legend>
+                <label><input type="radio" name="poem-type" value="tang" checked><span>唐诗</span></label>
+                <label><input type="radio" name="poem-type" value="songci"><span>宋词</span></label>
+                <label><input type="radio" name="poem-type" value="haiku"><span>俳句</span></label>
+                <label><input type="radio" name="poem-type" value="pailv"><span>排律</span></label>
+              </fieldset>
+
+              <div class="control-grid">
+                <div id="rhyme-book-field" class="field">
+                  <span>韵书</span>
+                  <select id="rhyme-book">
+                    <option value="Xinyun">中华新韵</option>
+                    <option value="Pinshui">平水韵</option>
+                    <option value="Cilin">词林正韵</option>
+                    <option value="Tongyun">中华通韵</option>
+                  </select>
+                </div>
+                <div id="tang-options" class="option-group">
+                  <label class="field"><span>字数</span><select id="tang-length"><option value="5">五言</option><option value="7" selected>七言</option></select></label>
+                  <label class="field"><span>篇式</span><select id="tang-form"><option value="jueju">绝句</option><option value="lvshi" selected>律诗</option></select></label>
+                </div>
+                <div id="songci-options" class="option-group" hidden>
+                  <label class="field"><span>篇幅</span><select id="cipai-length"><option value="all">全部</option><option value="short">小令</option><option value="medium">中调</option><option value="long">长调</option></select></label>
+                  <label class="field"><span>排序</span><select id="cipai-sort"><option value="name-asc">名称正序</option><option value="name-desc">名称逆序</option><option value="length-asc">字数升序</option><option value="length-desc">字数降序</option></select></label>
+                  <div class="field cipai-picker-field">
+                    <label for="cipai-search">词牌搜索</label>
+                    <div id="cipai-picker" class="cipai-picker">
+                      <div class="cipai-picker-control"><input id="cipai-search" type="search" placeholder="搜索并选择词牌" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cipai-listbox"><button id="cipai-picker-toggle" type="button" aria-label="展开词牌列表" tabindex="-1">⌄</button></div>
+                      <div id="cipai-listbox" role="listbox" aria-label="词牌搜索结果" hidden></div>
+                    </div>
+                    <select id="cipai" hidden aria-hidden="true" tabindex="-1"></select>
+                  </div>
+                  <label class="field"><span>变体</span><select id="variant"></select></label>
+                  <p id="cipai-filter-status" class="cipai-filter-status" aria-live="polite"></p>
+                </div>
+                <section id="analysis-settings" class="analysis-settings" aria-label="通用检测设置">
+                  <fieldset id="polyphonic-control" class="polyphonic-switch control-polyphonic">
+                    <legend>多音字</legend>
+                    <label><input type="radio" name="polyphonic-mode" value="automatic" checked><span>自动</span></label>
+                    <label><input type="radio" name="polyphonic-mode" value="strict"><span>严格</span></label>
+                    <label><input type="radio" name="polyphonic-mode" value="permissive"><span>放行</span></label>
+                  </fieldset>
+                  <div class="rule-options control-rule-options">
+                    <label id="smart-form-control" class="toggle-control" title="检查时自动选择综合分最高的五言、七言、绝句、律诗或排律">
+                      <input id="smart-form" type="checkbox" checked><span class="toggle-track" aria-hidden="true"></span><span>智能选式</span>
+                    </label>
+                    <label id="aojiu-control" class="toggle-control">
+                      <input id="allow-aojiu" type="checkbox" checked><span class="toggle-track" aria-hidden="true"></span><span>拗救</span>
+                    </label>
+                  </div>
+                </section>
+              </div>
+
+              <details id="meter-template" class="meter-template" hidden open>
+                <summary class="section-label">格律模板<span class="template-disclosure" aria-hidden="true"></span></summary>
+                <div id="template-content" aria-live="polite"></div>
+              </details>
+              <label class="field poem-input"><span>诗词正文</span><textarea id="poem-text" rows="2" placeholder="请粘贴诗词正文，可使用标点或换行分句"></textarea></label>
+              <div class="form-actions"><button id="check-button" class="primary-button" type="submit">开始检查</button><span id="form-status" role="status"></span></div>
+            </form>
+          </section>
+
+          <section id="result-panel" class="workbook-page result-panel" hidden role="tabpanel" aria-labelledby="prosody-result-tab">
+            <div class="result-header">
+              <div><h2 id="result-heading">检查结果</h2><p id="result-meta"></p></div>
+              <div class="scores">
+                <div class="score"><span>结构</span><strong id="structure-score">0</strong><small>分</small></div>
+                <div class="score"><span>平仄</span><strong id="tonal-score">0</strong><small>分</small></div>
+                <div class="score"><span>押韵</span><strong id="rhyme-score">0</strong><small>分</small></div>
+              </div>
+            </div>
+            <p id="result-freshness" class="result-freshness" role="status">点击诗句即可修改，与编辑页同步。</p>
+            <div class="legend">
+              <span><b>黑体</b> 多音字</span><span><b class="error-sample">红色</b> 格律错误</span>
+              <span id="aojiu-legend" hidden><b class="ao-sample">拗</b><b class="rescue-sample">救</b> 拗救字</span>
+            </div>
+            <div id="issues" class="issues" hidden></div>
+            <div id="line-results" class="line-results"></div><div id="rhyme-results" class="rhyme-results"></div>
+            <section id="detection-summary" class="detection-summary" hidden aria-live="polite"></section>
+            <div class="workbook-result-actions"><button id="result-recheck" type="submit" form="checker-form" class="primary-button">重新检查</button><button id="result-edit-all" type="button" class="secondary-button">编辑全文与选项</button><span id="result-check-status" role="status"></span></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-view sentence-search-view" data-view="sentence-search" aria-labelledby="sentence-search-title" hidden>
+      <div class="tool-shell sentence-search-shell">
+        <header class="tool-heading"><div><p class="eyebrow">格律工具</p><h1 id="sentence-search-title">佳句检索</h1></div><p>输入一句话，核对它的平仄；也可以从词牌数据库中寻找最合适的格律。</p></header>
+        <div class="sentence-tabs" role="tablist" aria-label="佳句检索功能"><button class="sentence-tab is-active" type="button" role="tab" aria-selected="true" data-sentence-tab="check">单句判律</button><button class="sentence-tab" type="button" role="tab" aria-selected="false" data-sentence-tab="match">词牌匹配</button></div>
+        <section class="sentence-panel" data-sentence-panel="check" aria-labelledby="single-check-title">
+          <div class="sentence-form-grid">
+            <div><h2 id="single-check-title">选择格律</h2><p class="sentence-help">唐诗、排律按常见五言或七言句式判断；宋词可精确到阙与句。</p></div>
+            <label class="field"><span>韵书</span><select id="sentence-rhyme-book"><option value="Xinyun">中华新韵</option><option value="Pinshui">平水韵</option><option value="Cilin">词林正韵</option><option value="Tongyun">中华通韵</option></select></label>
+            <label class="field"><span>诗体</span><select id="sentence-poem-type"><option value="tang">唐诗</option><option value="pailv">排律</option><option value="wuyan">五言</option><option value="qiyan">七言</option><option value="songci">宋词</option></select></label>
+            <label class="field" id="sentence-length-field"><span>字数</span><select id="sentence-length"><option value="5">五言</option><option value="7">七言</option></select></label>
+            <label class="field sentence-songci-only" hidden><span>词牌</span><select id="sentence-cipai"></select></label>
+            <label class="field sentence-songci-only" hidden><span>变体</span><select id="sentence-variant"></select></label>
+            <label class="field sentence-songci-only" hidden><span>阙</span><select id="sentence-stanza"><option value="0">上阙</option><option value="1">下阙</option></select></label>
+            <label class="field sentence-songci-only" hidden><span>第几句</span><select id="sentence-line"></select></label>
+          </div>
+          <div class="sentence-template" id="sentence-template" hidden><span>目标句式</span><strong id="sentence-pattern">—</strong><span class="sentence-template-input-label">输入</span><strong id="sentence-input-pattern">—</strong></div>
+          <label class="field sentence-input"><span>输入一句或多句</span><textarea id="sentence-text" rows="3" placeholder="例如：海内存知己，天涯若比邻"></textarea></label>
+          <div class="form-actions"><button class="primary-button" type="button" id="sentence-check-button">开始判断</button><span class="form-status" id="sentence-check-status" role="status"></span></div>
+          <div class="sentence-verdict" id="sentence-verdict" hidden></div>
+        </section>
+        <section class="sentence-panel" data-sentence-panel="match" hidden aria-labelledby="meter-match-title">
+          <div class="sentence-form-grid sentence-match-head"><div><h2 id="meter-match-title">按一句话找词牌</h2><p class="sentence-help">先生成这句话的平仄模板，再按选定规则遍历词牌和变体。</p></div><label class="field"><span>韵书</span><select id="match-rhyme-book"><option value="Xinyun">中华新韵</option><option value="Pinshui">平水韵</option><option value="Cilin">词林正韵</option><option value="Tongyun">中华通韵</option></select></label></div>
+          <label class="field sentence-input"><span>输入一句或多句</span><textarea id="match-text" rows="3" placeholder="例如：明月几时有，把酒问青天"></textarea></label>
+          <div class="match-options">
+            <div class="priority-picker"><span class="priority-picker__label">排序优先级（拖拽排序）</span><ol id="match-priority-list" class="priority-list" aria-label="拖动调整排序优先级"><li draggable="true" data-priority="score"><span class="priority-grip" aria-hidden="true">☷</span>平仄优先</li><li draggable="true" data-priority="shape"><span class="priority-grip" aria-hidden="true">☷</span>句式匹配</li><li draggable="true" data-priority="intra"><span class="priority-grip" aria-hidden="true">☷</span>句内优先</li><li draggable="true" data-priority="breaks"><span class="priority-grip" aria-hidden="true">☷</span>“读”少</li></ol></div>
+            <div class="match-filters">
+              <label class="match-filter"><input id="match-limit-enabled" type="checkbox" checked><span>最多</span><input id="match-limit" type="number" min="1" max="1000" step="1" value="30" aria-label="最多匹配条数"><span>条</span></label>
+              <label class="match-filter"><input id="match-score-enabled" type="checkbox"><input id="match-score-min" type="number" min="0" max="100" step="1" value="80" aria-label="最低匹配分数"><span>分以上</span></label>
+              <label class="match-filter" title="将断句计入匹配分数"><input id="match-respect-breaks" type="checkbox"><span>断句分数</span></label>
+            </div>
+            <input id="match-exclude-breaks" type="checkbox" hidden>
+          </div>
+          <select id="match-sort" hidden aria-hidden="true"><option value="score">平仄优先</option><option value="shape">句式匹配</option><option value="intra">句内优先</option><option value="breaks">“读”少</option></select>
+          <div class="form-actions"><button class="primary-button" type="button" id="match-button">开始匹配</button><span class="form-status" id="match-status" role="status"></span></div>
+          <div class="inferred-template" id="inferred-template" hidden><span>你的句式</span><strong></strong><small>可手动多音字消歧，点击“多”可在平、仄之间切换；未消歧的“多”按通配声调处理。</small></div><input id="match-polyphonic" type="hidden" value="automatic">
+          <div class="match-results" id="match-results" hidden></div>
+        </section>
+      </div>
+    </section>
+
+
+
+    <div class="collection-modal" id="collection-modal" hidden><div class="collection-modal__backdrop" data-collection-close></div><section class="collection-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="collection-modal-title"><button type="button" class="collection-modal__close" data-collection-close aria-label="关闭">×</button><p class="eyebrow">收藏整理</p><h2 id="collection-modal-title">选择合集</h2><div id="collection-modal-list"></div><div id="collection-create-form" hidden><label class="field"><span>合集名称</span><input id="collection-name-input" maxlength="120" placeholder="请输入合集名称"></label><p class="form-status" id="collection-create-status"></p><button type="button" class="primary-button" id="collection-create-submit">确认新建</button></div><button type="button" class="primary-button" id="collection-modal-new">＋ 新建合集</button></section></div>
+    <div class="collection-modal" id="confirm-modal" hidden><div class="collection-modal__backdrop" data-confirm-close></div><section class="collection-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title"><button type="button" class="collection-modal__close" data-confirm-close aria-label="关闭">×</button><p class="eyebrow">操作确认</p><h2 id="confirm-modal-title">确认操作</h2><p id="confirm-modal-message"></p><div class="modal-actions"><button type="button" class="quiet-button" data-confirm-close>取消</button><button type="button" class="primary-button" id="confirm-modal-submit">确认</button></div></section></div>
+
+
+
+
+
+
+
+
+
+    <section class="app-view poem-editor-view" data-view="poem" aria-labelledby="poem-editor-title" hidden>
+      <div class="poem-editor-shell">
+        <header class="poem-editor-header">
+          <div><button type="button" class="text-button" id="poem-editor-back">返回</button><p class="eyebrow">诗词创作</p><h1 id="poem-editor-title">修改诗作</h1><p id="poem-editor-source"></p></div>
+          <button type="button" class="primary-button" id="poem-editor-save" disabled>保存到我的创作</button>
+        </header>
+        <p class="form-status" id="poem-editor-status" role="status"></p>
+        <details class="poem-version-tree" id="poem-version-tree" hidden>
+          <summary id="poem-version-tree-title">作品森林</summary>
+          <div id="poem-version-tree-nodes"></div>
+        </details>
+        <div class="poem-editor-layout" id="poem-editor-layout" hidden>
+          <section class="poem-editor-writing" aria-label="作品正文">
+            <div class="poem-editor-identity"><strong>作品 ID</strong><div><span id="poem-editor-id" aria-label="当前作品 ID"></span><button type="button" class="quiet-button poem-editor-delete" id="poem-editor-delete" hidden>删除</button></div></div>
+            <label><span>作品标题</span><input id="poem-editor-name" maxlength="200" autocomplete="off"></label>
+            <label id="poem-editor-variant-field" hidden><span>词牌变体</span><select id="poem-editor-variant"><option value="">未记录</option></select></label>
+            <label><span>题序</span><textarea id="poem-editor-sequence" maxlength="10000" rows="4" placeholder="填写作品背景或创作缘由"></textarea></label>
+            <div class="poem-sentence-heading">诗词正文<span>选择一句，查询或修改</span></div>
+            <textarea id="poem-editor-content" hidden maxlength="20000" spellcheck="false" aria-label="诗词正文草稿"></textarea>
+            <div id="poem-editor-sentences"></div>
+            <section class="poem-editor-changes" id="poem-editor-changes" hidden><h2>与来源版本的变化</h2><div id="poem-editor-change-list"></div></section>
+          </section>
+          <button type="button" class="poem-review-drawer-scrim" id="poem-review-drawer-scrim" aria-label="关闭句子查询面板" hidden></button>
+          <button type="button" class="poem-review-drawer-toggle" id="poem-review-drawer-toggle" aria-expanded="false" aria-controls="poem-editor-review">句子查询</button>
+          <aside class="poem-editor-review" id="poem-editor-review" aria-label="句子变体查询">
+            <div class="poem-editor-review-head"><span>句子变体</span></div>
+            <p id="poem-sentence-query-state" role="status">选择一句后，这里会显示森林中的不同写法。</p>
+            <div id="poem-sentence-variations"></div>
+            <div hidden><strong id="poem-editor-score">--</strong><dl id="poem-editor-score-grid"></dl><p id="poem-editor-score-state"></p><div id="poem-editor-issues"></div></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="app-view settings-view" data-view="settings" aria-labelledby="settings-title" hidden>
+      <div class="tool-shell">
+        <header class="tool-heading"><div><a class="settings-back" href="#profile">个人中心 / 创作设置</a><h1 id="settings-title">模型与运行环境</h1><p class="settings-subtitle">为你的创作，备好笔墨。</p></div><p>模型、环境与密钥<br>只保存在这台电脑上</p></header>
+        <section class="profile-panel" aria-label="使用准备">
+          <p class="eyebrow">配置指引</p><h2>从对话，到成诗</h2>
+          <ol class="settings-steps"><li><span>一</span><div><strong>连接模型</strong><small>保存可用的对话服务</small></div></li><li><span>二</span><div><strong>检查环境</strong><small>确认依赖、显卡与模型兼容</small></div></li><li><span>三</span><div><strong>启动生成器</strong><small>加载本地模型，开始成诗</small></div></li></ol>
+          <p>对话模型负责交流和准备创作方案；本地生成器负责按格律生成诗稿。两者需要分别配置。使用 Ollama、LM Studio 等本机对话服务时，填写本机服务地址并获取模型列表即可，无须填写密钥。</p>
+          <p id="local-readiness" role="status">正在检查配置……</p>
+        </section>
+        <form id="model-config-form" class="profile-panel">
+          <div class="profile-panel__heading"><div><p class="eyebrow">服务端点</p><h2>可用模型</h2></div><button id="model-endpoint-add" class="quiet-button" type="button">添加端点</button></div>
+          <div id="model-endpoint-list"></div>
+          <p class="field-hint">填写地址和密钥后可获取服务允许访问的模型列表，也可直接输入模型 ID。列表中的模型不一定支持对话或工具调用，请选择后测试连接。OpenAI-like 使用 Chat Completions；Anthropic 使用 Messages API。</p>
+          <div class="form-actions"><button class="primary-button" type="submit">保存模型配置</button><span id="model-config-status" role="status"></span></div>
+        </form>
+        <section class="profile-panel" aria-label="运行环境">
+          <p class="eyebrow">启动器管理</p><h2>运行环境</h2>
+          <p class="field-hint">软件环境与推理环境可分别选择。需要更换时，请重新打开“诗矩单机版.bat”，在启动器中停止服务、选择环境并重新启动。</p>
+          <dl class="settings-environments"><dt>软件环境</dt><dd id="application-python-path">读取中……</dd><dt>本地推理环境</dt><dd id="inference-python-path">读取中……</dd></dl>
+          <button id="local-environment-check" class="quiet-button" type="button">重新检查推理环境</button>
+          <p id="local-environment-status" role="status"></p>
+        </section>
+        <form id="local-generator-form" class="profile-panel">
+          <h2>本地诗词生成模型</h2>
+          <p class="field-hint">本地生成支持 Qwen3 / Qwen3.5 原始浮点权重，具体取决于所选推理环境能否实际导入对应模型类。需要 NVIDIA CUDA，暂不支持预量化或 GGUF。扫描会列出发现的模型及不可用原因；权重加载、有效输出及约束生成全部通过后才会就绪。</p>
+          <label class="field"><span>扫描目录（留空扫描项目和常用模型缓存）</span><input id="local-model-scan-root" placeholder="例如 D:\Models"></label>
+          <button id="local-model-scan" class="quiet-button" type="button">扫描本地模型</button>
+          <label class="field"><span>已发现的本地模型</span><select id="local-model-choice"><option value="">请扫描或直接填写目录</option></select></label>
+          <label class="field"><span>模型目录</span><input id="local-model-path" placeholder="例如 D:\Models\Qwen3-4B"></label>
+          <p class="field-hint" id="local-model-plan">运行方式由环境、模型与显存检测自动决定，不需要手动选择精度。通过真实调用与约束生成验收后才会标记为就绪。</p>
+          <label for="local-model-idle">任务结束后的模型驻留时间</label>
+          <select id="local-model-idle"><option value="60">1 分钟</option><option value="300">5 分钟（推荐）</option><option value="600">10 分钟</option><option value="1800">30 分钟</option><option value="0">始终保留，直到停止软件</option></select>
+          <p class="field-hint">空闲超时才释放权重；驻留期间复用模型，释放后新任务会自动重新加载。运行中的任务不会被中断。</p>
+          <ul id="local-model-check-results" class="field-hint" aria-live="polite"></ul>
+          <label><input id="local-model-auto" type="checkbox"> 下次打开软件时自动加载此模型</label>
+          <div class="form-actions"><button class="primary-button" type="submit">保存生成器配置</button><button id="local-worker-start" class="quiet-button" type="button">保存并启动生成器</button><button id="local-worker-stop" class="quiet-button" type="button">停止生成器</button></div>
+          <p id="local-worker-status" role="status">尚未启动</p>
+          <p id="local-worker-action-status" role="status"></p>
+          <p id="local-model-scan-status" role="status"></p><details id="local-model-unsupported" hidden><summary>不可用模型及原因</summary><ul></ul></details>
+          <pre id="local-worker-error" hidden></pre>
+        </form>
+        <section class="profile-panel local-backup-panel">
+          <div class="profile-panel__heading"><div><p class="eyebrow">个人数据</p><h2>备份与恢复</h2></div></div>
+          <p class="field-hint">备份包含本地作品、对话、头像和图片，并包含恢复加密数据所需的本地密钥；模型 API 密钥不会包含在备份中，请妥善保管备份文件。</p>
+          <div class="form-actions"><button id="backup-download" class="quiet-button" type="button">下载本机备份</button><label class="quiet-button" for="backup-restore-file">选择备份恢复</label><input id="backup-restore-file" type="file" accept=".zip,application/zip" hidden><span id="backup-status" role="status"></span></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <aside class="prosody-inspector" id="prosody-inspector" aria-labelledby="prosody-inspector-title" hidden>
+    <header class="prosody-inspector__header">
+      <div><p class="eyebrow">格律检测</p><h2 id="prosody-inspector-title">评分详情</h2></div>
+      <button type="button" class="prosody-inspector__close" id="prosody-inspector-close" aria-label="关闭格律检测详情" title="关闭">×</button>
+    </header>
+    <div class="prosody-inspector__body" id="prosody-inspector-body"></div>
+  </aside>
+  <dialog class="poem-save-warning" id="poem-save-warning" aria-labelledby="poem-save-warning-title">
+    <h2 id="poem-save-warning-title">格律尚未满分</h2>
+    <p id="poem-save-warning-text"></p>
+    <div id="poem-save-warning-details" class="poem-save-warning-details"></div>
+    <div class="poem-save-warning-actions"><button type="button" class="quiet-button" id="poem-save-cancel">返回修改</button><button type="button" class="primary-button" id="poem-save-confirm">仍保存到我的创作</button></div>
+  </dialog>
+  <datalist id="poetry-form-suggestions">
+    <option value="五言绝句"></option><option value="七言绝句"></option>
+    <option value="五言律诗"></option><option value="七言律诗"></option>
+    <option value="五言排律"></option><option value="七言排律"></option>
+    <option value="汉俳"></option><option value="浣溪沙"></option><option value="蝶恋花"></option>
+  </datalist>
+
+
+
+  <dialog class="poem-picker-dialog" id="poem-picker-dialog" aria-labelledby="poem-picker-title">
+    <div class="poem-picker-shell">
+      <header class="poem-picker-header"><div><p class="eyebrow">诗作库</p><h2 id="poem-picker-title">选择要分享的诗作</h2></div><button type="button" class="icon-button" id="poem-picker-close" aria-label="关闭诗作选择">×</button></header>
+      <div class="poem-picker-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-poem-source="owned">生成记录</button><button type="button" role="tab" aria-selected="false" data-poem-source="favorites">我的收藏</button><button type="button" role="tab" aria-selected="false" data-poem-source="collections">我的合集</button></div>
+      <label class="poem-picker-search"><span>搜索</span><input id="poem-picker-search" type="search" placeholder="严格匹配题目或正文关键词"></label>
+      <div id="poem-picker-list" class="poem-picker-list" aria-live="polite"></div>
+      <footer class="poem-picker-footer"><span id="poem-picker-status">请选择一首诗作</span><button type="button" class="primary-button" id="poem-picker-confirm" disabled>确定分享</button></footer>
+    </div>
+  </dialog>
+
+  <dialog class="confirm-dialog" id="archive-dialog" aria-labelledby="archive-dialog-title"><form method="dialog"><h2 id="archive-dialog-title">归档这段对话？</h2><p>归档后将从聊天侧栏移除，可在个人中心的“归档对话”中查看和恢复。</p><div class="login-dialog__actions"><button type="submit" value="cancel" class="quiet-button">取消</button><button type="submit" value="confirm" class="primary-button" id="archive-confirm">确认归档</button></div></form></dialog>
+
+  <dialog class="avatar-crop-dialog" id="avatar-crop-dialog" aria-labelledby="avatar-crop-title">
+    <form class="avatar-crop-shell" id="avatar-crop-form">
+      <header class="avatar-crop-heading"><div><p class="eyebrow">头像编辑</p><h2 id="avatar-crop-title">调整头像</h2></div><button class="icon-button" type="button" id="avatar-crop-close" aria-label="取消裁剪">×</button></header>
+      <div class="avatar-crop-preview"><canvas id="avatar-crop-canvas" width="320" height="320" aria-label="头像裁剪预览"></canvas></div>
+      <label class="avatar-crop-zoom"><span>缩放</span><input id="avatar-crop-zoom" type="range" min="1" max="3" step="0.01" value="1"><output id="avatar-crop-zoom-value">100%</output></label>
+      <p class="avatar-crop-hint">拖动图片调整取景范围。</p>
+      <div class="avatar-crop-actions"><button class="quiet-button" type="button" id="avatar-crop-cancel">取消</button><button class="primary-button" type="submit" id="avatar-crop-confirm">使用此头像</button></div>
+    </form>
+  </dialog>
+
+  <div id="site-status" class="site-status" role="status" aria-live="polite"></div>
+  <script type="module" src="./site.js?v=131"></script>
+  <script type="module" src="./app.js?v=26"></script>
+  <script type="module" src="./sentence-search.js?v=17"></script>
+</body>
+</html>

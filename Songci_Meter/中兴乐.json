@@ -1,0 +1,138 @@
+{
+  "name": "中兴乐",
+  "aliases": [],
+  "description": "见《花间集》。牛希济词有“泪湿罗衣”句，名《湿罗衣》。",
+  "default_variant": "李珣",
+  "default_variant_source_id": 256,
+  "variants": [
+    {
+      "name": "毛文锡",
+      "source_id": 254,
+      "length_category": "short",
+      "variants_description": "此词六仄韵，即间入平韵之内。旧谱失注，今照《词堧》本点定。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄平",
+          "平平/仄仄/平平",
+          "仄平仄",
+          "平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_2_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "仄平/平仄",
+          "平仄",
+          "仄仄平平"
+        ]
+      }
+    },
+    {
+      "name": "牛希济",
+      "source_id": 255,
+      "length_category": "short",
+      "variants_description": "此词不间入仄韵，两结句读亦与毛词异。李珣两段者即照此体填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平平/仄仄/平平",
+          "平仄/平平",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平平/平仄/仄平",
+          "平平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "李珣",
+      "source_id": 256,
+      "length_category": "medium",
+      "variants_description": "此词前后段即牛词体加一叠，但“绣帘垂地”、“倚屏凝睇”，平仄与牛词小异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          9
+        ],
+        "lines": [
+          "仄平/仄仄/仄平平",
+          "平平/仄仄/平平",
+          "仄平/平仄",
+          "平仄/平平",
+          "平平/平仄/平平",
+          "仄平平",
+          "仄平/仄仄",
+          "平平/仄仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          9
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄平/仄仄/平平",
+          "仄平/平仄",
+          "仄仄/平平",
+          "仄平/平仄/平平",
+          "仄平平",
+          "仄平/平仄",
+          "平平/平仄",
+          "平仄/平平"
+        ]
+      }
+    }
+  ]
+}

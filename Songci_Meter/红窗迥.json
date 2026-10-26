@@ -1,0 +1,86 @@
+{
+  "name": "红窗迥",
+  "aliases": [],
+  "description": "调见周邦彦《片玉词》。",
+  "default_variant": "周邦彦",
+  "default_variant_source_id": 670,
+  "variants": [
+    {
+      "name": "周邦彦",
+      "source_id": 670,
+      "length_category": "short",
+      "variants_description": "此词坊刻向多脱误，今从《词纬》本改正。此惟欧良一词可校，故可平可仄悉参欧词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄平",
+          "中仄仄",
+          "仄中仄/中中",
+          "仄平/中仄",
+          "平仄/仄平/中仄",
+          "仄中平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "中仄/中平/平仄仄",
+          "仄/仄平/仄仄",
+          "平平/仄仄",
+          "中仄/中平平仄",
+          "仄仄/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "欧良",
+      "source_id": 671,
+      "length_category": "short",
+      "variants_description": "此与周词同，惟前后段起句多押一韵，后段第二、三句作九字一句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄仄",
+          "仄仄仄/平仄",
+          "仄平/平仄",
+          "平/仄仄平/仄仄",
+          "仄仄/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "仄仄平、仄仄/平仄/平仄",
+          "仄仄/平平/平仄",
+          "仄仄/平仄仄"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "回波乐",
+  "aliases": [],
+  "description": "唐刘肃《大唐新话》：景龙中，中宗尝游兴庆池，侍宴者递起鼓舞，并唱《回波词》。给事中李景伯亦起舞，歌词云云。",
+  "default_variant": "李景伯",
+  "default_variant_source_id": 26,
+  "variants": [
+    {
+      "name": "李景伯",
+      "source_id": 26,
+      "length_category": "short",
+      "variants_description": "此即唐六言绝句，但第一句俱用“回波尔时”四字起。\n按沈佺期词“回波尔时佺期，流向岭外生归。身名已蒙齿录，袍笏未复牙绯。”其平仄不同，其体则同也。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄平/中平",
+          "平中/仄仄/平平",
+          "中中/仄平/中仄",
+          "平中/仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 27,
+      "length_category": "short",
+      "variants_description": "此词用仄韵。\n按杨廷玉词起句“回波尔时廷玉”正与此同。但唐人风气初开，犹有古乐府遗意，其平仄往往不拘，故不复校注。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄平/仄仄",
+          "仄仄/仄仄/仄仄",
+          "仄平/仄仄/平平",
+          "仄仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

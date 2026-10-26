@@ -1,0 +1,43 @@
+{
+  "name": "华清引",
+  "aliases": [],
+  "description": "词赋华清旧事，因以名调。",
+  "default_variant": "苏轼",
+  "default_variant_source_id": 340,
+  "variants": [
+    {
+      "name": "苏轼",
+      "source_id": 340,
+      "length_category": "short",
+      "variants_description": "此调止此一词，平仄当遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄仄/平平",
+          "仄平/平仄/平仄",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/仄平平",
+          "仄平/平仄/平平",
+          "仄平/平仄仄",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

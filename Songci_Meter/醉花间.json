@@ -1,0 +1,177 @@
+{
+  "name": "醉花间",
+  "aliases": [],
+  "description": "唐教坊曲名。《宋史·乐志》：双调。",
+  "default_variant": "毛文锡",
+  "default_variant_source_id": 259,
+  "variants": [
+    {
+      "name": "毛文锡",
+      "source_id": 259,
+      "length_category": "short",
+      "variants_description": "《啸余谱》注《生查子》调，与《醉花间》调相近。不知《生查子》正体前后段皆五字句起，间有用六字者，变格耳。《醉花间》正体则前必六字、后必五字也。\n谱内可平可仄悉参下毛词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "仄平仄",
+          "平仄/平平仄",
+          "平仄/仄平平",
+          "中仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中中/中中仄",
+          "中中/平中仄",
+          "平中/仄中平",
+          "中仄/平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "毛文锡",
+      "source_id": 260,
+      "length_category": "short",
+      "variants_description": "此词后段第一句少押一韵，与前词异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "仄平仄",
+          "平仄/平平仄",
+          "平仄/仄平平",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "平平/平仄仄",
+          "平仄/仄平平",
+          "仄仄/平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 261,
+      "length_category": "short",
+      "variants_description": "此词前段第二、三、四句与毛词同，惟起句作七字异。后段第一、二句与毛词同， 以下句读全异。《阳春集》中四首皆然。\n前段第一句，冯词别首“月落霜繁深院闭”，“月”字仄声，“霜”字平声。第二句“洞房人正睡”，“洞”字仄声。后段第一句“夜深寒不彻”，“夜”字仄声。第三句“双眉愁几许”，“双”字平声。第四句“两条玉箸为君垂”，“两”字仄声。又“人心情绪自无端”，“情”字平声。谱内可平可仄据此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中仄/中平/平仄仄",
+          "中平/平仄仄",
+          "平仄/仄平平",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "中平/平仄仄",
+          "仄仄/平平仄",
+          "中平/平仄仄",
+          "中平/中仄/仄平平",
+          "仄平平",
+          "平仄仄"
+        ]
+      }
+    }
+  ]
+}

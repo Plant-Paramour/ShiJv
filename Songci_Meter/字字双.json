@@ -1,0 +1,31 @@
+{
+  "name": "字字双",
+  "aliases": [],
+  "description": "见《才鬼记》。因每句有叠字，故名《字字双》。",
+  "default_variant": "王丽贞",
+  "default_variant_source_id": 82,
+  "variants": [
+    {
+      "name": "王丽贞",
+      "source_id": 82,
+      "length_category": "short",
+      "variants_description": "此调无他词可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄平/平仄平",
+          "仄仄/平平/平仄平",
+          "平平/平仄/平仄平",
+          "仄平/仄仄/平仄平"
+        ]
+      }
+    }
+  ]
+}

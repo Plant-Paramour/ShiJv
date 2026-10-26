@@ -1,0 +1,185 @@
+{
+  "name": "画堂春",
+  "aliases": [],
+  "description": "调见《淮海集》。即咏画堂春色，取以为名。",
+  "default_variant": "秦观",
+  "default_variant_source_id": 426,
+  "variants": [
+    {
+      "name": "秦观",
+      "source_id": 426,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，其余减字、添字皆变格也。\n秦词别首前段结句“睡损红妆”，“睡”字仄声。谱内据之，余参所采诸词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/仄平平",
+          "中平/中仄/平平",
+          "仄平/平仄/仄平平",
+          "中仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "中平/中仄/平平",
+          "中平/中仄/仄平平",
+          "中仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "谢懋",
+      "source_id": 427,
+      "length_category": "short",
+      "variants_description": "此词前段第二句五字，较秦词减一字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "平平/平仄平",
+          "仄平/平仄/仄平平",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "仄平/平仄/平平",
+          "仄平/平仄/仄平平",
+          "平仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "赵长卿",
+      "source_id": 428,
+      "length_category": "short",
+      "variants_description": "此词后段第二句七字，较秦词添一字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄平/仄仄/平平",
+          "仄平/平仄/仄平平",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "仄/平平、仄仄/平平",
+          "平平/平仄/仄平平",
+          "平仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "黄庭坚",
+      "source_id": 429,
+      "length_category": "short",
+      "variants_description": "此词前后段结句皆五字，较秦词各添一字。张先“外湖莲子”词与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平平/平仄/平平",
+          "仄平/平仄/仄平平",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄平/平仄/平平",
+          "仄平/仄仄/仄平平",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "赵长卿",
+      "source_id": 430,
+      "length_category": "short",
+      "variants_description": "此词换头二句皆七字，多押一韵，较秦词添二字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄平/平仄/平平",
+          "仄平/平仄/仄平平",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄/平平、仄仄/平平",
+          "仄平/平仄/仄平平",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

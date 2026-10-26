@@ -1,0 +1,105 @@
+{
+  "name": "西溪子",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "牛峤",
+  "default_variant_source_id": 129,
+  "variants": [
+    {
+      "name": "牛峤",
+      "source_id": 129,
+      "length_category": "short",
+      "variants_description": "此词三换韵，两仄一平，与间叶者不同。其第四、五句用叠韵，或非定格，校下毛词可见。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          4,
+          5,
+          6
+        ],
+        "rhyme_3_positions": [
+          7,
+          8
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "平仄仄",
+          "平仄/平平/仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                3
+              ],
+              "end": [
+                4,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                3
+              ],
+              "end": [
+                5,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "毛文锡",
+      "source_id": 130,
+      "length_category": "short",
+      "variants_description": "此与牛词同，惟第七句添二字作五字句异。有李珣词二首可校。\n按李珣词起句“金缕翠钿浮动”，“金”字平声，“翠”字仄声。第二句“认得脸波相送”，“认”字、“脸”字俱仄声。第四、五句“无限意，夕阳里”，“限”字、“夕”字俱仄声。第六句“满地落花慵扫”，“满”字仄声。第七、八句“无语倚屏风，泣残红”，“无”字平声。谱内可平可仄据此。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          4,
+          5,
+          6
+        ],
+        "rhyme_3_positions": [
+          7,
+          8
+        ],
+        "lines": [
+          "中仄/中平/平仄",
+          "中仄/中平/平仄",
+          "仄平平",
+          "平中仄",
+          "中平仄",
+          "中仄/仄平/平仄",
+          "中仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

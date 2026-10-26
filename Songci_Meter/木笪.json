@@ -1,0 +1,47 @@
+{
+  "name": "木笪",
+  "aliases": [],
+  "description": "唐《教坊记》有《木笪》大曲，宋修内司所刊《乐府浑成集》亦有《木笪》曲名。周密《齐东野语》以为此音世人罕知。今《太平乐府》有白朴《乔木笪》词一套，疑其遗制。因《太和正音谱》采其首作，亦录以备一体。或名“",
+  "default_variant": "白朴",
+  "default_variant_source_id": 624,
+  "variants": [
+    {
+      "name": "白朴",
+      "source_id": 624,
+      "length_category": "short",
+      "variants_description": "此元人套数乐府，以其犹近宋词体制采之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄平/平仄仄",
+          "平仄/平平仄",
+          "仄仄/平平/平仄仄",
+          "平平/平仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄/平平仄",
+          "平仄/平平仄",
+          "仄/仄平平/平仄仄",
+          "平平/平仄仄",
+          "仄仄/平仄"
+        ]
+      }
+    }
+  ]
+}

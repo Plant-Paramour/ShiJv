@@ -1,0 +1,98 @@
+{
+  "name": "山亭柳",
+  "aliases": [],
+  "description": "此调有平韵、仄韵两体，平韵者始自晏殊，仄韵者始自杜安世。",
+  "default_variant": "晏殊",
+  "default_variant_source_id": 1160,
+  "variants": [
+    {
+      "name": "晏殊",
+      "source_id": 1160,
+      "length_category": "medium",
+      "variants_description": "此词平韵者衹此一体，无别首宋词可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "平仄/平平",
+          "仄仄/仄平平",
+          "平仄仄",
+          "仄平平",
+          "仄仄/仄平/平仄",
+          "仄平/平仄/平平",
+          "仄仄/平平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平平/仄仄/仄平平",
+          "平平仄",
+          "仄平平",
+          "仄仄/平平/仄仄",
+          "仄平/仄仄/平平",
+          "仄仄/平平/仄仄",
+          "平仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 1161,
+      "length_category": "medium",
+      "variants_description": "此调仄韵者亦衹此一体，无别首宋词可校，其句读与平韵词大同小异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄平/平仄",
+          "仄平/平仄",
+          "仄平平、平仄仄",
+          "平仄/平平",
+          "仄平平、仄平/仄仄",
+          "平平/仄平/仄仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄平/仄平/平仄仄",
+          "平平/平仄/仄平仄",
+          "仄平平",
+          "仄仄仄",
+          "仄仄/平平",
+          "仄平平、仄平/平仄",
+          "平平/仄仄/仄仄",
+          "仄仄仄、平平仄"
+        ]
+      }
+    }
+  ]
+}

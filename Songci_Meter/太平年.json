@@ -1,0 +1,45 @@
+{
+  "name": "太平年",
+  "aliases": [],
+  "description": "见《高丽史·乐志》。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 350,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 350,
+      "length_category": "short",
+      "variants_description": "此调止此一词，平仄当依之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄/仄平/平仄",
+          "平平/平仄/仄平仄",
+          "仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平平仄",
+          "仄仄/平平仄",
+          "平仄/仄平仄",
+          "仄仄/平仄"
+        ]
+      }
+    }
+  ]
+}

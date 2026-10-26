@@ -1,0 +1,44 @@
+{
+  "name": "柳摇金",
+  "aliases": [],
+  "description": "调见《梅苑》。",
+  "default_variant": "沈会宗",
+  "default_variant_source_id": 818,
+  "variants": [
+    {
+      "name": "沈会宗",
+      "source_id": 818,
+      "length_category": "short",
+      "variants_description": "此调句读近《思归乐》，惟前后段两起句平仄不同，且换头句不押韵，故与《思归乐》 有别。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平仄",
+          "仄仄仄、平平/仄仄",
+          "仄仄/平平/平仄仄",
+          "仄平平、仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄仄平、平平/仄仄",
+          "仄仄/平平/平仄仄",
+          "仄平平、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

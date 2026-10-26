@@ -1,0 +1,43 @@
+{
+  "name": "万里春",
+  "aliases": [],
+  "description": "调见周邦彦《片玉词》。《清真集》不载，故方千里、杨泽民、陈允平俱无和词。",
+  "default_variant": "周邦彦",
+  "default_variant_source_id": 347,
+  "variants": [
+    {
+      "name": "周邦彦",
+      "source_id": 347,
+      "length_category": "short",
+      "variants_description": "此调止此一词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄仄/平平/平仄",
+          "仄平平、仄仄/平平",
+          "仄平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄平仄、仄平/平仄",
+          "仄平平、仄仄/平平",
+          "仄平平/平仄"
+        ]
+      }
+    }
+  ]
+}

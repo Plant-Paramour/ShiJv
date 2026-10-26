@@ -1,0 +1,100 @@
+{
+  "name": "献衷心",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "欧阳炯",
+  "default_variant_source_id": 929,
+  "variants": [
+    {
+      "name": "欧阳炯",
+      "source_id": 929,
+      "length_category": "medium",
+      "variants_description": "调见《花间集》。宋元人无照此填者。在唐词中亦祇有顾夐添字一体，故谱内可平可仄即参之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "仄中平/中仄",
+          "平仄/平平",
+          "平仄仄",
+          "仄平平",
+          "仄仄平/平仄",
+          "平仄/平平",
+          "平中仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "平仄仄",
+          "仄/平平",
+          "仄平/平仄/仄平平",
+          "仄中平/平仄",
+          "平仄/平平",
+          "平中仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 930,
+      "length_category": "medium",
+      "variants_description": "此与欧阳炯词同，惟前段第二句、第六句添一字，后段第一、二句及第三、四句各添一字，皆衬字也。观此知唐时已开衬字法门。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "仄平平/仄仄",
+          "仄仄仄/平平",
+          "平仄仄",
+          "仄平平",
+          "仄仄平/平仄",
+          "仄/平仄/平平",
+          "平平仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平仄/平平",
+          "仄平/平仄",
+          "仄仄/平平",
+          "仄平平/平仄",
+          "平仄/平平",
+          "平平仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

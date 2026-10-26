@@ -1,0 +1,30 @@
+{
+  "name": "塞姑",
+  "aliases": [],
+  "description": "见《乐府诗集》。盖唐时边塞闺人之词也。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 33,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 33,
+      "length_category": "short",
+      "variants_description": "此亦六言绝句，其平仄不拘。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄仄",
+          "仄仄/平平仄仄",
+          "平仄/平平仄平",
+          "仄仄/平平平仄"
+        ]
+      }
+    }
+  ]
+}

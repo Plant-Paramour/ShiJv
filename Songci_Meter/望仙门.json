@@ -1,0 +1,76 @@
+{
+  "name": "望仙门",
+  "aliases": [],
+  "description": "调见《珠玉词》，取词中结句为名。",
+  "default_variant": "晏殊",
+  "default_variant_source_id": 376,
+  "variants": [
+    {
+      "name": "晏殊",
+      "source_id": 376,
+      "length_category": "short",
+      "variants_description": "后结“荷君恩”三字例用叠句。晏词别首“庆相逢”、“泛浓香”皆然。前段第三句，晏词别首“管絃声细出帘栊”，“管”字仄声，“声”字平声。后段第一句“仙酒斟云液”，“仙”字平声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄平平",
+          "中平/中仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "中仄/平平仄",
+          "平平/仄仄/平平",
+          "仄平/平仄/仄平平",
+          "仄平平",
+          "平仄/仄平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                5
+              ],
+              "end": [
+                3,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

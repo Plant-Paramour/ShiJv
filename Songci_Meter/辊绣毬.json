@@ -1,0 +1,48 @@
+{
+  "name": "辊绣毬",
+  "aliases": [],
+  "description": "调见《惜香乐府》。",
+  "default_variant": "赵长卿",
+  "default_variant_source_id": 944,
+  "variants": [
+    {
+      "name": "赵长卿",
+      "source_id": 944,
+      "length_category": "medium",
+      "variants_description": "汲古阁本后段第六句少一字，今据《词纬》增定，平仄无他词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          7
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄仄、平平/平仄",
+          "仄平/平仄",
+          "平平/平仄",
+          "仄平/平仄",
+          "仄平/仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          7
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "平仄仄、仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

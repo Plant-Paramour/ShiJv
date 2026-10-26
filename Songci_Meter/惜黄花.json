@@ -1,0 +1,98 @@
+{
+  "name": "惜黄花",
+  "aliases": [],
+  "description": "调见《梅溪词》，金词注“仙吕调”。",
+  "default_variant": "史达祖",
+  "default_variant_source_id": 1029,
+  "variants": [
+    {
+      "name": "史达祖",
+      "source_id": 1029,
+      "length_category": "medium",
+      "variants_description": "宋元人罕填此词，故此词可平可仄即参许词句法同者。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "中平/中仄",
+          "中平/平仄",
+          "仄平平",
+          "仄平平、仄平/平仄",
+          "平仄/中平中",
+          "中仄/平平仄",
+          "仄中仄、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/平仄",
+          "中平/中仄",
+          "仄平平",
+          "仄平平、仄平/平仄",
+          "仄仄/中平中",
+          "中仄/平平仄",
+          "仄中仄、仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "许冲元",
+      "source_id": 1030,
+      "length_category": "medium",
+      "variants_description": "此亦史词体，惟换头句不押韵，前后段第三句四字、第五句三字异。\n《花草粹编》后段起句“谁把瑶林秀”多一字，今从《梅苑》本。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄平/仄仄",
+          "平平/平仄",
+          "仄/仄平平",
+          "平平仄",
+          "仄仄仄",
+          "平仄/平平仄",
+          "平仄/平平仄",
+          "仄平仄、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "平仄/平平",
+          "平平/平仄",
+          "仄仄/平平",
+          "平平仄",
+          "仄平仄",
+          "仄仄/平平仄",
+          "仄仄/平平仄",
+          "仄平仄、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

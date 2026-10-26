@@ -1,0 +1,109 @@
+{
+  "name": "忆江南",
+  "aliases": [],
+  "description": "宋王灼《碧鸡漫志》：此曲自唐至今，皆南吕宫，字句皆同，止是今曲两段，盖近世曲子无单遍者。",
+  "default_variant": "白居易",
+  "default_variant_source_id": 50,
+  "variants": [
+    {
+      "name": "白居易",
+      "source_id": 50,
+      "length_category": "short",
+      "variants_description": "按温庭筠词：“千万恨，恨极在天涯。山月不知心里事，水风空落眼前花，摇曳碧云斜。”正与此同，平仄参之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平中/仄",
+          "中仄/仄平平",
+          "中仄/中平/平仄仄",
+          "中平/平仄/仄平平",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "欧阳修",
+      "source_id": 51,
+      "length_category": "short",
+      "variants_description": "此即单调词加一叠，其可平可仄与单调词同。\n按《啸余谱》录李煜作，本单调词两首，故前后段各韵。且双调始自宋人，从无用两韵者，即《海山记》讹託隋词八阕，亦前后一韵，不可不辨。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "平仄/仄平平",
+          "平仄/平平/平仄仄",
+          "平平/平仄/仄平平",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄/仄平平",
+          "平仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 52,
+      "length_category": "medium",
+      "variants_description": "按《阳春集》冯词二首前后段俱两平两仄四换韵，实与唐宋《忆江南》本调不同，因调名同，故为类列。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3
+        ],
+        "rhyme_2_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          3
+        ],
+        "rhyme_4_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄仄/平平",
+          "仄仄/平平仄",
+          "平平/平仄/仄平平",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

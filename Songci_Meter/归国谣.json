@@ -1,0 +1,117 @@
+{
+  "name": "归国谣",
+  "aliases": [],
+  "description": "唐教坊曲名。元颜奎词名《归平谣》。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 268,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 268,
+      "length_category": "short",
+      "variants_description": "此调以温、韦二词为正体，若颜词之摊破句法，乃变体也。\n按温词二首起句皆二字，韦词起句增出一字，即是此体，故此词平仄悉参韦词。又韦别首前段第二句“为我南飞传我意”，“南”字平声。谱内据之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄",
+          "仄仄/中平/平仄仄",
+          "中中/中中/平仄",
+          "中平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/仄平/平仄",
+          "仄平/平仄/仄",
+          "仄中/中中/平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 269,
+      "length_category": "short",
+      "variants_description": "此与温词同，惟前段起句多一字异。韦词三首皆然。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄/仄平/平仄仄",
+          "平仄/仄平/平仄",
+          "平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄平/平仄仄",
+          "仄仄/仄平/平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "颜奎",
+      "source_id": 270,
+      "length_category": "short",
+      "variants_description": "前段起句四字，第二句五字，与温、韦词异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄仄",
+          "仄平/平仄/平仄",
+          "仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄平/平仄",
+          "仄平/平仄仄",
+          "平平/平仄/平仄",
+          "仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

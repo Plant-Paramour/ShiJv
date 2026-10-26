@@ -1,0 +1,31 @@
+{
+  "name": "晴偏好",
+  "aliases": [],
+  "description": "明陈耀文《花草粹编》云：“西湖虽有山泉，而大旱亦尝龟坼。嘉熙庚子水涸，茂草生焉。”李霜崖作《晴偏好》词纪之，取词中结句为调名。",
+  "default_variant": "李霜崖",
+  "default_variant_source_id": 34,
+  "variants": [
+    {
+      "name": "李霜崖",
+      "source_id": 34,
+      "length_category": "short",
+      "variants_description": "此调止此一词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "平平/仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

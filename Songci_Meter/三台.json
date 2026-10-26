@@ -1,0 +1,50 @@
+{
+  "name": "三台",
+  "aliases": [],
+  "description": "唐教坊曲名。宋李济翁《资暇录》：《三台》，今之啐酒三十拍促曲，啐，送酒声也。宋张表臣《珊瑚鈎诗话》：乐部中有促拍催酒，谓之《三台》。沈括词名《开元乐》，因结有“翠华满陌东风”句，名《翠华引》。",
+  "default_variant": "王建",
+  "default_variant_source_id": 30,
+  "variants": [
+    {
+      "name": "王建",
+      "source_id": 30,
+      "length_category": "short",
+      "variants_description": "此亦六言绝句，平仄不拘。\n按《王建集》有“宫中三台”、“江南三台”之分，大约如《竹枝词》有“蜀中、江南渔父”之目，各随其所咏之事而名之也。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄",
+          "仄平/仄仄/平平",
+          "平仄/平平/仄仄",
+          "仄平/平仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "王建",
+      "source_id": 31,
+      "length_category": "short",
+      "variants_description": "此词首句用韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平",
+          "仄仄/平仄/平平",
+          "平平/仄平/仄仄",
+          "仄平/仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

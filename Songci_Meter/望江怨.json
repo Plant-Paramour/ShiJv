@@ -1,0 +1,36 @@
+{
+  "name": "望江怨",
+  "aliases": [],
+  "description": "调见花间集。",
+  "default_variant": "牛峤",
+  "default_variant_source_id": 157,
+  "variants": [
+    {
+      "name": "牛峤",
+      "source_id": 157,
+      "length_category": "short",
+      "variants_description": "按《花间集》此调祇有牛峤一词，平仄当遵之。\n《啸余谱》所注平仄及《词统》所采明词，皆误。\n★ 按《词律校勘记》，牛峤词“粉香和泪泣”句，王氏宽甫校本“泣作滴。”",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7
+        ],
+        "lines": [
+          "平平/仄",
+          "仄仄/平平/仄平仄",
+          "平平/平仄仄",
+          "仄平/平仄/平平仄",
+          "仄平/仄",
+          "仄仄/仄平平",
+          "仄平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

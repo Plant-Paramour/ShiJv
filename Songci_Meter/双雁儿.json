@@ -1,0 +1,45 @@
+{
+  "name": "双雁儿",
+  "aliases": [],
+  "description": "一名《双燕子》，《中原音韵》入商调。按此调微近《醉红妆》，但《醉红妆》后段第 三句不用韵，此则前后俱用韵也。",
+  "default_variant": "杨无咎",
+  "default_variant_source_id": 660,
+  "variants": [
+    {
+      "name": "杨无咎",
+      "source_id": 660,
+      "length_category": "short",
+      "variants_description": "按《花草粹编》两段刻作两首，今依本集订定。此词无别首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄仄仄、仄平平",
+          "仄平/平仄/仄平平",
+          "仄平平、仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄仄仄、仄平平",
+          "仄平/平仄/仄平平",
+          "仄平平、仄仄平"
+        ]
+      }
+    }
+  ]
+}

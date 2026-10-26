@@ -1,0 +1,45 @@
+{
+  "name": "城头月",
+  "aliases": [],
+  "description": "调见李昴英《文溪词》，和广帅马天骥韵，赠道士梁青霞作。此词盖马天骥所倡也， 取词中起句为名。",
+  "default_variant": "马天骥",
+  "default_variant_source_id": 578,
+  "variants": [
+    {
+      "name": "马天骥",
+      "source_id": 578,
+      "length_category": "short",
+      "variants_description": "此调祇有李昴英词可校。李词前段第三句“真气长存”，“真”字平声。后段第一句“一身二五只精媾”，“二”字仄声。其余平仄皆同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/平平仄",
+          "中仄/平平",
+          "平平/仄仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/中仄/平平仄",
+          "仄仄/平平仄",
+          "仄仄/平平",
+          "平平/仄仄",
+          "平仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

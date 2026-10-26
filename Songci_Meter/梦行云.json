@@ -1,0 +1,52 @@
+{
+  "name": "梦行云",
+  "aliases": [],
+  "description": "调见《梦窗词藁》。自注：“一名《六幺花十八》。”《碧鸡漫志》云：“六幺曲内一叠，名《花十八》，前后十八拍。”",
+  "default_variant": "吴文英",
+  "default_variant_source_id": 997,
+  "variants": [
+    {
+      "name": "吴文英",
+      "source_id": 997,
+      "length_category": "medium",
+      "variants_description": "此调仅见此词，无别首可校。\n★ 按《词律校勘记》，“晚蝉乱秋曲”句，“乱”当作“理”。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄平/仄平仄",
+          "平平仄",
+          "平仄仄",
+          "平平/仄仄",
+          "仄平/平平仄",
+          "仄平/平仄/平平仄",
+          "平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄平/仄仄",
+          "平平/平仄",
+          "平平仄",
+          "平仄仄",
+          "平平/平仄",
+          "仄平/仄平仄",
+          "仄平/平仄/平平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

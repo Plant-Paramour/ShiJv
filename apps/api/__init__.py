@@ -1,0 +1,1 @@
+"""Local desktop application API."""

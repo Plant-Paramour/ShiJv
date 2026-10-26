@@ -1,0 +1,80 @@
+{
+  "name": "水仙子",
+  "aliases": [],
+  "description": "唐教坊曲名。《太平乐府》注“双调”。",
+  "default_variant": "张可久",
+  "default_variant_source_id": 287,
+  "variants": [
+    {
+      "name": "张可久",
+      "source_id": 287,
+      "length_category": "short",
+      "variants_description": "张可久《小山乐府》中，此调凡十余首，自四十二字起，至五十一字，衬字递增， 长短不一，盖元人小令之渐流于曲者，故不多录。\n张词别首前段第一句“席间谈笑欠佳宾”，“席”字仄声。第三句“玉波流暖迎兰棹”，“玉”字仄声，“流”字平声。第四句“可怜辜负春”，“可”字仄声，“辜” 字平声。或作“香尘随去马”，换叶仄韵。后段第一句“孤山谁弔逋魂”，“谁”字平声。谱内可平可仄据此，余参下词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/仄平平",
+          "中仄/平平/仄仄平",
+          "中平/中仄/平平仄",
+          "中平/中仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平",
+          "平平仄",
+          "仄仄平",
+          "中仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "倪瓒",
+      "source_id": 288,
+      "length_category": "short",
+      "variants_description": "前段与张词同，后段第二、三句俱四字，与张词异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平平/仄仄/平平仄",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平",
+          "平平/平仄",
+          "平平/仄平",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

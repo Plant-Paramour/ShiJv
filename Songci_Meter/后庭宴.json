@@ -1,0 +1,46 @@
+{
+  "name": "后庭宴",
+  "aliases": [],
+  "description": "《庚溪诗话》云：“宋宣和中，掘地得石刻唐词，调名《后庭宴》。”",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 893,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 893,
+      "length_category": "medium",
+      "variants_description": "此词前段近《踏莎行》，后段字句又与前段不同。《庚溪诗话》定为唐词，然无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄/仄平",
+          "仄平/平仄",
+          "仄平/平仄/平平仄",
+          "仄平/平仄/仄平平",
+          "平平/平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平/仄仄/平平",
+          "平仄/仄平/平仄",
+          "仄平/平仄",
+          "平仄/平平仄",
+          "仄仄/仄平平",
+          "仄平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

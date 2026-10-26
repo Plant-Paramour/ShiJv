@@ -1,0 +1,46 @@
+{
+  "name": "怨三三",
+  "aliases": [],
+  "description": "调见李之仪《姑溪词》，取词中前段结句意为名。",
+  "default_variant": "李之仪",
+  "default_variant_source_id": 574,
+  "variants": [
+    {
+      "name": "李之仪",
+      "source_id": 574,
+      "length_category": "short",
+      "variants_description": "此李端叔《登姑孰堂寄旧游》，用贺方回韵也。今所传《东山词》中缺此调，其平仄亦无可校对矣。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄仄/平平",
+          "仄仄/平平/仄仄平",
+          "仄平仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平",
+          "仄平仄、平平/仄平",
+          "仄/仄仄/平平",
+          "平平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

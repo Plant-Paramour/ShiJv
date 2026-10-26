@@ -1,0 +1,48 @@
+{
+  "name": "喝火令",
+  "aliases": [],
+  "description": "调见《琴趣外篇》。",
+  "default_variant": "黄庭坚",
+  "default_variant_source_id": 939,
+  "variants": [
+    {
+      "name": "黄庭坚",
+      "source_id": 939,
+      "length_category": "medium",
+      "variants_description": "此词无他首可校。后段句法，若准前段，则第四句应作“星月雁行低度”，今叠用 三“晓也”字，摊作三句，当是体例应然，填者须遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄仄/平/平",
+          "仄仄/仄/平平",
+          "仄仄/仄平/平仄",
+          "仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

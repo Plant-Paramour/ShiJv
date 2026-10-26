@@ -1,0 +1,56 @@
+{
+  "name": "瑶阶草",
+  "aliases": [],
+  "description": "调见《书舟词》。",
+  "default_variant": "程垓",
+  "default_variant_source_id": 1174,
+  "variants": [
+    {
+      "name": "程垓",
+      "source_id": 1174,
+      "length_category": "medium",
+      "variants_description": "《花草粹编》本前段第三句作“又还帘幕风轻”，多二字，后段第八句作“醒来越 闷”，今从本集订正。其字句平仄无别首宋词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          7,
+          8
+        ],
+        "lines": [
+          "平平/仄平仄",
+          "仄仄/平平仄",
+          "平仄/平平",
+          "仄仄/平仄仄",
+          "仄平/仄仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "仄平/仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          7,
+          8,
+          9
+        ],
+        "lines": [
+          "仄平仄",
+          "仄平/平仄",
+          "仄平/仄仄/平平仄",
+          "仄仄/平平",
+          "仄平/仄仄/平仄仄",
+          "仄平/仄仄",
+          "仄平/仄仄",
+          "仄平/仄仄",
+          "平平/仄仄/平仄"
+        ]
+      }
+    }
+  ]
+}

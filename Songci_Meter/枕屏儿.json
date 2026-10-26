@@ -1,0 +1,55 @@
+{
+  "name": "枕屏儿",
+  "aliases": [],
+  "description": "调见《梅苑》。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 1085,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 1085,
+      "length_category": "medium",
+      "variants_description": "此调惟《梅苑》有此一词，无宋元人他作可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          5,
+          8,
+          9
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/仄平/仄仄",
+          "仄平平",
+          "平仄仄",
+          "平平/仄仄",
+          "平仄仄",
+          "平平仄",
+          "仄平/平仄",
+          "平平平、仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5,
+          8,
+          9
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "平平/仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平/平仄",
+          "仄平仄、仄平/仄仄"
+        ]
+      }
+    }
+  ]
+}

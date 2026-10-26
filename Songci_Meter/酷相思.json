@@ -1,0 +1,107 @@
+{
+  "name": "酷相思",
+  "aliases": [],
+  "description": "调见《书舟雅词》。",
+  "default_variant": "程垓",
+  "default_variant_source_id": 960,
+  "variants": [
+    {
+      "name": "程垓",
+      "source_id": 960,
+      "length_category": "medium",
+      "variants_description": "此调祇有此词，前后段两结句例用叠韵，填者须遵之。\n汲古阁本后段第二句脱“箇”字，今照《花草粹编》增入。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平仄、平平仄",
+          "仄平仄、平平/平仄仄",
+          "仄仄仄、平平仄",
+          "仄仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄仄、平平仄",
+          "仄平仄、平平/平仄仄",
+          "平仄仄、平平仄",
+          "平仄仄、平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                5
+              ],
+              "end": [
+                4,
+                6
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                5
+              ],
+              "end": [
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                4,
+                2
+              ],
+              "end": [
+                4,
+                6
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                6
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "name": "饮马歌",
+  "aliases": [],
+  "description": "调见《松隐集》。自序：此曲自金源传至边城，饮牛马即横笛吹之，不鼓不拍，声甚 凄断。",
+  "default_variant": "曹勛",
+  "default_variant_source_id": 146,
+  "variants": [
+    {
+      "name": "曹勛",
+      "source_id": 146,
+      "length_category": "short",
+      "variants_description": "此词第五、六句“悲”、“低”二字，疑是间押二平韵，然无他首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          7,
+          8
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "仄仄/平平仄",
+          "仄平/平平仄",
+          "仄平/平平仄",
+          "仄平平",
+          "仄仄平",
+          "仄仄/平平仄",
+          "仄平仄"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "浪淘沙",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "皇甫松",
+  "default_variant_source_id": 78,
+  "variants": [
+    {
+      "name": "皇甫松",
+      "source_id": 78,
+      "length_category": "short",
+      "variants_description": "此与宋人《浪淘沙令》、《浪淘沙慢》不同，盖宋人借旧曲名，另倚新腔。此七言绝句也。\n按《浪淘沙》词创自刘、白，刘词九首与此同，惟白词六首皆拗体耳。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平仄/平平/仄仄平",
+          "仄仄/平平/平仄仄",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

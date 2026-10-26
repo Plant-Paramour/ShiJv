@@ -1,0 +1,31 @@
+{
+  "name": "桂殿秋",
+  "aliases": [],
+  "description": "本唐李德裕《送神》、《迎神》曲，有“桂殿夜凉吹玉笙”句，取为调名。",
+  "default_variant": "向子諲",
+  "default_variant_source_id": 71,
+  "variants": [
+    {
+      "name": "向子諲",
+      "source_id": 71,
+      "length_category": "short",
+      "variants_description": "按李德裕词二首，其一首第二句“玉练颜”， “练”字仄声。其一首第三句“桂殿夜凉吹玉笙”，“桂”字、“殿”字俱仄声，“凉”字、“吹”字俱平声，“玉”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄仄",
+          "仄中平",
+          "中中/仄中/中中平",
+          "平平/仄仄/平平仄",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

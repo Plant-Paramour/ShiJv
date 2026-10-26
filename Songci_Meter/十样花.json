@@ -1,0 +1,58 @@
+{
+  "name": "十样花",
+  "aliases": [],
+  "description": "宋李弥逊词十首，分咏十样花，故名。",
+  "default_variant": "李弥逊",
+  "default_variant_source_id": 83,
+  "variants": [
+    {
+      "name": "李弥逊",
+      "source_id": 83,
+      "length_category": "short",
+      "variants_description": "此词以“陌上风光浓处”为起句，李词十首皆然，谱中止采其二。可平可仄即参后词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "中仄/中平/平仄",
+          "仄仄/中平中",
+          "平中仄",
+          "仄平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "李弥逊",
+      "source_id": 84,
+      "length_category": "short",
+      "variants_description": "此词第四句多押一韵。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄/仄平/平仄",
+          "仄仄/仄平平",
+          "平仄仄",
+          "仄平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

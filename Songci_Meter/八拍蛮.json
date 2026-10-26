@@ -1,0 +1,50 @@
+{
+  "name": "八拍蛮",
+  "aliases": [],
+  "description": "唐教坊曲名。按孙光宪词所咏俱越中事，或即八拍之蛮歌也。",
+  "default_variant": "孙光宪",
+  "default_variant_source_id": 80,
+  "variants": [
+    {
+      "name": "孙光宪",
+      "source_id": 80,
+      "length_category": "short",
+      "variants_description": "此词起句用韵，可平可仄即参后词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中仄/仄平/平仄平",
+          "中平/平仄/仄平平",
+          "中仄/中平/平仄仄",
+          "平平/中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "阎选",
+      "source_id": 81,
+      "length_category": "short",
+      "variants_description": "此词起句不用韵。\n按《花间集》孙光宪词一首、阎选词两首，俱拗体七言绝句，不似《竹枝》、《柳枝》平仄可以不拘也，作者辨之。\n以上六调皆唐人七言绝句，当时音律必有所属，今歌法不传矣，聊为类列。至《清平调》三首、《水调》、《梁州》、《伊州》诸词，此宋人大曲之源，另辑一卷，附于卷末。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "平平/平仄/仄平平",
+          "平仄/仄平/平仄仄",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

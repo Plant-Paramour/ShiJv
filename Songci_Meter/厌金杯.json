@@ -1,0 +1,51 @@
+{
+  "name": "厌金杯",
+  "aliases": [],
+  "description": "调见《东山乐府》，一名《献金杯》。",
+  "default_variant": "贺铸",
+  "default_variant_source_id": 948,
+  "variants": [
+    {
+      "name": "贺铸",
+      "source_id": 948,
+      "length_category": "medium",
+      "variants_description": "此词无他首可校。\n按《花草粹编》后段“采苹溪晚”句，误刻“拾翠沙空”句上，今从《词纬》本订正。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄/平平",
+          "平平/仄仄",
+          "仄平平、仄平/平仄",
+          "仄平/平仄",
+          "仄仄/仄平平",
+          "平仄仄",
+          "仄仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄平仄、仄平/平仄",
+          "仄平/仄仄",
+          "仄仄/仄平平",
+          "平仄仄",
+          "平仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

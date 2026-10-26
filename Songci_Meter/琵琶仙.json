@@ -1,0 +1,54 @@
+{
+  "name": "琵琶仙",
+  "aliases": [],
+  "description": "姜夔自度黄钟商曲。",
+  "default_variant": "姜夔",
+  "default_variant_source_id": 1724,
+  "variants": [
+    {
+      "name": "姜夔",
+      "source_id": 1724,
+      "length_category": "long",
+      "variants_description": "此调祇有此词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "平仄/平平",
+          "仄平仄、仄仄/平平/平仄",
+          "平仄/平仄/平平",
+          "平平/仄平仄",
+          "平仄仄、平平/仄仄",
+          "仄平仄、仄平/平仄",
+          "仄仄/平平",
+          "平平/仄仄",
+          "平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄平仄、平仄/平平",
+          "仄平仄、平平/仄平仄",
+          "平仄/仄平/平仄",
+          "仄/平平/平仄",
+          "平仄仄、平平/仄仄",
+          "仄仄平、仄仄/平仄",
+          "仄仄/平仄/平平",
+          "仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "纥那曲",
+  "aliases": [],
+  "description": "明胡震亨《唐音癸签》云：“《纥那曲》，不知所出。考唐天宝中，崔成甫翻《得体 歌》，有‘得体纥那也，纥囊得体那’之句，岂其所本欤？”",
+  "default_variant": "刘禹锡",
+  "default_variant_source_id": 8,
+  "variants": [
+    {
+      "name": "刘禹锡",
+      "source_id": 8,
+      "length_category": "short",
+      "variants_description": "此即唐平韵五言绝句。\n按《尊前集》刘词别首第一句“蹋曲兴无穷”，“蹋”字仄声。第三句“愿郎千万寿”， “愿”字仄声，“千”字平声，“万”字仄声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中仄/仄平平",
+          "仄平/平仄平",
+          "中平/中中仄",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

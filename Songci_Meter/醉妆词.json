@@ -1,0 +1,121 @@
+{
+  "name": "醉妆词",
+  "aliases": [],
+  "description": "唐孙光宪《北梦琐言》：“蜀王衍尝裹小巾，其尖如锥。宫人皆衣道服，簪莲花冠， 施胭脂夹脸，号‘醉妆’，因作《醉妆词》。”",
+  "default_variant": "王衍",
+  "default_variant_source_id": 14,
+  "variants": [
+    {
+      "name": "王衍",
+      "source_id": 14,
+      "length_category": "short",
+      "variants_description": "此调祇此一词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平仄",
+          "仄平仄",
+          "仄仄/平平仄",
+          "仄平仄",
+          "仄平仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                2
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                1
+              ],
+              "end": [
+                4,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                1
+              ],
+              "end": [
+                5,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

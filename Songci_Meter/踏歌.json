@@ -1,0 +1,112 @@
+{
+  "name": "踏歌",
+  "aliases": [],
+  "description": "调见《太平樵唱》词，又见《梅苑群贤词》，与唐人小令《踏歌行》不同。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 1290,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 1290,
+      "length_category": "medium",
+      "variants_description": "此调祇有朱词及无名氏词，故谱内可平可仄悉参下词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 3,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄",
+          "仄平平、仄仄/平平仄",
+          "中平中、仄仄/平平仄",
+          "仄平平/仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄",
+          "仄中平、中仄/平平仄",
+          "中平仄、仄仄/中平仄",
+          "仄中平/中仄/平平仄"
+        ]
+      },
+      "stanza3": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄仄",
+          "平平仄、仄仄/平平仄",
+          "中中/仄平平",
+          "仄仄/平平仄",
+          "中中平/仄中平仄"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 1291,
+      "length_category": "medium",
+      "variants_description": "此与朱词同，惟第三段起二句添一字，作七字一句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 3,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄",
+          "仄平/平仄仄/平平仄",
+          "仄平平、仄仄/平平仄",
+          "仄平平/仄仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄",
+          "仄仄平/平仄/平平仄",
+          "平平仄、仄仄/平平/仄",
+          "仄/仄平/平仄/平平仄"
+        ]
+      },
+      "stanza3": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平仄/仄仄平仄",
+          "平平仄、仄仄/平平仄",
+          "平仄/仄平平",
+          "仄仄/平平仄",
+          "平仄平/仄平平仄"
+        ]
+      }
+    }
+  ]
+}

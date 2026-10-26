@@ -1,0 +1,44 @@
+{
+  "name": "倾杯令",
+  "aliases": [],
+  "description": "唐教坊曲有《倾杯乐》，调名本此。但此令词与慢词名《倾杯乐》者不同。",
+  "default_variant": "吕渭老",
+  "default_variant_source_id": 658,
+  "variants": [
+    {
+      "name": "吕渭老",
+      "source_id": 658,
+      "length_category": "short",
+      "variants_description": "此调祇有吕词二首，宋元人无填此者。\n吕词别首前段起句“隔座藏鈎”，“隔”字仄声。第四句“筝按教坊新谱”，“教”字仄声。结句“楼外月生春浦”，“月”字仄声。后段起句“徘徊爭忍忙归去”，“爭”字平声。余与此词平仄如一。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "中仄/平平",
+          "平平/仄仄",
+          "仄仄/仄平/平仄",
+          "平仄/中平/平仄",
+          "平仄/中平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/中仄/平平仄",
+          "仄平平、平平/平仄",
+          "平平/仄仄/平仄",
+          "仄仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

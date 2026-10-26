@@ -1,0 +1,57 @@
+{
+  "name": "天净沙",
+  "aliases": [],
+  "description": "《太平乐府》注“越调”。无名氏词有“塞上清秋早寒”句，又名《塞上秋》。",
+  "default_variant": "乔吉",
+  "default_variant_source_id": 85,
+  "variants": [
+    {
+      "name": "乔吉",
+      "source_id": 85,
+      "length_category": "short",
+      "variants_description": "此亦元人小令，第四句叶一仄韵。《老学丛谭》有无名氏词二首，正与此同。谱内可平可仄即参后词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "中中/中仄/平平",
+          "仄平/平仄/平平",
+          "仄仄/平平/仄平",
+          "中平/中仄",
+          "仄平/平仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "马致远",
+      "source_id": 86,
+      "length_category": "short",
+      "variants_description": "此词第三、四句俱叶仄韵。\n按孟昉词十二首，其十首俱与此同。惟一首起句“七十二候环催”，“七”字、“十” 字俱仄声。又一首第四句“风高露下”。“风”字平声，“露”字仄声。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "中中/仄仄/平平",
+          "仄平/平仄/平平",
+          "仄仄/平平/仄仄",
+          "中平/中仄",
+          "仄平平/仄平平"
+        ]
+      }
+    }
+  ]
+}

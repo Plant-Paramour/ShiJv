@@ -1,0 +1,82 @@
+{
+  "name": "甘草子",
+  "aliases": [],
+  "description": "《乐章集》注“正宫”。",
+  "default_variant": "寇准",
+  "default_variant_source_id": 423,
+  "variants": [
+    {
+      "name": "寇准",
+      "source_id": 423,
+      "length_category": "short",
+      "variants_description": "此调前段第四句押韵者，祇有此词。柳词二首自注“宫调”，又有杨无咎词可校，故可平可仄悉注于柳词之下。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄",
+          "仄平/平仄",
+          "平仄/平平仄",
+          "仄仄/平平仄",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/仄平仄",
+          "仄仄仄、平平/仄仄",
+          "平仄/平平/仄平仄",
+          "仄/仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "柳永",
+      "source_id": 424,
+      "length_category": "short",
+      "variants_description": "换头句“愁无侣”三字，《词律》误为“愁无似”，今从《花草粹编》改正。\n柳词别首前段结句“还有边庭信”，“还”字平声。后段第二句“动罗幕晓寒犹嫩”，“罗”字平声，“晓”字仄声。第三句“中酒残妆慵整顿”，“慵”字平声，“整”字仄声。杨词“谁与浮家五湖去”，“谁”字平声。谱内可平可仄据此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄",
+          "仄仄/平平",
+          "仄仄/平平仄",
+          "仄仄/仄平平",
+          "中仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平平仄",
+          "仄中仄、中平/平仄",
+          "中仄/平平/中中仄",
+          "仄/仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

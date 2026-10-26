@@ -1,0 +1,55 @@
+{
+  "name": "雪明鳷鹊夜",
+  "aliases": [],
+  "description": "调见《花草粹编》。",
+  "default_variant": "宋徽宗",
+  "default_variant_source_id": 1412,
+  "variants": [
+    {
+      "name": "宋徽宗",
+      "source_id": 1412,
+      "length_category": "long",
+      "variants_description": "此调仅见此词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          7,
+          10
+        ],
+        "lines": [
+          "仄/仄平/平仄",
+          "仄平/平仄仄",
+          "仄仄/平仄",
+          "仄/平仄/仄平",
+          "仄仄/平仄",
+          "仄仄/平平/平仄平",
+          "仄仄平、仄平/仄仄",
+          "仄平平",
+          "平仄/平平",
+          "平仄/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          6,
+          8
+        ],
+        "lines": [
+          "仄平/平平/仄仄",
+          "仄/平仄/仄平",
+          "仄仄/仄仄",
+          "仄平平/仄仄/平平仄",
+          "仄仄/平平/仄仄",
+          "平仄仄、平/仄平/仄仄",
+          "仄/平平/仄仄",
+          "平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

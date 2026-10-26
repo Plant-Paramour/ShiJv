@@ -1,0 +1,29 @@
+{
+  "name": "梧桐影",
+  "aliases": [],
+  "description": "宋周紫芝《竹坡诗话》云：“大梁景德寺峨嵋院壁间，有吕岩题字。寺僧相传，有蜀僧号峨嵋道者，戒律甚严，不下席者二十年。一日，有布衣青裘，昂然一伟人来，与语良久，期以明年是日，复相见于此，愿少见待。明年是日",
+  "default_variant": "吕岩",
+  "default_variant_source_id": 10,
+  "variants": [
+    {
+      "name": "吕岩",
+      "source_id": 10,
+      "length_category": "short",
+      "variants_description": "按《竹坡诗话》作“落日斜，西风冷，幽人今夜来不来，教人立尽梧桐影”，与此小异。今照《庚溪诗话》校定。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄平",
+          "平平仄",
+          "平仄/仄平/平仄平",
+          "平平/仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

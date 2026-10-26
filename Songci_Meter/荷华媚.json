@@ -1,0 +1,45 @@
+{
+  "name": "荷华媚",
+  "aliases": [],
+  "description": "调见《东坡词集》，即赋题本意也。",
+  "default_variant": "苏轼",
+  "default_variant_source_id": 871,
+  "variants": [
+    {
+      "name": "苏轼",
+      "source_id": 871,
+      "length_category": "medium",
+      "variants_description": "此词两结句俱上一下四句法，填者宜遵之。\n★ 按《词律校勘记》，“夭邪无力”句，“邪”应作“斜”。按香山诗有“钱塘苏小小，人道最夭斜。”",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄平仄",
+          "平平仄、仄仄/平平/平仄",
+          "平平/平仄仄",
+          "平平/仄仄",
+          "仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄仄仄、平仄/平平仄",
+          "仄平平/仄仄",
+          "平平/平仄",
+          "平平仄、平平仄",
+          "平平/平仄",
+          "仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

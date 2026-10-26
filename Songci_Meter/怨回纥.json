@@ -1,0 +1,65 @@
+{
+  "name": "怨回纥",
+  "aliases": [],
+  "description": "此调本五言律诗，见《尊前集》。皇甫词第一首云：“白首南朝女，悉听异域歌。收兵颉利国，饮马胡卢河。”结二句云：“雕窠城上宿，吹笛泪滂沱。”盖戍妇之怨词也。",
+  "default_variant": "皇甫松",
+  "default_variant_source_id": 222,
+  "variants": [
+    {
+      "name": "皇甫松",
+      "source_id": 222,
+      "length_category": "short",
+      "variants_description": "按皇甫词别首后段第二句“穹庐岁月多”，“岁”字可仄。谱内据之。余详见调注。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/中平仄",
+          "平平/仄仄平",
+          "中平/中仄仄",
+          "中仄/中平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "平平/中仄平",
+          "中平/平仄仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 223,
+      "length_category": "short",
+      "variants_description": "此见《乐府诗集》，名《回纥》。《乐苑》注“商调曲也”。与皇甫松词句读不同。元郭茂倩编入《近代曲辞》，故亦采入以备一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄仄/平平仄",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

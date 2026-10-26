@@ -1,0 +1,44 @@
+{
+  "name": "促拍采桑子",
+  "aliases": [],
+  "description": "调见朱希真《太平樵唱词》，一名《促拍丑奴儿》。促拍者，即促节繁声之意，《中原音韵》所谓“急曲子”也，字句与《采桑子》、《添字采桑子》迥别。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 573,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 573,
+      "length_category": "short",
+      "variants_description": "此调亦祇此词，无别首可校。\n按《黄山谷集》，《丑奴儿》词六十二字者，减去前后段第三句即是此词，但换头句黄词止五字耳。因黄体已编入《似孃儿》调，兹不类列。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "仄平平、平仄/平平",
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平平、平仄/平平",
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

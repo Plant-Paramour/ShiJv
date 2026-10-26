@@ -1,0 +1,45 @@
+{
+  "name": "天门谣",
+  "aliases": [],
+  "description": "贺铸词，有“牛渚天门险”句，因取为调名。李之仪《姑溪词》注：贺方回登采石娥眉亭作也。",
+  "default_variant": "贺铸",
+  "default_variant_source_id": 341,
+  "variants": [
+    {
+      "name": "贺铸",
+      "source_id": 341,
+      "length_category": "short",
+      "variants_description": "按李之仪词，前段第二句“尽远目、与天俱占”，“远”字仄声。后段第一句“正风静云閒平潋滟”，“风”字平声。末句“杳杳落沙鸥数点”，“数”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "仄/中仄、仄平/平仄",
+          "平仄仄",
+          "仄平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄中/仄平/平平/仄仄",
+          "仄仄/平平/平仄仄",
+          "平仄仄",
+          "仄仄仄、平平/中仄"
+        ]
+      }
+    }
+  ]
+}

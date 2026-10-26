@@ -1,0 +1,51 @@
+{
+  "name": "皂罗特髻",
+  "aliases": [],
+  "description": "调见宋苏轼词，词中有“髻鬟初合”句，亦赋题也。",
+  "default_variant": "苏轼",
+  "default_variant_source_id": 1187,
+  "variants": [
+    {
+      "name": "苏轼",
+      "source_id": 1187,
+      "length_category": "medium",
+      "variants_description": "此调无别词可校。\n按词中凡七用“采菱拾翠”句，想其体例应然，填者依之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          7,
+          9
+        ],
+        "lines": [
+          "仄平/仄仄",
+          "仄仄仄/平平",
+          "仄平/平仄",
+          "仄平/仄仄",
+          "仄仄平/平仄",
+          "平平仄、仄平/仄仄",
+          "仄平平、仄仄/平平仄",
+          "仄平/仄仄",
+          "仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平仄/仄平/仄仄",
+          "仄/平平平仄",
+          "仄平仄、仄平仄仄",
+          "仄平仄、仄仄/平平仄",
+          "仄平仄仄",
+          "仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

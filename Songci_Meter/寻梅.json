@@ -1,0 +1,85 @@
+{
+  "name": "寻梅",
+  "aliases": [],
+  "description": "调见《乐府雅词》及《梅苑》，盖咏梅花也。因词中有“朝来寻见”句。取以为名。",
+  "default_variant": "沈会宗",
+  "default_variant_source_id": 883,
+  "variants": [
+    {
+      "name": "沈会宗",
+      "source_id": 883,
+      "length_category": "medium",
+      "variants_description": "此调祇有沈词二首，故可平可仄即参后词。\n按《音韵集成》五歌部：蹉，蹉跎失时也。又去声，故图作仄声。若作平声，歌、哿二韵，亦是本部三声叶。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/中仄仄",
+          "仄中中、中平/仄仄",
+          "仄中/中仄/中平仄",
+          "仄平平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "中平/仄仄/平平仄",
+          "仄中中、中平/平仄",
+          "中平/仄仄/平中仄",
+          "仄平平/平仄",
+          "平仄/仄仄"
+        ]
+      }
+    },
+    {
+      "name": "沈会宗",
+      "source_id": 884,
+      "length_category": "medium",
+      "variants_description": "此与“今年早觉”词同，惟前后两结句法异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/仄仄仄",
+          "仄仄仄、平平/仄仄",
+          "仄平/仄仄/平平仄",
+          "仄平平",
+          "仄仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平、平平/平仄",
+          "仄平/仄仄/平平仄",
+          "仄仄平",
+          "仄仄/仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

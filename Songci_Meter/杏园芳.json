@@ -1,0 +1,44 @@
+{
+  "name": "杏园芳",
+  "aliases": [],
+  "description": "调见《花间集》。",
+  "default_variant": "尹鹗",
+  "default_variant_source_id": 337,
+  "variants": [
+    {
+      "name": "尹鹗",
+      "source_id": 337,
+      "length_category": "short",
+      "variants_description": "“梦相萦”，或作“梦相迎”，今照《花间集》改定。无别首可校，平仄当遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平",
+          "平平/仄仄/平平",
+          "平平/仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/仄仄/平平",
+          "平平/平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "好时光",
+  "aliases": [],
+  "description": "词见《尊前集》，唐明皇制，取结句三字为调名。",
+  "default_variant": "唐明皇",
+  "default_variant_source_id": 331,
+  "variants": [
+    {
+      "name": "唐明皇",
+      "source_id": 331,
+      "length_category": "short",
+      "variants_description": "或疑此词非明皇笔，然《尊前集》所收，固唐词也，编入以备一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄仄、仄平平",
+          "平仄/仄平/平仄仄",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平仄仄",
+          "仄仄仄、仄平平",
+          "仄仄/平平仄",
+          "仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

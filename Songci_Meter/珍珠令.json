@@ -1,0 +1,77 @@
+{
+  "name": "珍珠令",
+  "aliases": [],
+  "description": "调见张炎《山中白云词》。",
+  "default_variant": "张炎",
+  "default_variant_source_id": 664,
+  "variants": [
+    {
+      "name": "张炎",
+      "source_id": 664,
+      "length_category": "short",
+      "variants_description": "此本张炎自度曲，无别首宋词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "仄仄仄、平平/平仄",
+          "平仄/仄平平",
+          "仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平仄、仄平/平仄",
+          "平仄",
+          "仄/仄仄/平平",
+          "平平/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                6
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                2
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

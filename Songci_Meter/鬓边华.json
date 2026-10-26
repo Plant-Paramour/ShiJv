@@ -1,0 +1,42 @@
+{
+  "name": "鬓边华",
+  "aliases": [],
+  "description": "调见《梅苑》词。因词中有“映青鬓、开人醉眼”句，取以为名。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 714,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 714,
+      "length_category": "short",
+      "variants_description": "前后段字句悉同，惟后段起句不押韵。换头遇变，例须如此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄仄",
+          "平仄仄、平平/仄仄",
+          "仄平平、平仄/平平",
+          "仄平仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平",
+          "仄仄仄、平平/仄仄",
+          "仄平仄、平仄/平平",
+          "仄平仄、平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

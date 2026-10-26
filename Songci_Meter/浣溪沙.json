@@ -1,0 +1,173 @@
+{
+  "name": "浣溪沙",
+  "aliases": [
+    "浣纱溪",
+    "浣溪纱"
+  ],
+  "description": "唐教坊曲名。张泌词有“露浓香泛小庭花”句，名《小庭花》。贺铸名《减字浣溪沙》。 韩淲词有“芍药酴醾满院春”句，名《满院春》。有“东风拂栏露犹寒”句，名《东风寒》。 有“一曲西风醉木犀”句，名《",
+  "default_variant": "韩偓",
+  "default_variant_source_id": 274,
+  "variants": [
+    {
+      "name": "韩偓",
+      "source_id": 274,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若薛词之少押一韵，孙词、顾词之摊破句法，李词之换仄韵，皆变体也。\n前段第二句，韦庄词“孤灯照壁背窗纱”，“孤”字平声，“照”字仄声。后段第二句，欧阳炯词“园中缓步折花枝”，“缓”字仄声。第三句，李煜词“登临不惜更沾衣”，“登”字平声，“不”字仄声。谱内可平可仄据此，其余悉参后词。\n至《花草粹编》所载李氏一词，前段第三句“流水飘香乳燕啼”，历查唐宋元诸家平韵词，此句从无第二第六字用仄、第四字用平者，李词误填，不可从。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "中仄/中平/中仄平",
+          "中平/中仄/仄平平",
+          "中平/中仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "中仄/中平/平仄仄",
+          "中平/中仄/仄平平",
+          "中平/中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "薛昭蕴",
+      "source_id": 275,
+      "length_category": "short",
+      "variants_description": "此词首句不起韵。薛词别首“越女淘金春水上，步摇云鬓佩鸣珰”，正与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "仄平/平仄/仄平平",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "仄平/平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 276,
+      "length_category": "short",
+      "variants_description": "此词后结作三字三句，唐宋元词，仅见此作。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "平平/平仄/仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 277,
+      "length_category": "short",
+      "variants_description": "此词前后结皆三字三句。按《花间集》本，前后两结仍作七字一句，今从《花草粹编》，以备一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "平仄平",
+          "仄仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄仄",
+          "平平/平仄/仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "李煜",
+      "source_id": 278,
+      "length_category": "short",
+      "variants_description": "此调全押仄韵者，止此一词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "平平/仄仄/平平仄",
+          "平仄/仄平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/平平/平仄仄",
+          "仄仄/平平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

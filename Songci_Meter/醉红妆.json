@@ -1,0 +1,48 @@
+{
+  "name": "醉红妆",
+  "aliases": [],
+  "description": "调见张先词集，因词中有“一般妆样百般娇”及“郎未醉，有金貂”句，取以为名。",
+  "default_variant": "张先",
+  "default_variant_source_id": 636,
+  "variants": [
+    {
+      "name": "张先",
+      "source_id": 636,
+      "length_category": "short",
+      "variants_description": "此调近《双雁儿》，惟后段第四句不押韵异。宋词中亦无别首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          6
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄平平",
+          "仄仄平",
+          "仄平/平仄/仄平平",
+          "平平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          6
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄平仄",
+          "仄平平",
+          "仄仄/平平/平仄仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

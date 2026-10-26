@@ -1,0 +1,43 @@
+{
+  "name": "玉阑干",
+  "aliases": [],
+  "description": "调见《寿域词》。",
+  "default_variant": "杜安世",
+  "default_variant_source_id": 811,
+  "variants": [
+    {
+      "name": "杜安世",
+      "source_id": 811,
+      "length_category": "short",
+      "variants_description": "《词律》误从汲古阁本，前段第二句少一字，今照《花草粹编》校正，平仄无他首可校。\n★ 据《全宋词》，《御定词谱》影印本中“庭轩悄悄燕高空”应为“庭轩悄悄燕高飞”。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/仄平/平仄仄",
+          "平平/仄仄/仄平平",
+          "平平仄、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄平、平仄/平仄",
+          "仄平/仄仄/仄平平",
+          "平平平、仄仄/平仄"
+        ]
+      }
+    }
+  ]
+}

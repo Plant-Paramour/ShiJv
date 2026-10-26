@@ -1,0 +1,56 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+var/
+
+# Local IDE, browser automation, and container build state
+.idea/
+.playwright-mcp/
+.docker-build-config/
+.aws/
+.ssh/
+.codex/
+
+# Model downloads and weights (keep model configuration in source control)
+.tmp-qwen*
+*.safetensors
+*.safetensors.*
+*.incomplete
+
+# Generated reports, screenshots, logs, and exports
+/output/
+/exports/
+/*.png
+*.log
+
+# Local archives and release bundles
+/dist/
+*.zip
+*.7z
+
+# Local user data and databases
+/avatars/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Credentials and private keys
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Single-player local model configuration (contains user API keys)
+models.local.toml
+models.toml
+
+# Local diagnostic scratch files
+/.tmp-inference-diagnosis/
+.venv/
+node_modules/
+/build/

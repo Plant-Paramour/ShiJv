@@ -1,0 +1,85 @@
+{
+  "name": "婆罗门令",
+  "aliases": [],
+  "description": "调见柳永《乐章集》，原注“夹钟商”。与《婆罗门引》不同。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 1316,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 1316,
+      "length_category": "medium",
+      "variants_description": "此调祇有此词，无别首宋词可校。\n《花草粹编》于“闪闪灯摇曳”句分段，然前后段终不整齐，今从本集。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "仄平仄、仄/平平仄",
+          "平平仄、仄仄/平平仄",
+          "仄仄/平平",
+          "平平仄、平平仄",
+          "平仄仄",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7,
+          9,
+          10
+        ],
+        "lines": [
+          "平平仄",
+          "平仄仄",
+          "仄平平、仄仄/平平仄",
+          "平平/仄仄/平平仄",
+          "平仄仄、仄平仄/平仄",
+          "仄平/仄仄",
+          "仄仄/平仄",
+          "仄仄/平平",
+          "仄仄/平仄/平平仄",
+          "仄仄/平平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                5
+              ],
+              "end": [
+                1,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                6
+              ],
+              "end": [
+                2,
+                8
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

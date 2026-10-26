@@ -1,0 +1,115 @@
+{
+  "name": "西地锦",
+  "aliases": [],
+  "description": "元高拭词，第三句七字者，注“黄钟宫”。",
+  "default_variant": "蔡伸",
+  "default_variant_source_id": 381,
+  "variants": [
+    {
+      "name": "蔡伸",
+      "source_id": 381,
+      "length_category": "short",
+      "variants_description": "此词前后段两结句各四字，章华“重过黄粮”词正与此同。\n按章词前段起句“重过黄粮古驿”，“古”字仄声。末句“不禁攀折”，“不”字仄声。后段第三句“紫泥诰下”，“紫”字仄声。谱内可不可仄据此，余参下词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "仄/中平/中仄",
+          "平平/仄仄",
+          "中平/仄仄",
+          "中平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "中/中平/平仄",
+          "中平/仄仄",
+          "平平/仄仄",
+          "平平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "石孝友",
+      "source_id": 382,
+      "length_category": "short",
+      "variants_description": "此词前后段两结句各五字，周紫芝“雨细欲收”词正与此同，平仄亦如一。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄/仄平/平仄",
+          "平平/仄仄",
+          "仄平/仄仄",
+          "仄平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "平仄/平平仄",
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄/平平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 383,
+      "length_category": "short",
+      "variants_description": "此词前后段第三句各七字，其前段第二句不作上一下四句法，后段第二句六字折腰，自成一体。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "仄仄/平平仄",
+          "平平/仄仄/仄/平平",
+          "平/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄",
+          "仄仄仄、平平仄",
+          "仄平/仄仄/仄仄平",
+          "仄仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

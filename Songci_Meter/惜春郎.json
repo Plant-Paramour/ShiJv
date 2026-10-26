@@ -1,0 +1,44 @@
+{
+  "name": "惜春郎",
+  "aliases": [],
+  "description": "调见《花草粹编》柳永词，因《乐章集》不载，故宫调无考。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 493,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 493,
+      "length_category": "short",
+      "variants_description": "此调亦无别词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄平/平仄",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄/仄平仄",
+          "仄仄平、仄仄/平平",
+          "仄仄/仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

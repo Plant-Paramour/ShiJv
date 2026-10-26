@@ -1,0 +1,55 @@
+{
+  "name": "八音谐",
+  "aliases": [],
+  "description": "调见曹勛《松隐集》，自注“以八曲声合成，故名。”",
+  "default_variant": "曹勛",
+  "default_variant_source_id": 1715,
+  "variants": [
+    {
+      "name": "曹勛",
+      "source_id": 1715,
+      "length_category": "long",
+      "variants_description": "此调祇此一词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          7,
+          9
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "平仄/平平仄",
+          "平平/平仄",
+          "仄仄/仄平仄",
+          "仄/平平/平仄",
+          "平仄/仄仄/平平",
+          "仄仄仄、平平/平仄仄",
+          "仄仄仄、仄平平/仄仄",
+          "平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          7,
+          9
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "仄/仄仄/平仄",
+          "仄平/平仄",
+          "平仄/仄平平",
+          "仄/平平/平仄",
+          "仄平/平仄/平平",
+          "仄仄仄、仄平/平仄",
+          "仄仄/仄平平",
+          "仄仄仄、平平/仄"
+        ]
+      }
+    }
+  ]
+}

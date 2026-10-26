@@ -1,0 +1,47 @@
+{
+  "name": "朝玉阶",
+  "aliases": [],
+  "description": "见杜安世《寿域词》。其调近《散天花》，然换头句平仄自不同也。",
+  "default_variant": "杜安世",
+  "default_variant_source_id": 869,
+  "variants": [
+    {
+      "name": "杜安世",
+      "source_id": 869,
+      "length_category": "medium",
+      "variants_description": "按《寿域集》杜词二首，平仄如一，别无宋词可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄仄",
+          "仄平平",
+          "平平/平仄/仄平平",
+          "平平/平仄仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平平/平仄仄",
+          "仄平平",
+          "平平/平仄/仄平平",
+          "仄平/平仄仄、仄平平"
+        ]
+      }
+    }
+  ]
+}

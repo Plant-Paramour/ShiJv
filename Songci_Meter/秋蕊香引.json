@@ -1,0 +1,51 @@
+{
+  "name": "秋蕊香引",
+  "aliases": [],
+  "description": "《乐章集》注“小石调”。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 867,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 867,
+      "length_category": "medium",
+      "variants_description": "此柳永自度曲，无别首可校，其句读平仄当遵之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5,
+          7
+        ],
+        "lines": [
+          "平仄仄",
+          "平平/平仄",
+          "仄/平平仄",
+          "仄平仄",
+          "平仄仄",
+          "仄平/仄仄/平平仄",
+          "仄平仄/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄/平平/仄仄",
+          "仄平仄",
+          "仄平/仄仄",
+          "仄仄/平平/仄",
+          "仄平仄",
+          "平平仄",
+          "仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

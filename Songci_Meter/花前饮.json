@@ -1,0 +1,43 @@
+{
+  "name": "花前饮",
+  "aliases": [],
+  "description": "调见宋杨湜《古今词话》，取词中前段结句为名。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 583,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 583,
+      "length_category": "short",
+      "variants_description": "亦近嚯词，以其调僻，采以备体。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平仄",
+          "仄平仄、平平/平仄",
+          "仄仄/平仄平",
+          "仄仄仄、平平/仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄平仄",
+          "仄平仄、平平/平仄",
+          "仄仄/平仄平",
+          "仄仄仄、仄仄仄"
+        ]
+      }
+    }
+  ]
+}

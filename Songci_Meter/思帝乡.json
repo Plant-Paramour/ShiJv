@@ -1,0 +1,92 @@
+{
+  "name": "思帝乡",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 163,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 163,
+      "length_category": "short",
+      "variants_description": "此调创自温词，若韦作则本此减字者。《词律》列韦词在前，此词在后，失其源流矣。 按孙光宪词正与此同，惟第三句“永日水堂帘下”，“永”字仄声。第五句“六幅罗裙窣地”，“六”字、“窣”字仄声，“罗”字平声。第六句“微行曳碧波”，“微” 字平声，“曳”字仄声。第七句“看尽满池疏雨”，“看”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平",
+          "仄平/平仄平",
+          "中仄/仄平/平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "中仄/中平中仄",
+          "中平/中仄平",
+          "中仄/仄平/平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 164,
+      "length_category": "short",
+      "variants_description": "此词起句比温词多一字，第六句比温词少二字，第七句比温词少一字，余俱同。此所谓本温词减字也。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄/平",
+          "仄平/平仄平",
+          "仄仄/平平/平仄",
+          "仄平平",
+          "仄仄/平平/仄仄",
+          "仄平平",
+          "仄仄/平平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 165,
+      "length_category": "short",
+      "variants_description": "此词较前词第二句又减二字，惟第七句九字，仍照温词填。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "仄仄/平平/平仄",
+          "仄平平",
+          "仄仄/平平/仄仄",
+          "仄平平",
+          "仄仄/平平/平仄、仄平平"
+        ]
+      }
+    }
+  ]
+}

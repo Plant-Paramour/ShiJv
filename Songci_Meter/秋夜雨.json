@@ -1,0 +1,43 @@
+{
+  "name": "秋夜雨",
+  "aliases": [],
+  "description": "调见蒋捷《竹山乐府》，题“咏秋雨”。",
+  "default_variant": "蒋捷",
+  "default_variant_source_id": 622,
+  "variants": [
+    {
+      "name": "蒋捷",
+      "source_id": 622,
+      "length_category": "short",
+      "variants_description": "蒋词四首平仄如一，惟前段第二句或作“春情不解分雪”，“不”字仄声。第三句作\n“宝筝絃断尽”，“宝”字仄声。后段第三句作“今夜休要别”，“今”字平声。谱内可平可仄据之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/中仄/平仄",
+          "中平/平仄仄",
+          "仄仄仄、平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄平、平仄/平仄",
+          "中仄/平仄仄",
+          "仄仄仄、平平/平仄"
+        ]
+      }
+    }
+  ]
+}

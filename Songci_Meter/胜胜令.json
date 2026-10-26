@@ -1,0 +1,97 @@
+{
+  "name": "胜胜令",
+  "aliases": [],
+  "description": "俞克成词名《声声令》。",
+  "default_variant": "曹勛",
+  "default_variant_source_id": 973,
+  "variants": [
+    {
+      "name": "曹勛",
+      "source_id": 973,
+      "length_category": "medium",
+      "variants_description": "此与俞词俱用闭口韵，想是音律所寓，惜无可考，故谱内可平可仄，悉参俞词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/中仄",
+          "中仄/平平",
+          "仄平/平仄/仄平平",
+          "平平/仄仄",
+          "仄平中",
+          "仄平平",
+          "仄仄中、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          7,
+          8
+        ],
+        "lines": [
+          "中仄/平平",
+          "中仄仄",
+          "仄平平",
+          "仄平/平仄/仄平平",
+          "平平/仄仄",
+          "仄平平",
+          "仄平平",
+          "仄仄平、中仄/仄平"
+        ]
+      }
+    },
+    {
+      "name": "俞克成",
+      "source_id": 974,
+      "length_category": "medium",
+      "variants_description": "此与曹词同，惟后段起句及第六句俱用韵异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平仄/平平",
+          "仄平/平仄/仄平平",
+          "平平/仄仄",
+          "仄平仄",
+          "仄平平",
+          "仄仄平、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄仄",
+          "仄平平",
+          "仄平/平仄/仄平平",
+          "平平/仄仄",
+          "仄平平",
+          "仄平平",
+          "仄仄平、仄仄/仄平"
+        ]
+      }
+    }
+  ]
+}

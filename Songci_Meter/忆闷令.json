@@ -1,0 +1,43 @@
+{
+  "name": "忆闷令",
+  "aliases": [],
+  "description": "调见《小山乐府》。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 342,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 342,
+      "length_category": "short",
+      "variants_description": "“酒醒迟来晚”，“醒”字作平声读，与后“有深深良愿”句法同。此调止此一词，无他作可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平/平平仄",
+          "平平/仄仄/平平",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄平平/平仄",
+          "仄平仄、仄仄/平平",
+          "平仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

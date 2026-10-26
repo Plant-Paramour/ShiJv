@@ -1,0 +1,355 @@
+{
+  "name": "更漏子",
+  "aliases": [],
+  "description": "此调有两体，四十六字者始于温庭筠，唐宋词最多。《尊前集》注“大石调”，又属 “商调”。一百四字者止杜安世词，无别首可录。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 365,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 365,
+      "length_category": "short",
+      "variants_description": "此调以温、韦二词为正体，唐人多宗温词，宋人多宗韦词。其余押韵异同，或有减 字，皆变格也。\n后段第二句，牛峤词“寸肠结”，“寸“字仄声。第四句，冯延巳词“星移后”， “移“字平声。谱内可平可仄据此，余参下所采各词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "中中平",
+          "中中仄",
+          "中仄/中平/平仄",
+          "中中仄",
+          "仄平平",
+          "中平/中仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          2,
+          3
+        ],
+        "rhyme_4_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "平中仄",
+          "中中仄",
+          "中仄/中平/中仄",
+          "中中仄",
+          "仄平平",
+          "中平/中仄平"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 366,
+      "length_category": "short",
+      "variants_description": "此即温词体，惟换头句不用韵异。\n按宋词换头句多不用韵。但唐人此句第三字用仄声，宋人此句第三字则用平声。晏殊词后段起句“探花开”，“探”字仄声，“花”、“开”二字俱平声。谱内参之，余详温词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "平仄平",
+          "平仄仄",
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          2,
+          3
+        ],
+        "rhyme_4_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "中中中",
+          "平仄仄",
+          "平仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "贺铸",
+      "source_id": 367,
+      "length_category": "short",
+      "variants_description": "此即韦词体，惟后段仄韵、平韵即押前段原韵异。贺词凡四首皆同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄仄/仄平/平仄",
+          "仄仄仄",
+          "仄平平",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "平平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "欧阳炯",
+      "source_id": 368,
+      "length_category": "short",
+      "variants_description": "此亦温词体，惟换头句减一字，其后结平韵，即押前韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄仄仄/平平仄",
+          "仄仄仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "rhyme_3_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "仄仄",
+          "平平仄",
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 369,
+      "length_category": "short",
+      "variants_description": "此词句读，与温韦词同，惟后段第一、二、三句不押仄韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "仄平/仄仄/平平",
+          "平仄仄",
+          "仄平平",
+          "平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 370,
+      "length_category": "short",
+      "variants_description": "此亦韦词体，惟后段第三句五字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "rhyme_2_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄平",
+          "仄平仄",
+          "平仄/平平/平仄",
+          "仄平仄",
+          "仄平平",
+          "仄平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          2,
+          3
+        ],
+        "rhyme_4_positions": [
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平平仄",
+          "仄仄/仄平仄",
+          "仄仄仄",
+          "仄平平",
+          "平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "欧阳炯",
+      "source_id": 371,
+      "length_category": "short",
+      "variants_description": "此词前后段全押平韵，见《尊前集》。唐人亦无填此体者。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄仄平/平仄仄",
+          "仄平/仄仄/平平",
+          "平平/仄仄/仄平平",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平/平",
+          "平平/仄仄/平平",
+          "平平/仄仄/仄平平",
+          "仄平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 372,
+      "length_category": "long",
+      "variants_description": "此与唐词迥别，即宋词中亦无他首可校。因调名相同，故附列于此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          7,
+          10
+        ],
+        "lines": [
+          "平仄/平平",
+          "仄/仄仄/平平",
+          "仄仄/平平",
+          "仄仄/平平、仄仄/平仄",
+          "平仄/仄仄/平平",
+          "仄仄/仄仄/平平",
+          "平仄/仄仄平",
+          "仄/平仄/平平",
+          "仄仄/仄仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          7,
+          10
+        ],
+        "lines": [
+          "平仄/仄仄/平平",
+          "仄仄仄/平平",
+          "仄仄/平平",
+          "仄仄/平平、仄平/平仄",
+          "平平/仄仄/平平",
+          "平仄/仄平/平仄",
+          "仄平/仄仄平",
+          "仄/平平/平仄",
+          "仄平/平平",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

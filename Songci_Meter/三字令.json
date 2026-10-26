@@ -1,0 +1,99 @@
+{
+  "name": "三字令",
+  "aliases": [],
+  "description": "调见《花间集》。前后段俱三字句，故名。",
+  "default_variant": "欧阳炯",
+  "default_variant_source_id": 434,
+  "variants": [
+    {
+      "name": "欧阳炯",
+      "source_id": 434,
+      "length_category": "short",
+      "variants_description": "此调始于此词，向词即本此添字也。\n按前后段第四句，“幌”字、“烬”字俱用仄声，与向词“满”字、“我”字同。《图谱》注“可平”者非。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "向子諲",
+      "source_id": 435,
+      "length_category": "short",
+      "variants_description": "较欧词前后段各多第三句三字，两词平仄略同，惟“烟光里”、“春欲去”两句，与欧词“彩笺书”、“月分明”平仄异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "中平中",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "平中仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平",
+          "中中中",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "散余霞",
+  "aliases": [],
+  "description": "谢朓诗“余霞散成绮”，调名本此。",
+  "default_variant": "毛滂",
+  "default_variant_source_id": 343,
+  "variants": [
+    {
+      "name": "毛滂",
+      "source_id": 343,
+      "length_category": "short",
+      "variants_description": "此调止此一词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄/仄平/仄仄",
+          "平仄/平仄/平平",
+          "仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄平/仄仄",
+          "仄仄/平平/仄",
+          "平仄/仄仄/平平",
+          "仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

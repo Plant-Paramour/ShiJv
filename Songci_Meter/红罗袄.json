@@ -1,0 +1,45 @@
+{
+  "name": "红罗袄",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "周邦彦",
+  "default_variant_source_id": 672,
+  "variants": [
+    {
+      "name": "周邦彦",
+      "source_id": 672,
+      "length_category": "short",
+      "variants_description": "汲古阁本后段第二句“空怀乖梦约心期”，误多一“乖”字，今从《花草粹编》改正。\n此词前段第一、二句及三四五六句例作对偶，陈允平和词亦然，其平仄亦如一，惟前段起句“别来书渐少”，“来”字平声，“渐”字仄声，与此小异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          6
+        ],
+        "lines": [
+          "仄中/平中仄",
+          "平仄/仄平平",
+          "仄/仄仄/平平",
+          "平平/平仄",
+          "仄平/平仄",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平仄、平仄/平平",
+          "平平/仄仄/平平",
+          "仄仄/仄/平平",
+          "仄仄仄、仄仄/仄平/平"
+        ]
+      }
+    }
+  ]
+}

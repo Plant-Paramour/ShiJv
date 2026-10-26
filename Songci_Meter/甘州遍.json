@@ -1,0 +1,51 @@
+{
+  "name": "甘州遍",
+  "aliases": [],
+  "description": "按唐教坊大曲有《甘州》。凡大曲多遍，此则《甘州曲》之一遍也。",
+  "default_variant": "毛文锡",
+  "default_variant_source_id": 926,
+  "variants": [
+    {
+      "name": "毛文锡",
+      "source_id": 926,
+      "length_category": "medium",
+      "variants_description": "按《花间集》毛词别首与此平仄如一，惟后段第四句“往往路人迷”，上“往”字仄声。第七句“凤凰诏下”，“凤”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "平平仄",
+          "平仄/仄平平",
+          "仄平平",
+          "平平/仄仄",
+          "平平/仄仄",
+          "平平/仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5,
+          6,
+          8
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "平平/仄仄/平仄",
+          "中仄/仄平平",
+          "仄平仄、仄仄/仄平平",
+          "仄平平",
+          "中平/仄仄",
+          "仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

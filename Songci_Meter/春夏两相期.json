@@ -1,0 +1,58 @@
+{
+  "name": "春夏两相期",
+  "aliases": [],
+  "description": "调见《竹山词》。",
+  "default_variant": "蒋捷",
+  "default_variant_source_id": 1733,
+  "variants": [
+    {
+      "name": "蒋捷",
+      "source_id": 1733,
+      "length_category": "long",
+      "variants_description": "此调祇有此词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          9
+        ],
+        "lines": [
+          "仄平平、仄平/平仄",
+          "平平/仄仄/平仄",
+          "仄仄/平平",
+          "平仄/仄平/平仄",
+          "平平/平仄/仄平平",
+          "仄仄/平平/平平仄",
+          "仄仄/平平",
+          "平平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          7,
+          10
+        ],
+        "lines": [
+          "平平/仄仄/平仄",
+          "仄/仄平/平仄",
+          "仄平/平仄",
+          "仄仄/平平",
+          "平仄/仄平/平仄",
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平平仄",
+          "仄仄/平平",
+          "仄仄/平平",
+          "仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

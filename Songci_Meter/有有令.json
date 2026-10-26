@@ -1,0 +1,56 @@
+{
+  "name": "有有令",
+  "aliases": [],
+  "description": "调见《惜香乐府》。",
+  "default_variant": "赵长卿",
+  "default_variant_source_id": 1202,
+  "variants": [
+    {
+      "name": "赵长卿",
+      "source_id": 1202,
+      "length_category": "medium",
+      "variants_description": "此本嚯词，因此调无别词可录，故采以备体。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5,
+          8
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平仄/仄平平",
+          "仄平/平仄仄",
+          "平仄/平平仄",
+          "平平仄、平平仄",
+          "仄仄平、仄仄/平平",
+          "仄平/仄仄",
+          "平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "lines": [
+          "仄仄",
+          "平平/仄仄",
+          "平仄仄、仄平/平仄",
+          "仄仄/平平/仄仄",
+          "仄仄/平平仄",
+          "仄平/仄仄/平仄",
+          "仄平/仄仄",
+          "平仄仄、仄平/仄仄"
+        ]
+      }
+    }
+  ]
+}

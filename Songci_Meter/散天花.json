@@ -1,0 +1,47 @@
+{
+  "name": "散天花",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "舒亶",
+  "default_variant_source_id": 870,
+  "variants": [
+    {
+      "name": "舒亶",
+      "source_id": 870,
+      "length_category": "medium",
+      "variants_description": "此调与《朝玉阶》同，只后段起句平仄异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "平平/平仄仄",
+          "仄平平",
+          "平平/平仄/仄平平",
+          "平平/平仄仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "平平/平仄仄",
+          "仄平平",
+          "平平/仄仄/仄平平",
+          "仄平/平仄仄、仄平平"
+        ]
+      }
+    }
+  ]
+}

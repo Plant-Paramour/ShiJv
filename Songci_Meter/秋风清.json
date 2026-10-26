@@ -1,0 +1,80 @@
+{
+  "name": "秋风清",
+  "aliases": [],
+  "description": "一名《秋风引》。寇准词名《江南春》，刘长卿仄韵词名《新安路》。",
+  "default_variant": "李白",
+  "default_variant_source_id": 97,
+  "variants": [
+    {
+      "name": "李白",
+      "source_id": 97,
+      "length_category": "short",
+      "variants_description": "此本三、五、七言诗，后人采入词中，其平仄不拘。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平平",
+          "平仄平",
+          "仄仄/仄平仄",
+          "平平/平仄平",
+          "平平/平仄/平平仄",
+          "仄平/仄仄/平平平"
+        ]
+      }
+    },
+    {
+      "name": "寇准",
+      "source_id": 98,
+      "length_category": "short",
+      "variants_description": "此即李白“秋风清”词体，但首句不用韵，且声调亦较谐婉，故列又一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平仄仄",
+          "仄平平",
+          "平平/平仄仄",
+          "平仄/仄平平",
+          "平平/平仄/平平仄",
+          "平仄/平平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "刘长卿",
+      "source_id": 99,
+      "length_category": "short",
+      "variants_description": "此词用仄韵，其字句与李词同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平仄",
+          "平平仄",
+          "仄平/仄仄平",
+          "平仄/平平仄",
+          "平仄/平平/仄仄平",
+          "仄平/平仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

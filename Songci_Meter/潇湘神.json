@@ -1,0 +1,62 @@
+{
+  "name": "潇湘神",
+  "aliases": [],
+  "description": "调始自唐刘禹锡咏湘妃词。所谓赋题本意也。",
+  "default_variant": "刘禹锡",
+  "default_variant_source_id": 53,
+  "variants": [
+    {
+      "name": "刘禹锡",
+      "source_id": 53,
+      "length_category": "short",
+      "variants_description": "此词首三字例用叠句，如刘词别首之“湘水流，湘水流”是也。其第三句“九疑云 物至今秋”，“云”字平声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄平",
+          "平仄平",
+          "仄平/中仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "平平/平仄/仄平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                1
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                1
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

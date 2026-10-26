@@ -1,0 +1,81 @@
+{
+  "name": "金凤鈎",
+  "aliases": [],
+  "description": "见晁补之《琴趣外篇》。此调微近《夜行船》，其实不同也。",
+  "default_variant": "晁补之",
+  "default_variant_source_id": 778,
+  "variants": [
+    {
+      "name": "晁补之",
+      "source_id": 778,
+      "length_category": "short",
+      "variants_description": "或以此词近《夜行船》史达祖词体，然前段起句作三字两句，实与史词不同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "平平仄",
+          "仄平仄",
+          "仄仄仄、仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "平仄/仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄仄仄、仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "平仄/仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "晁补之",
+      "source_id": 779,
+      "length_category": "short",
+      "variants_description": "或以此词近《夜行船》毛滂词体，然前段结句六字，实与毛词不同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平仄",
+          "仄仄仄、仄平/平仄",
+          "平平/平仄/仄平仄",
+          "仄仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "仄仄仄、仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平/仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

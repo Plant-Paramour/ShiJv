@@ -1,0 +1,533 @@
+{
+  "name": "少年游",
+  "aliases": [],
+  "description": "调见《珠玉集》。因词有“长似少年时”句，取以为名。《乐章集》注“林钟商调”。韩淲词有“明窗玉蜡梅枝好”句，更名《玉蜡梅枝》。萨都刺词名《小阑干》。",
+  "default_variant": "晏殊",
+  "default_variant_source_id": 522,
+  "variants": [
+    {
+      "name": "晏殊",
+      "source_id": 522,
+      "length_category": "short",
+      "variants_description": "自晏殊词至周密词共四首，其前后段起句皆七字，第三、四句皆四字。所不同者，前后段第二句及结句添字、减字耳。而晏词实为正体，宋元人悉依此填。\n前段第四句，陈允平词“箫吹紫玉”，“紫”字仄声。换头句，吴元可词“钏脱钗斜浑不省”，“脱”字、“不”字俱仄声，“钗”字、“斜”字俱平声。结句，柳永词“独上木兰桡”，“独”字仄声。谱内可平可仄据此，余参类列李词、柳词、周词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "中平/中仄/仄平平",
+          "中仄/仄平平",
+          "中中/中中",
+          "中平/中仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "中中/中中/平中仄",
+          "中仄/仄平平",
+          "中中/中中",
+          "仄平/中仄",
+          "中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "李甲",
+      "source_id": 523,
+      "length_category": "short",
+      "variants_description": "此词见《梅苑》，与晏词同，惟前段起句不押韵异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "仄仄/仄平平",
+          "仄平/仄仄",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/仄平平",
+          "仄平/仄仄",
+          "仄平/仄仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "柳永",
+      "source_id": 524,
+      "length_category": "short",
+      "variants_description": "此与晏词同，惟后段第二句添一字作六字异。《乐章集》四首皆然。欧阳修二词“追往事、又成空”、“忍抛弃、向秋光”亦与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平仄/仄平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "中中仄、仄平平",
+          "仄仄/平平",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "柳永",
+      "source_id": 525,
+      "length_category": "short",
+      "variants_description": "此亦与晏词同，惟前后段第二句各添一字俱作六字句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平仄仄、仄平平",
+          "仄平/平仄",
+          "平平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平仄、仄平平",
+          "仄仄/平平",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "周密",
+      "source_id": 526,
+      "length_category": "short",
+      "variants_description": "此亦晏词体，惟前后段两结句各减一字作四字句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平仄/仄平平",
+          "仄仄/平平",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "平仄/仄平平",
+          "平平/平仄",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 527,
+      "length_category": "short",
+      "variants_description": "此与向词俱后段第三句减一字，改晏词四字两句作七字句，结句添一字作六字者。欧阳修词“那堪疏雨滴黄昏，更特地、忆王孙”，张耒词“相见时稀隔别多，又春尽、奈愁何”，正与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平仄/仄平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平/仄",
+          "仄仄/仄/平平",
+          "平中/平中/仄中/平",
+          "仄/中仄、仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "向子諲",
+      "source_id": 528,
+      "length_category": "short",
+      "variants_description": "此与杜词同，惟前段起句、后段第三句不押韵异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄/仄平平",
+          "平平/平仄",
+          "平平/仄仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "平仄/仄平平",
+          "平仄/平平/平仄仄",
+          "平仄仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "姜夔",
+      "source_id": 529,
+      "length_category": "short",
+      "variants_description": "此词摊破晏词前段起句七字一句作四字两句。周邦彦“并刀如水”词正与此同。此与下韩淲词又自成一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄",
+          "平仄/仄平平",
+          "仄仄/平平",
+          "平平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平仄/仄平平",
+          "平仄/平平",
+          "平平/平仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "韩淲",
+      "source_id": 530,
+      "length_category": "short",
+      "variants_description": "此与姜词同，惟后段第二句添一字作六字折腰异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/平仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "平仄/平平",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平仄、仄平平",
+          "仄仄/平平",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "晏几道",
+      "source_id": 531,
+      "length_category": "short",
+      "variants_description": "此词摊破“芙蓉花发”词，前后段起句七字一句各添一字作四字两句。《小山乐府》三首皆然。高观国“春风吹碧”词正与之同，此又自为一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "平平/仄仄",
+          "平平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "仄仄/平平",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 532,
+      "length_category": "short",
+      "variants_description": "此词摊破晏词换头七字一句作四字两句，摊破晏词第三、四句四字两句作七字一句，结句又添一字作六字折腰句法。宋元人无依此填者，自成一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄仄/仄平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "平平/仄仄/仄平平",
+          "仄/仄仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "苏轼",
+      "source_id": 533,
+      "length_category": "short",
+      "variants_description": "此词摊破晏词前段起句七字一句作四字两句，又摊破后段第三、四句四字两句作七字一句，结句又添一字作六字折腰。晁补之“前时相见”词正与之同。此亦自成一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/平仄",
+          "平仄/仄平平",
+          "平平/平仄",
+          "平平/仄仄",
+          "平仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平/平平仄",
+          "平仄/仄平平",
+          "仄仄/平平/平平仄",
+          "平平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "晏几道",
+      "source_id": 534,
+      "length_category": "short",
+      "variants_description": "此词摊破“芙蓉花发”词前后段起句七字一句俱作四字两句，又摊破后段第三、四句四字两句作七字一句。晏殊“重阳过后”词、“霜华满树”词，几道“雕梁燕去”词正与之同。此亦自成一体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/仄平平",
+          "平平/平仄/仄平平",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "杨亿",
+      "source_id": 535,
+      "length_category": "short",
+      "variants_description": "此调见《梅苑》，与晏词同，惟后段结句添一字作六字折腰句法异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄/仄平平",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4,
+          5
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/仄仄",
+          "仄仄/仄平平",
+          "仄平/平仄/仄平平",
+          "仄仄仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "晁补之",
+      "source_id": 536,
+      "length_category": "short",
+      "variants_description": "此词用仄韵，宋元人无填此者。因见《琴趣外篇》，采之以备一体。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/平仄",
+          "仄仄/平平",
+          "平平/仄仄",
+          "仄/仄仄/仄平仄",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄平/平仄",
+          "仄平/平仄",
+          "平平/平仄",
+          "仄仄仄、仄平/平仄",
+          "仄/仄平/仄仄"
+        ]
+      }
+    }
+  ]
+}

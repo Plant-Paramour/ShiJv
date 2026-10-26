@@ -1,0 +1,174 @@
+{
+  "name": "恋绣衾",
+  "aliases": [],
+  "description": "韩淲词有“泪珠弹，犹带粉香”句，名《泪珠弹》。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 704,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 704,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若周词之句法小异，辛、韩、赵三词之添字，皆变格也。\n按南宋词前段起句俱作拗体，如史达祖词之“黄花惊破九日愁”，又“吴梅初试涧谷春”，陆游词之“无方能驻脸上红”，吴文英词之“频摩书眼怯细文”，蒋捷词之“蒨金小袖花下行”，陈允平词之“缃桃红浅柳褪黄”，皆同。至辛弃疾词之“长夜偏冷添被儿”，张翥词之“醉乡残梦惊唤醒”，句法又变，俱与此词平仄全异。填词者选择一体宗之，自无混淆之弊。谱内可平可仄，悉参所采诸词，惟前段第三句“甚”字可平， 则据陆游词“归棹借、轻风便”，“归”字平声也。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中中/平中/中中平",
+          "仄中中、平中/仄平",
+          "中中中、平平仄",
+          "仄中平、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "仄中平、中仄/仄平",
+          "仄仄中、平平仄",
+          "仄/平中、中仄/仄平"
+        ]
+      }
+    },
+    {
+      "name": "周密",
+      "source_id": 705,
+      "length_category": "short",
+      "variants_description": "《词律》驳《图谱》于此调第三句误注“六字”，若此词则六字一气，原不折腰也，但可谓之变体，不可为正体耳。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平仄平",
+          "仄平平、平仄/仄平",
+          "仄仄/仄平/平仄",
+          "仄仄平、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平、平仄/仄平",
+          "平仄仄/平平仄",
+          "仄平平、平仄/仄平"
+        ]
+      }
+    },
+    {
+      "name": "辛弃疾",
+      "source_id": 706,
+      "length_category": "short",
+      "variants_description": "此词见《稼轩集》，前段第三句校朱词多一衬字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平仄/平仄平",
+          "仄平平、平仄/仄平",
+          "仄仄仄、仄仄/平仄",
+          "仄平平、平仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄仄、仄仄/仄平",
+          "仄仄仄、平平仄",
+          "仄平仄、平仄/仄平"
+        ]
+      }
+    },
+    {
+      "name": "韩淲",
+      "source_id": 707,
+      "length_category": "short",
+      "variants_description": "此词见《涧泉诗余》，后段第二句校朱词多一衬字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄仄平",
+          "仄平平、平仄仄平",
+          "仄仄仄、平平/仄",
+          "仄平平、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄/平平仄、仄仄/仄平",
+          "仄仄仄、平平仄",
+          "仄/仄平平仄/仄平"
+        ]
+      }
+    },
+    {
+      "name": "赵汝茪",
+      "source_id": 708,
+      "length_category": "short",
+      "variants_description": "此词见周密《绝妙好词》选本，前后段第三句校朱词各多一衬字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄仄仄、平平/仄平",
+          "仄平平、仄仄/平仄",
+          "仄平平、平仄/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平平、平仄/仄平",
+          "仄仄平、平平/平仄",
+          "仄平平、平仄/仄平"
+        ]
+      }
+    }
+  ]
+}

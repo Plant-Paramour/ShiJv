@@ -1,0 +1,29 @@
+{
+  "name": "拜新月",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "李端",
+  "default_variant_source_id": 9,
+  "variants": [
+    {
+      "name": "李端",
+      "source_id": 9,
+      "length_category": "short",
+      "variants_description": "此即唐仄韵五言绝句，而语气微拗。填此词者平仄当从之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄平仄",
+          "仄仄/仄平仄",
+          "仄仄/平仄平",
+          "仄平/平平仄"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "瑞云浓",
+  "aliases": [],
+  "description": "调见《逃禅集》。蒋氏《九宫谱》入黄钟宫。",
+  "default_variant": "杨无咎",
+  "default_variant_source_id": 1115,
+  "variants": [
+    {
+      "name": "杨无咎",
+      "source_id": 1115,
+      "length_category": "medium",
+      "variants_description": "此词无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄/平仄",
+          "平仄/平平/仄平仄",
+          "平平/仄仄",
+          "仄仄仄、平平/平仄",
+          "仄仄/仄平平",
+          "仄平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄仄、平平/仄仄",
+          "仄仄/平平/仄平仄",
+          "仄平/平仄",
+          "仄仄平、仄平/平仄",
+          "仄仄/平平",
+          "仄平/仄仄"
+        ]
+      }
+    }
+  ]
+}

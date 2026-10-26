@@ -1,0 +1,44 @@
+{
+  "name": "珠帘卷",
+  "aliases": [],
+  "description": "调见欧阳修词，因词有“珠帘卷”句，取以为名。",
+  "default_variant": "欧阳修",
+  "default_variant_source_id": 425,
+  "variants": [
+    {
+      "name": "欧阳修",
+      "source_id": 425,
+      "length_category": "short",
+      "variants_description": "此调仅见此词，无他作可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "仄平平",
+          "平平/仄仄/平平",
+          "平仄/平平/平仄",
+          "平平/平仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "平平/仄仄/平平",
+          "平仄/仄平/平仄",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "双韵子",
+  "aliases": [],
+  "description": "调见张先词集。按金元曲子有双声叠韵，调名疑出于此。",
+  "default_variant": "张先",
+  "default_variant_source_id": 495,
+  "variants": [
+    {
+      "name": "张先",
+      "source_id": 495,
+      "length_category": "short",
+      "variants_description": "此调仅见此词，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "仄平/仄仄",
+          "平平/平仄",
+          "仄平/仄仄/平平",
+          "平仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "平平仄",
+          "平平仄、平平/仄仄",
+          "仄平/仄仄/平平",
+          "平/仄仄、平平/仄"
+        ]
+      }
+    }
+  ]
+}

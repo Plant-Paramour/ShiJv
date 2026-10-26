@@ -1,0 +1,284 @@
+{
+  "name": "解佩令",
+  "aliases": [],
+  "description": "调见《小山乐府》。按《楚辞》“捐予佩兮澧浦”，《韩诗外传》“郑交甫遇汉皋神女解佩”，调名取此。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 961,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 961,
+      "length_category": "medium",
+      "variants_description": "此词有许、王、史、蒋四词可校，故谱内可平可仄，悉参下四词。\n汲古阁本前段第三句“掩深宫、团扇无情绪”多一字。又“团扇无绪”,一本作“扇鸾无绪”，今从《花草粹编》校定。\n★ 《御定词谱》影印本原註为“汲古阁本前段第二句”，据正文改。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "中平/中仄",
+          "中中/中仄",
+          "中中中、平中/中仄",
+          "中仄/平平",
+          "中中中、中平/平仄",
+          "中平中、中平/中仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/中仄",
+          "中平/中仄",
+          "仄平平、中中/中仄",
+          "中仄/平平",
+          "仄中中、平平/中仄",
+          "仄平平、仄中/中仄"
+        ]
+      }
+    },
+    {
+      "name": "许冲元",
+      "source_id": 962,
+      "length_category": "medium",
+      "variants_description": "此与晏词同，惟后段第二句用韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平仄/平仄",
+          "平仄仄、平平/平仄",
+          "仄仄/平平",
+          "平仄平、仄平/平仄",
+          "平平仄、平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平平、仄平/仄仄",
+          "仄仄/平平",
+          "仄仄仄、平平/平仄",
+          "仄平平、仄平/仄仄"
+        ]
+      }
+    },
+    {
+      "name": "王庭珪",
+      "source_id": 963,
+      "length_category": "medium",
+      "variants_description": "此亦与晏词同，惟后段第一、二句俱用韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/平仄",
+          "仄平/平仄",
+          "仄平平、平平/平仄",
+          "平仄/平平",
+          "仄平仄、平平/平仄",
+          "仄平平、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/平仄",
+          "平平/平仄",
+          "仄平平、仄平/平仄",
+          "平仄/平平",
+          "仄平仄、平平/仄仄",
+          "仄平平、仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "史达祖",
+      "source_id": 964,
+      "length_category": "medium",
+      "variants_description": "此与晏词同，惟前后段第一句俱用韵，后段第二句叠韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/平仄",
+          "平平/平仄",
+          "仄平平、平平/平仄",
+          "仄仄/平平",
+          "仄仄仄、仄平/平仄",
+          "仄平平、仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平平、平平/平仄",
+          "仄仄/平平",
+          "仄仄平、平平/平仄",
+          "仄平平、仄平/仄仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                1,
+                3
+              ],
+              "end": [
+                1,
+                4
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                3
+              ],
+              "end": [
+                2,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "蒋捷",
+      "source_id": 965,
+      "length_category": "medium",
+      "variants_description": "此与史词同，惟前段第二、第三句用叠韵，第五句减一字，后段第二句仍用韵，不叠上韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平平、平仄/仄仄",
+          "平仄/平平",
+          "仄仄/平平/平仄",
+          "仄平平、仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "平平/平仄",
+          "仄平/平仄",
+          "仄平平、仄仄/平仄",
+          "仄仄/平平",
+          "仄/仄仄仄平/平仄",
+          "仄平平、仄仄/仄仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                1,
+                4
+              ],
+              "end": [
+                1,
+                4
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                4
+              ],
+              "end": [
+                2,
+                4
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                7
+              ],
+              "end": [
+                3,
+                7
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

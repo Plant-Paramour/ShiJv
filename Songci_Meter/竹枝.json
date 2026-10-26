@@ -1,0 +1,66 @@
+{
+  "name": "竹枝",
+  "aliases": [],
+  "description": "唐教坊曲名。元郭茂倩《乐府诗集》云：“《竹枝》本出于巴渝。唐贞元中，刘禹锡在沅湘，以里歌鄙陋，乃依骚人《九歌》，作《竹枝》新词九章，教里中儿歌之。由是 盛于贞元、元和之间。”",
+  "default_variant": "皇甫松",
+  "default_variant_source_id": 1,
+  "variants": [
+    {
+      "name": "皇甫松",
+      "source_id": 1,
+      "length_category": "short",
+      "variants_description": "《尊前集》载皇甫松《竹枝》词六首,皆两句体，平韵者五，仄韵者一。每句第二字俱用平声，余字平仄不拘。所注“竹枝”、“女儿”，“枝”、“儿”叶韵，乃歌时群相随和之声，犹《采莲》之有“举棹”、“年少”也。\n按古乐府，《江南弄》等曲皆有和声。如《江南曲》和云：“阳春路，时使佳人度。”《龙笛曲》和云：“江南弄，真龙下翔凤。”《采莲曲》和云：“采莲归，渌水好沾衣。” 亦各叶韵。此其遗意耳。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          7
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "皇甫松",
+      "source_id": 2,
+      "length_category": "short",
+      "variants_description": "此首用仄韵。\n★ “遥相映”字韵应为“○○●”，影印本误作“○○○”。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          7
+        ],
+        "lines": [
+          "平平/平平/仄仄仄",
+          "仄平/仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 3,
+      "length_category": "short",
+      "variants_description": "此词较皇甫松词多两句。\n按刘、白《竹枝》词俱拗体七言绝句，此独谐婉，且每句有和声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          7,
+          15
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "平仄/平平/平仄仄",
+          "仄平/平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

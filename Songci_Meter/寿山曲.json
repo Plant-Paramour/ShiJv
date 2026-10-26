@@ -1,0 +1,38 @@
+{
+  "name": "寿山曲",
+  "aliases": [],
+  "description": "调见赵德麟《侯鲭录》，南唐冯延巳作。因词中有“圣寿南山永同”句，故名。",
+  "default_variant": "冯延巳",
+  "default_variant_source_id": 866,
+  "variants": [
+    {
+      "name": "冯延巳",
+      "source_id": 866,
+      "length_category": "medium",
+      "variants_description": "此词《阳春集》不载，今从《花草粹编》采入。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "lines": [
+          "平平/仄仄/平仄",
+          "平仄/平平/仄平",
+          "平仄/仄平/平仄",
+          "平平/平仄/平平",
+          "平平/仄仄/平仄",
+          "仄仄/平平/仄平",
+          "平仄/仄平/仄仄",
+          "平平/仄仄/平平",
+          "仄平/仄仄/平仄",
+          "仄仄/平平/仄平"
+        ]
+      }
+    }
+  ]
+}

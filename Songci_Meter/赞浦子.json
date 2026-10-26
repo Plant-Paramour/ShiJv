@@ -1,0 +1,41 @@
+{
+  "name": "赞浦子",
+  "aliases": [],
+  "description": "唐教坊曲名。一名《赞普子》。",
+  "default_variant": "毛文锡",
+  "default_variant_source_id": 273,
+  "variants": [
+    {
+      "name": "毛文锡",
+      "source_id": 273,
+      "length_category": "short",
+      "variants_description": "词见《花间集》，无别首可校，平仄当依之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "平平/仄仄平",
+          "仄仄/平平仄",
+          "平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄仄",
+          "仄平/仄仄/平平",
+          "仄仄/平平仄",
+          "平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

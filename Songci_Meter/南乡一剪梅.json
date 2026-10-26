@@ -1,0 +1,99 @@
+{
+  "name": "南乡一剪梅",
+  "aliases": [],
+  "description": "每段上三句《南乡子》体，下二句《一剪梅》体。",
+  "default_variant": "虞集",
+  "default_variant_source_id": 717,
+  "variants": [
+    {
+      "name": "虞集",
+      "source_id": 717,
+      "length_category": "short",
+      "variants_description": "旧谱以此与《江月晃重山》词皆为犯调，不知宋词名“犯”者，取宫调相犯之意，如仙吕调犯商调，为羽犯商类，从来未有以两调相犯为犯者。南北曲如此者更多，其误至今犹相沿也。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          9,
+          10
+        ],
+        "lines": [
+          "平仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平/平仄仄",
+          "平仄/平平",
+          "仄仄/平平",
+          "平仄/仄平平",
+          "仄仄/平平/仄仄平",
+          "仄仄/平平/平仄仄",
+          "平仄/平平",
+          "平仄/平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                4,
+                2
+              ],
+              "end": [
+                4,
+                4
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                4
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                9,
+                2
+              ],
+              "end": [
+                9,
+                4
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                10,
+                2
+              ],
+              "end": [
+                10,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,370 @@
+{
+  "name": "定风波",
+  "aliases": [],
+  "description": "唐教坊曲名。李珣词名《定风流》，张先词名《定风波令》。",
+  "default_variant": "欧阳炯",
+  "default_variant_source_id": 905,
+  "variants": [
+    {
+      "name": "欧阳炯",
+      "source_id": 905,
+      "length_category": "medium",
+      "variants_description": "此调以此词为正体，前后段以平韵为主。前段第三、四句、后段第一、二句、第四、五句又间入仄韵，宋词俱如此填。若苏词之不押仄韵，孙词之添字，蔡词、京词之摊破句法，曹词、李词、陈词之减字，皆变体也。\n按欧阳修词前段第三、四句“春睡觉来情绪恶，寂寞”，“寂”字仄声，谱内据之，其余可平可仄悉参所采诸词。至阎选词换头句“扁舟短棹归兰浦”，“舟”字平声，“棹”字仄声，“兰”字平声。李珣词后段第四句“更饮一杯红霞酒”，“霞”字平声。宋元词无如此者，但附注以备参考。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/平平/中仄平",
+          "中平/中仄/仄平平",
+          "中仄/中平/平中仄",
+          "中仄",
+          "中平/中仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "rhyme_4_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "中仄/中平/平仄仄",
+          "中仄",
+          "中平/中仄/仄平平",
+          "中仄/中平/平仄仄",
+          "中仄",
+          "中平/中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 906,
+      "length_category": "medium",
+      "variants_description": "此与欧阳词体同，惟后段结句多一字，亦衬字也。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "平仄",
+          "仄平/仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "rhyme_4_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "平仄",
+          "平平/平仄/仄平平",
+          "平仄/平平/平仄仄",
+          "平仄",
+          "仄平平、平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "蔡伸",
+      "source_id": 907,
+      "length_category": "medium",
+      "variants_description": "此亦欧阳词体，惟后段第五、六句摊破句法，不押仄声短韵异。\n按唐李珣词后段第四、五、六句“听鹊凭龟无定处，不知泪痕，流在画罗衣”亦不押仄声短韵，正与此同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "仄平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "平仄",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄仄",
+          "平平/仄仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "仄仄/平平",
+          "仄仄/仄平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                1,
+                7
+              ],
+              "end": [
+                1,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                2
+              ],
+              "end": [
+                2,
+                2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "李泳",
+      "source_id": 908,
+      "length_category": "medium",
+      "variants_description": "此亦欧词体，惟换头下减去押短韵两字句异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "平平/平仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "平仄",
+          "平平/仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "rhyme_3_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄仄",
+          "平平/平仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "平仄",
+          "仄平/平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "曹冠",
+      "source_id": 909,
+      "length_category": "medium",
+      "variants_description": "此即李词体，惟前段起句不用韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄仄",
+          "平仄",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "rhyme_3_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "仄仄",
+          "仄平/仄仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "苏轼",
+      "source_id": 910,
+      "length_category": "medium",
+      "variants_description": "此词前后段俱不间入仄韵，与欧词异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄仄/仄平/平仄仄",
+          "平仄",
+          "仄平/平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平仄/平平/平仄仄",
+          "平仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄仄",
+          "平仄",
+          "仄平/仄仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "京镗",
+      "source_id": 911,
+      "length_category": "medium",
+      "variants_description": "此词不间入仄韵，前后结各摊破作上四字一句、下五字一句异。至换头第二句“何似”二字，即连下句，如衬字法，亦一格也。\n按京词别首“骑气乘风，也作等閒游”句法又与此有别，因注明不另录。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/仄仄/仄平平",
+          "平仄/平平/平仄仄",
+          "平仄/平平",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄仄",
+          "平仄/仄平/平仄/仄/平平",
+          "仄仄/仄平/平仄仄",
+          "仄仄/平平",
+          "仄仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "陈允平",
+      "source_id": 912,
+      "length_category": "medium",
+      "variants_description": "此与京镗词体同，惟后段第二句减二字作七字一句异。\n按周紫芝《琴调相思引》亦名《定风波令》，校此调前后段各少第三句七字，因已编入《琴调相思引》，故不类列。\n★ 《御定词谱》影印本原註为“惟后段第二、三句减二字作七字一句异。”多一“三” 字，据文义删去。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "平仄/平平/平仄仄",
+          "平仄/仄平",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "仄仄/平平",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

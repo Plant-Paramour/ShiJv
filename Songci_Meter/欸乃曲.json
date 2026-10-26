@@ -1,0 +1,30 @@
+{
+  "name": "欸乃曲",
+  "aliases": [],
+  "description": "唐元结诗自序：大历初，结为道州刺史，以军事诣都。使还州，逢春水，舟行不进， 作《欸乃曲》，令舟子唱之，以取适于道路云。",
+  "default_variant": "元结",
+  "default_variant_source_id": 76,
+  "variants": [
+    {
+      "name": "元结",
+      "source_id": 76,
+      "length_category": "short",
+      "variants_description": "按《欸乃曲》五首，平仄不拘，本唐七言绝句，如《竹枝》、《柳枝》之类。今江南棹船有棹歌，每歌一句，则群和一声，犹见遗意。其“欸乃”二字，乃人声。或注作船声者非。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/平仄平",
+          "平平/平仄/仄平平",
+          "平平/仄仄/仄平仄",
+          "仄仄/平平/平仄平"
+        ]
+      }
+    }
+  ]
+}

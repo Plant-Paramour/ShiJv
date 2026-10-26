@@ -1,0 +1,79 @@
+{
+  "name": "恨来迟",
+  "aliases": [],
+  "description": "《梅苑》词名《恨欢迟》。",
+  "default_variant": "王灼",
+  "default_variant_source_id": 662,
+  "variants": [
+    {
+      "name": "王灼",
+      "source_id": 662,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若《梅苑》词之衬字亦变格也。但宋元人填此调者甚少，故此词可平可仄悉参后词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄中/平仄",
+          "仄仄/平平",
+          "仄/仄仄/平平",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄/仄中、中仄/仄平平",
+          "仄中/平仄/平平",
+          "仄/仄仄/平平",
+          "中平/中仄",
+          "中仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 663,
+      "length_category": "short",
+      "variants_description": "此较王词多一衬字，前段第四句、后段第三句句法亦异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/平平",
+          "仄仄/平平",
+          "仄仄仄、平平/仄平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄仄、平仄/仄平平",
+          "仄仄仄、平仄/平平",
+          "仄仄仄、平平/仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

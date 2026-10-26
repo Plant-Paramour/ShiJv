@@ -1,0 +1,32 @@
+{
+  "name": "花非花",
+  "aliases": [],
+  "description": "调见白居易《长庆集》。以首句为调名。",
+  "default_variant": "白居易",
+  "default_variant_source_id": 37,
+  "variants": [
+    {
+      "name": "白居易",
+      "source_id": 37,
+      "length_category": "short",
+      "variants_description": "此本《长庆集》长短句诗，后人采入词中，其平仄亦不拘。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平平平",
+          "仄平仄",
+          "仄仄平",
+          "平平仄",
+          "平平/平仄/仄平平",
+          "仄仄/平平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

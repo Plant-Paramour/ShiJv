@@ -1,0 +1,49 @@
+{
+  "name": "閒中好",
+  "aliases": [],
+  "description": "调见唐段成式《酉阳杂俎》，有平韵、仄韵二体，即以首句三字为调名也。",
+  "default_variant": "段成式",
+  "default_variant_source_id": 6,
+  "variants": [
+    {
+      "name": "段成式",
+      "source_id": 6,
+      "length_category": "short",
+      "variants_description": "按《酉阳杂俎》有张希复平韵词，与此悉同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平仄",
+          "平仄/仄平平",
+          "仄仄/平平仄",
+          "平平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "郑符",
+      "source_id": 7,
+      "length_category": "short",
+      "variants_description": "此词用仄韵。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平仄",
+          "仄仄/平平仄",
+          "仄仄/平仄平",
+          "平平/仄平仄"
+        ]
+      }
+    }
+  ]
+}

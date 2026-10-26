@@ -1,0 +1,49 @@
+{
+  "name": "鞓红",
+  "aliases": [],
+  "description": "调见《梅苑》。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 894,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 894,
+      "length_category": "medium",
+      "variants_description": "此调起结近《鹊桥仙》词，然中三句句读实与《鹊桥仙》不同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/仄仄",
+          "仄仄仄、平平/仄仄",
+          "仄平/仄仄",
+          "仄平/平仄",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平平/平仄",
+          "仄仄仄、平平/仄仄",
+          "仄平/仄仄",
+          "仄平/平仄",
+          "仄仄仄、平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

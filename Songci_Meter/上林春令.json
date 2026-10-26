@@ -1,0 +1,43 @@
+{
+  "name": "上林春令",
+  "aliases": [],
+  "description": "《宋史·乐志》属中吕宫。",
+  "default_variant": "毛滂",
+  "default_variant_source_id": 669,
+  "variants": [
+    {
+      "name": "毛滂",
+      "source_id": 669,
+      "length_category": "short",
+      "variants_description": "《词律》录杨无咎词四十字一体，脱去前段第三、四句两句，今按杨本集作“秾李夭桃堆绣。正暖日、如熏芳袖。流莺恰恰娇啼，似为劝、百觞进酒。少年不用称遐寿。愿来岁、如今时候。相将得意皇都，同携手、上林春昼。”即毛词五十三字体也。谱内可平可仄参之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/平仄",
+          "仄仄仄、平平/中仄",
+          "中平/中仄/平平",
+          "中仄仄、仄平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/仄仄/中中仄",
+          "仄中仄、中平/平仄",
+          "中平/仄仄/平平",
+          "中平中、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

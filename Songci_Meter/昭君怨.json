@@ -1,0 +1,131 @@
+{
+  "name": "昭君怨",
+  "aliases": [],
+  "description": "朱敦儒词咏洛妃，名《洛妃怨》。侯寘词名《宴西园》。",
+  "default_variant": "万俟咏",
+  "default_variant_source_id": 237,
+  "variants": [
+    {
+      "name": "万俟咏",
+      "source_id": 237,
+      "length_category": "short",
+      "variants_description": "此词四换韵。\n按坊本后段第一句或作“莫把阑干倚”，疑“频”字乃后人增入。然观苏轼词之“欲去又还不去”，及秦观、朱希真、侯寘等词，俱作六字句，故当以六字句换头者为正格。前段第一句，秦观词“隔叶乳鸦声转”，“乳”字仄声。第二句，刘克庄词“只许姚黄独步”，“只”字、“独”字俱仄声。第三句，秦词“杨柳小腰肢”，“杨”字平声。后段第一句，苏轼词“欲去又还不去”，“又”字、“不”字俱仄声；韩驹词“留恋芳丛深处”，“留”字平声。第三句，秦词“极目送行云”，“极”字仄声。谱内可平可仄据此。其余参校蔡词同调。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "中仄/中平/中仄",
+          "中仄/仄平/平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "rhyme_4_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "中仄/中平/中仄",
+          "中仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "蔡伸",
+      "source_id": 238,
+      "length_category": "short",
+      "variants_description": "此词后段第一句五字，宋词仅见此作，无别首可校。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄/平平/平仄",
+          "仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "rhyme_4_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄仄/仄平/平仄",
+          "平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "周紫芝",
+      "source_id": 239,
+      "length_category": "short",
+      "variants_description": "此词后段起句作三字两句，多押一韵，有朱希真词“襟上泪，难再会”可校。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄",
+          "平仄/仄平/平仄",
+          "仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          2,
+          3
+        ],
+        "rhyme_4_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "平仄仄",
+          "平仄仄",
+          "平仄/平平/仄仄",
+          "平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

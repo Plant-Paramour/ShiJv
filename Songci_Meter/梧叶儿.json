@@ -1,0 +1,141 @@
+{
+  "name": "梧叶儿",
+  "aliases": [],
+  "description": "《太平乐府》注“商调”。《唐书·礼乐志》：商调，乃夷则之商声也。",
+  "default_variant": "吴西逸",
+  "default_variant_source_id": 39,
+  "variants": [
+    {
+      "name": "吴西逸",
+      "source_id": 39,
+      "length_category": "short",
+      "variants_description": "此在元人为小令，其实则曲也。但其词未至俚鄙，故并采入以备体。其可平可仄，参后张可久“鸳鸯浦”一词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平仄",
+          "平仄平",
+          "中仄/仄平/平",
+          "平平仄",
+          "中仄平",
+          "仄平平",
+          "平仄/平平/仄仄"
+        ]
+      }
+    },
+    {
+      "name": "张可久",
+      "source_id": 40,
+      "length_category": "short",
+      "variants_description": "此与吴词同，惟结句多一衬字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平仄",
+          "平仄平",
+          "仄仄/仄平平",
+          "平平仄",
+          "平仄平",
+          "仄平平",
+          "仄仄平、平平/仄平"
+        ]
+      }
+    },
+    {
+      "name": "张可久",
+      "source_id": 41,
+      "length_category": "short",
+      "variants_description": "此亦与吴词同，惟第四、五、六句多二衬字。可平可仄，参张雨词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平仄",
+          "仄仄平",
+          "平仄/仄平/平",
+          "中中/平平/仄",
+          "平平/仄仄/平",
+          "中仄/仄平/平",
+          "仄仄/平平/仄平"
+        ]
+      }
+    },
+    {
+      "name": "张雨",
+      "source_id": 42,
+      "length_category": "short",
+      "variants_description": "此与张可久《花垂露》词同，惟结句多一字。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平仄",
+          "仄仄平",
+          "平仄/仄平平",
+          "平平/平平仄",
+          "平平/仄仄平",
+          "仄仄/仄平平",
+          "仄仄仄、平平/仄平"
+        ]
+      }
+    },
+    {
+      "name": "张可久",
+      "source_id": 43,
+      "length_category": "short",
+      "variants_description": "此与张雨“移家去”词同，惟第一、二句各多二衬字，结句用仄韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "平平/仄仄平",
+          "平仄/仄平平",
+          "仄仄/平平仄",
+          "平平/仄仄平",
+          "仄仄/仄平平",
+          "平仄仄、平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

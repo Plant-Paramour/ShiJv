@@ -1,0 +1,44 @@
+{
+  "name": "庆春时",
+  "aliases": [],
+  "description": "调见《小山乐府》，凡二首，俱庆赏春时宴乐之词。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 459,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 459,
+      "length_category": "short",
+      "variants_description": "晏词二首，平仄略同，惟别首起句“梅梢已有”，“梅”字平声，“已”字仄声。第三句“风意犹寒”，“风”字平声。《词律》谓前段第五句“调”字可平、后段第四句“画”字可平，无据，不必从。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "中平/中仄",
+          "平平/平仄",
+          "中仄/平平",
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平平/平仄",
+          "平仄/平仄/平平",
+          "平平/仄仄",
+          "平平/仄仄",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

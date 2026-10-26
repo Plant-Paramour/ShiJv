@@ -1,0 +1,30 @@
+{
+  "name": "杨柳枝",
+  "aliases": [],
+  "description": "唐教坊曲名。按白居易诗注：《杨柳枝》，洛下新声。其诗云：“听取新翻杨柳枝” 是也。薛能诗序：令部妓作杨柳枝健舞，复度新声。其诗云：“试蹋吹声作唱声”是也。盖乐府横吹曲有《折杨柳》名，此则借旧曲名，另创",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 79,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 79,
+      "length_category": "short",
+      "variants_description": "按，刘、白倡和以后，为此词者甚多，皆赋柳枝本意。原属绝句，因《花间集》载此，故采以备调。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "仄平/平仄/仄平平",
+          "仄平/仄仄/平平仄",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

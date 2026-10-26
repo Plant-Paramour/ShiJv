@@ -1,0 +1,43 @@
+{
+  "name": "伊州令",
+  "aliases": [],
+  "description": "唐教坊曲名，一作《伊川令》。《碧鸡漫志》云：“伊州有七商曲。”",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 623,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 623,
+      "length_category": "short",
+      "variants_description": "此词坊本俱有脱误，今从《词纬》抄本。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平仄/平平仄",
+          "平仄/平平/平仄平",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平仄",
+          "平仄/平平仄",
+          "平平/仄仄/仄平平",
+          "仄平仄、平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

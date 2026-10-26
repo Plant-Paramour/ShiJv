@@ -1,0 +1,706 @@
+{
+  "name": "忆秦娥",
+  "aliases": [],
+  "description": "元高拭词注“商调”。按此词昉自李白，自唐迄元，体各不一。要其源皆从李词出也。因词有“秦娥梦断秦楼月”句，故名《忆秦娥》，更名《秦楼月》。苏轼词有“清光偏照双荷叶”句，名《双荷叶》。无名氏词有“水天摇盪",
+  "default_variant": "李白",
+  "default_variant_source_id": 354,
+  "variants": [
+    {
+      "name": "李白",
+      "source_id": 354,
+      "length_category": "short",
+      "variants_description": "此调押仄韵者，以此词为正体，若晁词之不作叠句，石词之少押一韵，秦词之多口号四句，倪词之减去叠句，虽为变格，犹与李词大同小异。至冯延巳创为减字之体，张词由此添字，毛词由此偷声，在变格中更与诸家不同。前段起句，周邦彦词“香馥馥”，上“馥”字仄声。第二句，赵师侠词“不堪凉月穿珠箔”，“不”字仄声，“凉”字平声。第四句，李之仪词“迎得云归”，“得”字仄声，“归”字平声。第五句，李词“还送云别”，“送”字仄声。换头句，苏轼词“背风迎南泪珠滑”，“泪”字仄声。第五句，周紫芝词“西楼残月”，“西”字平声。谱内可平可仄据此，余参姚、石、秦、倪四词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "中中仄",
+          "中平/中仄/平平仄",
+          "平平仄",
+          "中中/中中",
+          "中中/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "中平中仄/中平仄",
+          "中平中仄/平平仄",
+          "平平仄",
+          "中平/中仄",
+          "中中/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "晁补之",
+      "source_id": 355,
+      "length_category": "short",
+      "variants_description": "此与李词同，惟前后段第三句不作叠句体异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "平平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄/平平/平仄仄",
+          "仄平/平仄/平平仄",
+          "平平仄",
+          "仄平/仄仄",
+          "仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "石孝友",
+      "source_id": 356,
+      "length_category": "short",
+      "variants_description": "此与李词同，惟换头句第七字用平声不押仄韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平仄",
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "平平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "秦观",
+      "source_id": 357,
+      "length_category": "short",
+      "variants_description": "此即李词体，惟词首多口号四句异。\n按秦词四首，每首前各有口号四句（驴背吟诗清到骨，人间别是閒勋业。云台烟阁久销沉，千载人图灞桥雪。），即以口号末句三字为起句，亦如《调笑令》例。乐府舞曲转踏类如此。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄平仄",
+          "平平/仄仄/平平仄",
+          "平平仄",
+          "仄平/平仄",
+          "平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/平仄/平平仄",
+          "平平仄",
+          "仄平/仄仄",
+          "平平/平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "倪瓒",
+      "source_id": 358,
+      "length_category": "short",
+      "variants_description": "此亦李词体，惟前后段减去两叠句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平仄",
+          "平平/仄仄/平平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/平仄/平平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 359,
+      "length_category": "short",
+      "variants_description": "此词前后段起句与李白词同，惟第二句各减二字，第三句各减一字，第四、五句减一字，祇作七字一句。此体仅见《阳春集》，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄/平平仄",
+          "仄仄",
+          "平仄/平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平仄",
+          "仄仄/平平仄",
+          "仄仄",
+          "仄仄/仄平/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "张先",
+      "source_id": 360,
+      "length_category": "short",
+      "variants_description": "此与冯词同，惟换头添一字，前后段第三句各添一字，仍照李白词体作三字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄",
+          "平仄/平平仄",
+          "平仄仄",
+          "平仄/平平/平仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平平、平仄/仄平仄",
+          "平仄/平平仄",
+          "平仄仄",
+          "平仄/平平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "毛滂",
+      "source_id": 361,
+      "length_category": "short",
+      "variants_description": "此词句读与冯词同，但冯词起句三字，此词两字，冯词全押仄韵，此词前后第三、四句偷用平声，虽同本李词，亦自成一体耳。\n毛词别首前段第四句“先借春光与酒家”，“先”字平声。换头句“夜寒我醉谁扶我”，“夜”字、“我”字俱仄声。第二句“应抱瑶琴卧”，“应”字平声，余平仄悉同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄",
+          "仄仄/平平仄",
+          "平平",
+          "中仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_3_positions": [
+          1,
+          2
+        ],
+        "rhyme_4_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "中仄/平平仄",
+          "平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "贺铸",
+      "source_id": 362,
+      "length_category": "short",
+      "variants_description": "此调押平韵，以此词为正体，若秦词之多口号四句，颜词之减去叠句，皆变格也。前段起句，程垓词“青门深”，“青”字平声。后段起句，贺词别首“粉娥采叶共亲蚕”，“共”字仄声。第二句，孙道绚词“画眉楼上愁登临”，“画”字仄声。谱内可平可仄据此，余参秦词、颜词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "中平平",
+          "中平/中仄/中平平",
+          "中平平",
+          "中平/中仄",
+          "中仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "中平/中仄/中平平",
+          "中平/中仄/平平平",
+          "平平平",
+          "中平/中仄",
+          "中仄/平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "秦观",
+      "source_id": 363,
+      "length_category": "short",
+      "variants_description": "此即贺词体，惟词前多口号四句异（帝城东畔富韶华，满路飘香烂彩霞。多少风流年少客，马蹄踏遍曲江花。）。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄平平",
+          "平平/仄仄/仄平平",
+          "仄平/平",
+          "仄平/仄仄",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平平",
+          "平平/仄仄/平平平",
+          "平平平",
+          "仄平/平仄",
+          "平仄/平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠句",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                5
+              ],
+              "end": [
+                2,
+                7
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                1
+              ],
+              "end": [
+                3,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "颜奎",
+      "source_id": 364,
+      "length_category": "short",
+      "variants_description": "此词见元《天下同文录》，亦贺词体，惟前后段各减两叠句异。倪瓒仄韵词，正与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平平",
+          "仄/平平仄/平平平",
+          "平平/平仄",
+          "仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平平",
+          "平平/仄仄/平平平",
+          "平平/仄仄",
+          "平仄/平平"
+        ]
+      }
+    }
+  ]
+}

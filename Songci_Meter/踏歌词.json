@@ -1,0 +1,33 @@
+{
+  "name": "踏歌词",
+  "aliases": [],
+  "description": "唐《辇下岁时记》：先天初，上御安福门观灯，令朝士能文者为《踏歌》。陈旸《乐书》云：“《踏歌》，队舞曲也。”",
+  "default_variant": "崔液",
+  "default_variant_source_id": 96,
+  "variants": [
+    {
+      "name": "崔液",
+      "source_id": 96,
+      "length_category": "short",
+      "variants_description": "此调五字六句，崔词二首皆然。旧谱于此词第五句作七字，第六句作三字者非。按崔词别首第一句“庭际花微落”，“庭”字平声。第四句“罗袖觉寒轻”，“罗”字平声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "中仄/平平仄",
+          "平平/仄仄平",
+          "平平/平仄仄",
+          "中仄/仄平平",
+          "平仄/仄平平",
+          "仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "柘枝引",
+  "aliases": [],
+  "description": "唐教坊曲名。《乐府杂录》：“健舞曲”。《乐苑》：“羽调曲”。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 32,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 32,
+      "length_category": "short",
+      "variants_description": "按《宋史·乐志》：小儿舞队有《柘枝》。又沈括《笔谈》：柘枝旧曲，遍数极多。今已不传，存此以志其概。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄仄/仄平平",
+          "平仄/平平仄",
+          "平平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title>诗矩 AI</title>
+  <rect width="96" height="96" rx="28" fill="#a9362c"/>
+  <path d="M24 29h48v7H24zm0 15h48v7H24zm0 15h30v7H24z" fill="#fffaf0"/>
+  <circle cx="69" cy="62" r="10" fill="#e9e0ce"/>
+  <path d="M65 62h8M69 58v8" stroke="#a9362c" stroke-width="3" stroke-linecap="round"/>
+</svg>

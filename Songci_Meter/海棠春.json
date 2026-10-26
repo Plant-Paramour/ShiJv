@@ -1,0 +1,112 @@
+{
+  "name": "海棠春",
+  "aliases": [],
+  "description": "此调始自秦观，因词中有“试问海棠花，昨夜开多少”句，故名。马庄父词名《海棠花》，史达祖词名《海棠春令》。",
+  "default_variant": "秦观",
+  "default_variant_source_id": 468,
+  "variants": [
+    {
+      "name": "秦观",
+      "source_id": 468,
+      "length_category": "short",
+      "variants_description": "此调以此词为正体，若吴词之摊破句法、马词之减字，皆变体也。或疑此词换头亦 可照吴词点定四字两句、六字一句，然有史达祖词可证，则固七字两句也。\n史词前段第二句“锦宫外烟轻雨细”，“宫”字平声，“雨”字仄声。换头两句“烛 花偏在红帘底，想人怕春寒正睡”，“偏”字、“人”字俱平声。谱内可平可仄据之，余参吴词、马词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "中中仄、中平/中仄",
+          "中仄/仄平平",
+          "中仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/中仄/平平仄",
+          "仄中仄、平平/仄仄",
+          "仄仄/仄平平",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "吴潜",
+      "source_id": 469,
+      "length_category": "short",
+      "variants_description": "此亦秦词体，惟换头摊破七字两句，作四字两句、六字一句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "平仄仄、平平/平仄",
+          "平仄仄/平平",
+          "平仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄仄/平平/仄仄",
+          "仄仄/仄平平",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "马庄父",
+      "source_id": 470,
+      "length_category": "short",
+      "variants_description": "此即秦词体，惟前后段第二句各减一字，作六字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "平仄/平平/仄仄",
+          "平仄/仄平平",
+          "平仄/平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "仄仄/平平/仄仄",
+          "仄仄/仄平平",
+          "仄仄/平平仄"
+        ]
+      }
+    }
+  ]
+}

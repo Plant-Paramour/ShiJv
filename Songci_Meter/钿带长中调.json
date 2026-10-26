@@ -1,0 +1,53 @@
+{
+  "name": "钿带长中调",
+  "aliases": [],
+  "description": "调见《大声集》，即咏钿带香囊本意。",
+  "default_variant": "万俟咏",
+  "default_variant_source_id": 996,
+  "variants": [
+    {
+      "name": "万俟咏",
+      "source_id": 996,
+      "length_category": "medium",
+      "variants_description": "《花草粹编》少起句“钿带长”三字，今从本集校正。此调祇有此词，无别首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄仄平",
+          "仄平平",
+          "仄平平、仄仄平",
+          "仄仄/平平",
+          "仄仄/仄平",
+          "平平/仄仄",
+          "仄仄/平仄/平",
+          "仄仄/仄平/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平/仄仄",
+          "平仄/平平",
+          "仄平仄、仄仄/仄平",
+          "平平/仄仄",
+          "仄平/仄仄平",
+          "仄仄/仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

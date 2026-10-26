@@ -1,0 +1,205 @@
+{
+  "name": "相见欢",
+  "aliases": [],
+  "description": "唐教坊曲名。南唐李煜词有“无言独上西楼，月如鈎”句，更名《秋夜月》，又名《上西楼》，又名《西楼子》。康与之词名《忆真妃》。张辑词有“唯有渔竿明月上瓜州”句， 因名《月上瓜州》。或名《乌夜啼》。",
+  "default_variant": "薛昭蕴",
+  "default_variant_source_id": 166,
+  "variants": [
+    {
+      "name": "薛昭蕴",
+      "source_id": 166,
+      "length_category": "short",
+      "variants_description": "此词换头间入两仄韵。如李煜词之“剪不断。理还乱。”毛滂词之“中庭树。空阶雨。”元好问词之“人欲去。花无语。”如此者多。或不间入仄韵者，止一两体耳。前后两结句，或上四下五，或上六下三，句法俱蝉联不断。\n按石孝友词前段第三句“愁见拍天沧水”，“拍”字可仄。谱内据此，其余可平可仄，悉参后词。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "中平/中仄/平平",
+          "仄平平",
+          "中仄/中平/中仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "rhyme_2_positions": [
+          1,
+          2
+        ],
+        "lines": [
+          "中中仄",
+          "中中仄",
+          "仄平平",
+          "中仄/中平/中仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "杨无咎",
+      "source_id": 167,
+      "length_category": "short",
+      "variants_description": "此词换头句仄韵，即用三声叶，与间入别韵者异。黄机词“路渐远。家渐远。恨难堪。”其体正与此同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "仄平/仄仄/平平",
+          "仄平平",
+          "仄仄/平平/仄仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平仄",
+          "平仄/仄",
+          "仄/平平",
+          "平仄/仄平/平仄、仄平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                1,
+                3
+              ],
+              "end": [
+                1,
+                3
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                2,
+                3
+              ],
+              "end": [
+                2,
+                3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "蔡伸",
+      "source_id": 168,
+      "length_category": "short",
+      "variants_description": "此词换头不间入仄韵。张辑词“英雄恨，古今泪，水东流。”其体正与此同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平平/平仄/平平",
+          "仄平平",
+          "仄仄/平平/平仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄仄",
+          "平仄仄",
+          "仄平平",
+          "平仄/仄平/平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "张镃",
+      "source_id": 169,
+      "length_category": "short",
+      "variants_description": "此词换头作六字一句，亦不间入仄韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "仄平/平仄/平平",
+          "仄平平",
+          "仄仄/平平/平仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "平仄/平平/平仄",
+          "仄平平",
+          "平仄/平平/仄仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "吴文英",
+      "source_id": 170,
+      "length_category": "short",
+      "variants_description": "此词后段第二句亦押平韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平平/平仄/平平",
+          "仄平平",
+          "平仄/平平/仄仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄仄",
+          "仄平平",
+          "仄平平",
+          "平仄/仄平/平仄、仄平平"
+        ]
+      }
+    }
+  ]
+}

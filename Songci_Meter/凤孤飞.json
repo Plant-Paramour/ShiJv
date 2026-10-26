@@ -1,0 +1,44 @@
+{
+  "name": "凤孤飞",
+  "aliases": [],
+  "description": "调见《小山乐府》。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 496,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 496,
+      "length_category": "short",
+      "variants_description": "此词平仄亦无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平平仄",
+          "仄仄/平平仄",
+          "仄仄/平平仄仄",
+          "仄仄仄、平平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/平仄仄",
+          "平平仄、仄平/仄仄",
+          "平仄/平平/平仄仄",
+          "仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

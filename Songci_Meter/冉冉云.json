@@ -1,0 +1,81 @@
+{
+  "name": "冉冉云",
+  "aliases": [],
+  "description": "韩淲词有“倚遍阑干弄花雨”句，更名《弄花雨》。",
+  "default_variant": "卢炳",
+  "default_variant_source_id": 861,
+  "variants": [
+    {
+      "name": "卢炳",
+      "source_id": 861,
+      "length_category": "medium",
+      "variants_description": "宋词惟韩淲一首可校，故平仄悉参之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄平仄",
+          "中中平、仄平/平仄",
+          "平仄仄、中仄/平平/平仄",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄中/平中/中平仄",
+          "仄平平、仄平/中仄",
+          "平仄中、仄仄/平平/平仄",
+          "中仄/平平/中仄"
+        ]
+      }
+    },
+    {
+      "name": "韩淲",
+      "source_id": 862,
+      "length_category": "medium",
+      "variants_description": "此与卢词同，惟前段第三句不用韵异。或云“往”字改“去”字即韵，然《涧泉集》原本如此，仍之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄平仄",
+          "仄平平、仄平/平仄",
+          "平仄仄、仄仄/平平/平仄",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平平、仄平/平仄",
+          "平仄仄、仄仄/平平/平仄",
+          "平仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

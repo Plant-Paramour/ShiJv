@@ -1,0 +1,33 @@
+{
+  "name": "摘得新",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "皇甫松",
+  "default_variant_source_id": 38,
+  "variants": [
+    {
+      "name": "皇甫松",
+      "source_id": 38,
+      "length_category": "short",
+      "variants_description": "皇甫松词别首第五句“繁红一夜惊风雨”，“一”字仄声，“惊”字、“风”字俱平声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "仄仄平",
+          "平平/仄仄平",
+          "仄平/平仄仄",
+          "仄平平",
+          "平平/中仄/中中仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

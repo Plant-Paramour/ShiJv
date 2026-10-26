@@ -1,0 +1,81 @@
+{
+  "name": "忆余杭",
+  "aliases": [],
+  "description": "见《湘山野录》。潘阆自度曲，因忆西湖诸胜，故名《忆余杭》。《词律》编入《酒泉子》者误。",
+  "default_variant": "潘阆",
+  "default_variant_source_id": 437,
+  "variants": [
+    {
+      "name": "潘阆",
+      "source_id": 437,
+      "length_category": "short",
+      "variants_description": "此调祇有潘词三首，故可平可仄悉依之。潘词别首前段第三句“冷泉亭上几曾游”，\n“冷”字仄声，“亭”字平声。后段第三句“别来几向画图看”，“几”字仄声。余参校下首。\n坊本后段第二句或作“白鸟成行忽惊起”，今从《湘山野录》改正。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平",
+          "中仄/平平/平仄仄",
+          "中平/中仄/仄平平",
+          "中仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          1,
+          2
+        ],
+        "rhyme_3_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄/仄平/平仄",
+          "仄平/中仄/仄平平",
+          "中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "潘阆",
+      "source_id": 438,
+      "length_category": "short",
+      "variants_description": "后段第二句较前词多一字，潘词别首“长啸一声何处去”正与此同。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/平平/平仄仄",
+          "平平/仄仄/仄平平",
+          "平仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          1,
+          2
+        ],
+        "rhyme_3_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

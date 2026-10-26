@@ -1,0 +1,43 @@
+{
+  "name": "清江曲",
+  "aliases": [],
+  "description": "此宋苏庠泛舟清江作也，体近古诗。因《花草粹编》采入，今仍之。",
+  "default_variant": "苏庠",
+  "default_variant_source_id": 822,
+  "variants": [
+    {
+      "name": "苏庠",
+      "source_id": 822,
+      "length_category": "short",
+      "variants_description": "此词前段近《瑞鹧鸪》，后段近《玉楼春》，全似七言诗句，平仄可不拘。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄仄平",
+          "平平/平仄/仄平平",
+          "仄平/仄仄/平平仄",
+          "平仄/平平/仄仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/仄仄/平平仄",
+          "仄仄/仄仄/仄仄平",
+          "平仄/平平/仄平仄"
+        ]
+      }
+    }
+  ]
+}

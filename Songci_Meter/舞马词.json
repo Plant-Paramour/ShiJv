@@ -1,0 +1,50 @@
+{
+  "name": "舞马词",
+  "aliases": [],
+  "description": "《唐书·礼乐志》:明皇尝命教舞马四百蹄，各为左右，分部目，衣以文绣，络以金珠，每千秋节舞于勤政楼下。赐宴设酺，其曲数十叠。马闻声奋首鼓尾，纵横应节。又施三层板牀，乘马而上，抃转如飞。或命壮士举榻，马舞",
+  "default_variant": "张说",
+  "default_variant_source_id": 28,
+  "variants": [
+    {
+      "name": "张说",
+      "source_id": 28,
+      "length_category": "short",
+      "variants_description": "此亦唐人六古绝句，其平仄不拘。\n按张说本集词六首，惟此一首起句用韵。和声云：“四海和平乐”。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平",
+          "平平/仄仄/平平",
+          "仄仄/平平/仄仄",
+          "平平/仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "张说",
+      "source_id": 29,
+      "length_category": "short",
+      "variants_description": "此首起句不用韵。\n按张说词五首皆然。和声云：“圣代昇平乐”。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄",
+          "仄平/仄仄/平平",
+          "平仄/仄平/平仄",
+          "平平/仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

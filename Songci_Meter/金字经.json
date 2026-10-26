@@ -1,0 +1,91 @@
+{
+  "name": "金字经",
+  "aliases": [],
+  "description": "《太平乐府》注“南吕宫”。《元史·乐志》说法舞队有《金字经》曲，一名《阅金 经》。",
+  "default_variant": "张可久",
+  "default_variant_source_id": 110,
+  "variants": [
+    {
+      "name": "张可久",
+      "source_id": 110,
+      "length_category": "short",
+      "variants_description": "此亦元人小令平仄韵互叶者。因《元史》采入舞曲，且各有宫调，故存之。其可平可仄悉参后词，故不复注。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "中仄/平中仄",
+          "仄平/平仄平",
+          "平仄/平平/中仄平",
+          "平",
+          "仄平/中仄平",
+          "平平仄",
+          "仄平/平仄平"
+        ]
+      }
+    },
+    {
+      "name": "《太平乐府》徐失名",
+      "source_id": 111,
+      "length_category": "short",
+      "variants_description": "此与张词同，惟结句添一衬字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "仄平/平仄平",
+          "平仄/平平/平仄平",
+          "平",
+          "仄平/仄仄平",
+          "平平仄",
+          "仄仄仄、平仄平"
+        ]
+      }
+    },
+    {
+      "name": "《太平乐府》徐失名",
+      "source_id": 112,
+      "length_category": "short",
+      "variants_description": "此与前词同，惟第三句、第五句各添一衬字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "仄仄/平仄仄",
+          "仄平/平仄平",
+          "仄仄仄、仄平/平仄仄",
+          "平",
+          "仄平平、平仄平",
+          "平平仄",
+          "仄平平、平仄平"
+        ]
+      }
+    }
+  ]
+}

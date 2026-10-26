@@ -1,0 +1,42 @@
+{
+  "name": "遍地锦",
+  "aliases": [],
+  "description": "调见毛滂《东堂词》，孙守席上咏牡丹花作也。《花草粹编》注“小石调”。",
+  "default_variant": "毛滂",
+  "default_variant_source_id": 813,
+  "variants": [
+    {
+      "name": "毛滂",
+      "source_id": 813,
+      "length_category": "short",
+      "variants_description": "《词律》误从汲古阁本，前段第二句作“满枝头、新彩云雕雾”，多一“新”字，今从《花草粹编》改正，平仄宜遵之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平/仄平仄",
+          "仄平平、仄平/平仄",
+          "仄平平、仄仄/平平",
+          "仄仄仄、平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平平、仄仄/平平",
+          "仄平平、仄平/平仄",
+          "仄仄平、平仄/平平",
+          "仄仄仄、平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

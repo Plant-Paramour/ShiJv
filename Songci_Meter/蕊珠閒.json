@@ -1,0 +1,55 @@
+{
+  "name": "蕊珠閒",
+  "aliases": [],
+  "description": "调见《介庵词》。",
+  "default_variant": "赵彦端",
+  "default_variant_source_id": 1114,
+  "variants": [
+    {
+      "name": "赵彦端",
+      "source_id": 1114,
+      "length_category": "medium",
+      "variants_description": "此词前段第四句“有娇黄上林梢”，疑有脱误，然无别首可校。\n★ 《御定词谱》影印本原註为“此词前段第三句‘有娇黄上林梢’”，据文义改。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄平平",
+          "平平仄",
+          "仄仄/平平/平仄",
+          "仄/平平/仄平平",
+          "仄平/仄仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "仄平/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄平/仄",
+          "仄平/平仄/仄仄",
+          "平仄/平平/平仄",
+          "仄平/平仄",
+          "仄仄/仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "仄平/仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

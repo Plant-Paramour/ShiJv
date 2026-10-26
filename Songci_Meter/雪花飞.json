@@ -1,0 +1,41 @@
+{
+  "name": "雪花飞",
+  "aliases": [],
+  "description": "《宋史·乐志》：“高角调”。按高角乃大吕之角声也。",
+  "default_variant": "黄庭坚",
+  "default_variant_source_id": 280,
+  "variants": [
+    {
+      "name": "黄庭坚",
+      "source_id": 280,
+      "length_category": "short",
+      "variants_description": "此调仅见山谷一词，无别首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄仄",
+          "平平/仄仄平平",
+          "平仄/平平仄仄",
+          "平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平仄",
+          "平平/仄仄平",
+          "平仄/平平/仄仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

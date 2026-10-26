@@ -1,0 +1,13 @@
+{
+  "check-environment.py": "86bbc3324e1fb47ab7833a634d1047ff1666d3d92b79eda83cb7f9e73717d4b6",
+  "conda-bootstrap.yml": "d55916515a7626767348fb720d928cc96cb4ae23a920979f9a44f943b398dc0f",
+  "dependency-versions.txt": "63fd52168e993927ce9c90934af29bec9974ef98ed902fcd070e1714af5de31d",
+  "environment.yml": "b5e57714c791497ca5686f4736592d20c0784608ca1be62be230e0ee81e1b5f5",
+  "expected-packages.json": "494c6968773c911894af13ff358ddb1248356f3648248713fee82f1c6ab4b4cb",
+  "install-conda.cmd": "403b04919ac424e00ee5fb66f65c2ddbbf4bca50852a3163ebeae2ad987afd9b",
+  "install-conda.ps1": "86ae9724bab2d49c5b39f5612b8bcb7b316b57e0f8eda6162de39faa0f81e8c4",
+  "plan.json": "23c87ae0bbb499e1b174f998bfb7c7c7716b1b402bfc9502de88da3057783bd5",
+  "requirements-windows-x64.lock": "e5f8149d5f1c1426cfc6041d05ca2064230c185064251aa8201cdb914f7f5a2a",
+  "requirements.lock": "e5f8149d5f1c1426cfc6041d05ca2064230c185064251aa8201cdb914f7f5a2a",
+  "使用说明.md": "60f3a3791477046674e6a4be8d106ef4651f1923069da99e83096ccdf3004f42"
+}

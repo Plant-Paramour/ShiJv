@@ -1,0 +1,71 @@
+{
+  "name": "啰唝曲",
+  "aliases": [],
+  "description": "唐范摅《云溪友议》云：“金陵有啰唝楼，乃陈后主所建。《啰唝曲》，刘采春所唱，皆当代才子所作五六七言绝句。一名《望夫歌》，元稹诗所谓‘更有恼人肠断处，选词能唱望夫歌’也。”",
+  "default_variant": "刘采春",
+  "default_variant_source_id": 11,
+  "variants": [
+    {
+      "name": "刘采春",
+      "source_id": 11,
+      "length_category": "short",
+      "variants_description": "按《云溪友议》所载《啰唝曲》，其起句不用韵者凡五首，其第四首云：“那年离别日，只道往桐庐。桐庐人不见，今得广州书。”第五首云：“昨日胜今日，今年老去年。黄河清有日，白发黑无缘。”谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄中/中中仄",
+          "中中/中中平",
+          "中平/平仄仄",
+          "中仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "刘采春",
+      "source_id": 12,
+      "length_category": "short",
+      "variants_description": "此首起句用韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平平",
+          "平平/仄仄平",
+          "平平/仄仄仄",
+          "平仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "刘采春",
+      "source_id": 13,
+      "length_category": "short",
+      "variants_description": "此本七言绝句，因亦名《啰唝曲》，故并列之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平/仄仄平",
+          "平平/仄仄/仄平平",
+          "仄平/仄仄/平平仄",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    }
+  ]
+}

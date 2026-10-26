@@ -1,0 +1,44 @@
+{
+  "name": "思远人",
+  "aliases": [],
+  "description": "调见《小山乐府》，因词有“千里念行客”句，取其意以为名。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 637,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 637,
+      "length_category": "short",
+      "variants_description": "此词亦无别首宋词可校。《词律》云：“前后段第二句、第五句‘念’、‘寄’、‘旋’、‘为’四字皆用去声。”",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          5
+        ],
+        "lines": [
+          "平仄/平平/平仄仄",
+          "平仄/仄平仄",
+          "仄/平平/仄仄",
+          "平平/平仄",
+          "平仄/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "仄仄/仄平仄",
+          "仄/仄仄/仄平",
+          "仄平/平仄",
+          "平平/仄平仄"
+        ]
+      }
+    }
+  ]
+}

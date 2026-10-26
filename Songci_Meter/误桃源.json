@@ -1,0 +1,42 @@
+{
+  "name": "误桃源",
+  "aliases": [],
+  "description": "宋张耒《明道杂志》云：“掌禹锡学士考试太学生，出《砥柱勒铭赋》题，此铭今俱在，乃唐太宗铭禹功，而掌公误记为太宗自铭其功。宋涣中第一，其赋悉是太宗自铭， 有无名子作此嘲之。”",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 177,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 177,
+      "length_category": "short",
+      "variants_description": "原注：“冥”字上声。冥子里，俗谓昏也。此词平仄无他首可校。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平仄",
+          "仄仄/仄平平",
+          "仄平/平仄平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄仄",
+          "平仄/仄平平",
+          "仄仄/仄平仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

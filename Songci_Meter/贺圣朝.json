@@ -1,0 +1,422 @@
+{
+  "name": "贺圣朝",
+  "aliases": [],
+  "description": "唐教坊曲名。《花间集》有欧阳炯词，本名《贺明朝》，《词律》混入《贺圣朝》误。",
+  "default_variant": "冯延巳",
+  "default_variant_source_id": 412,
+  "variants": [
+    {
+      "name": "冯延巳",
+      "source_id": 412,
+      "length_category": "short",
+      "variants_description": "此调昉自此词，如杜词、黄词、叶词、赵词，皆由此添字或摊破句法，其实同出一原也。若无名氏之《转调贺圣朝》，另押平韵，与此不同，因调名同，故为类列。\n谱内可平可仄悉参后列七词句法同者。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "中平/中仄/平平仄",
+          "平平/中仄",
+          "中平/平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "中平/中仄",
+          "中平/仄仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "中平/中仄",
+          "中中/平仄"
+        ]
+      }
+    },
+    {
+      "name": "黄庭坚",
+      "source_id": 413,
+      "length_category": "short",
+      "variants_description": "此即冯词体，惟前段第三、四、五句，后段第四、五、六句，俱摊破句法，作七字一句、五字一句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平平/仄仄",
+          "平平/平仄/仄平平",
+          "仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/平仄",
+          "平平/仄仄",
+          "仄平/平仄",
+          "平平/平仄/仄平平",
+          "仄平平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "叶清臣",
+      "source_id": 414,
+      "length_category": "short",
+      "variants_description": "此亦冯词体，惟前段第二句添一字，后段第三句添一字。前段第三、四、五句，后段第四、五、六句俱摊破句法，作七字一句、五字一句异。赵鼎、马庄父词正与此同。别本前结或作“三分春色，二分愁闷，一分风雨”，后起或作“花开花谢花无语”，后结或作“知他来岁。牡丹时候，相逢何处”，即后赵彦端“一江风月”词体，今照《花庵词选》本。\n前段起句，赵词“断霞收尽黄昏雨”，“收”字平声；马词“游人拾翠不知远”，“游”字平声，“不”字仄声。第二句，马词“被子规呼转”，“子”字仄声。第三句， 赵词“帘栊不卷夜深沈”，“不”字仄声。后段第二句，马词“海棠红浅”，“海”字仄声，“红”字平声。第四句，马词“花前一笑不须悭”，“花”字平声，“一”字仄声。结句，赵词“有许多言语”，“许”字仄声。谱内可平可仄据之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/中仄/中平仄",
+          "仄/中平/平仄",
+          "平平/中仄/仄平平",
+          "仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/平仄",
+          "中平/中仄",
+          "仄/平平/平仄",
+          "中平/中仄/仄平平",
+          "仄中平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "赵师侠",
+      "source_id": 415,
+      "length_category": "short",
+      "variants_description": "此与叶词同，惟后段第二句不用韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄平/平仄",
+          "平平/平仄/仄平平",
+          "仄平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/平仄",
+          "仄平/仄仄",
+          "仄/平平/仄仄",
+          "仄/平仄仄/仄平平",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "赵彦端",
+      "source_id": 416,
+      "length_category": "short",
+      "variants_description": "此词前段即冯词体，惟第二句添一字。后段则摊破句法，另成变调，与冯词异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄/平平/平仄",
+          "平平/仄仄",
+          "仄/平平、仄/平平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "赵彦端",
+      "source_id": 417,
+      "length_category": "short",
+      "variants_description": "此与叶词同，惟换头处摊破句法异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄平平/平仄",
+          "仄平/仄仄/仄平平",
+          "仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄/平平仄仄",
+          "仄平/平仄/仄平平",
+          "仄/平平平仄"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 418,
+      "length_category": "short",
+      "variants_description": "此亦冯词体，惟后段第三句添一字，前段第三、四、五句摊破作七字一句、四字一句，后段第四、五、六句摊破作七字一句、五字一句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "平平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "仄平平/平仄",
+          "仄平/平仄/仄平平",
+          "仄仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 419,
+      "length_category": "short",
+      "variants_description": "此即冯词体，惟前段第三、四、五句摊破作七字一句、四字一句，后段第三句添一字异。\n杜词二首句读参差，不足为法，采入以备一体。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/仄仄",
+          "仄/平平/平仄",
+          "仄平/平仄",
+          "仄平/仄仄",
+          "平仄/平仄"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 420,
+      "length_category": "short",
+      "variants_description": "此见《古今词话》，名《转调贺圣朝》，押平声韵，与押仄韵者不同。谱内可平可仄悉参下词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄中/中仄",
+          "平平/中仄",
+          "中仄/平平",
+          "仄平平、仄平/仄仄",
+          "中仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "中平/平仄",
+          "中仄/平平",
+          "仄平平、仄平/仄仄",
+          "平仄/平仄/平平"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                3,
+                4
+              ],
+              "end": [
+                3,
+                4
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                5,
+                6
+              ],
+              "end": [
+                5,
+                6
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "无名氏",
+      "source_id": 421,
+      "length_category": "short",
+      "variants_description": "此与转调词同，惟前后段第四句各添一字作八字句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/平仄",
+          "仄仄/平平",
+          "仄平平、平仄/仄平平",
+          "仄/仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄",
+          "平仄/平平",
+          "仄/平平、仄仄/仄平平",
+          "仄/仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 422,
+      "length_category": "short",
+      "variants_description": "此亦转调词体，惟前段第四、五句添一字，后段第四、五句摊破句法，俱作五字一句、四字两句异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄平/平仄",
+          "平平/平仄",
+          "平仄/平平",
+          "仄/平平/平仄",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄",
+          "仄仄/平平",
+          "仄/平平/平仄",
+          "仄平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

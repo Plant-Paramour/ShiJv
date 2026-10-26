@@ -1,0 +1,143 @@
+{
+  "name": "忆汉月",
+  "aliases": [],
+  "description": "唐教坊曲名。柳永词名《望汉月》，《乐章集》注“正平调”。",
+  "default_variant": "欧阳修",
+  "default_variant_source_id": 542,
+  "variants": [
+    {
+      "name": "欧阳修",
+      "source_id": 542,
+      "length_category": "short",
+      "variants_description": "此调祇有两体，前后段结句或六字、或七字。柳词虽注宫调，然句读参差，非正体也。\n此词两结句六字，无宋元词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄仄/平平/平仄",
+          "仄平/平仄/仄平平",
+          "仄仄/仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "平仄仄、仄平/平仄",
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "柳永",
+      "source_id": 543,
+      "length_category": "short",
+      "variants_description": "此亦欧词体，惟后段第二句减一字作六字句，结句添一字作七字句异。亦无宋元人别词可校。\n按前段起句叠用三“明月”，本系游戏笔墨，无关体例。至第四字“月”字仄声，乃以入替平之法，若用上去，便不协律矣。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平仄/平仄",
+          "平仄/仄平/平仄",
+          "仄平/平仄/仄平平",
+          "平仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄仄",
+          "仄仄/仄平/平仄",
+          "平仄/平平/仄平仄",
+          "仄仄仄、平平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "杜安世",
+      "source_id": 544,
+      "length_category": "short",
+      "variants_description": "此词两结句各七字，后段第三句又押韵，晏殊“千缕万条”词正与之同。\n晏词前段第三、四句“谢孃春晚先多愁”，“先”字平声；“更撩乱飞絮如雪”，“乱”字仄声。后段第二句“长忆得醉中攀折”，“长”字平声。第三句“年年岁岁好时节”，上“年”字平声，上“岁”字仄声。谱内可平可仄据此，余参李词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "中仄/仄平/平仄",
+          "中平/中仄/中平平",
+          "仄平中、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/平仄仄",
+          "中仄仄、仄平/平仄",
+          "中中/中中/仄平仄",
+          "仄中中、仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "李遵勖",
+      "source_id": 545,
+      "length_category": "short",
+      "variants_description": "此与杜词同，惟后段起句押韵，第三句不押韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄仄/仄平/平仄",
+          "仄平/仄仄/仄平平",
+          "仄平平、仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "仄仄仄、仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄仄仄、仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

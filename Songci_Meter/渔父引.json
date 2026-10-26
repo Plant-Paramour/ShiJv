@@ -1,0 +1,29 @@
+{
+  "name": "渔父引",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "顾况",
+  "default_variant_source_id": 5,
+  "variants": [
+    {
+      "name": "顾况",
+      "source_id": 5,
+      "length_category": "short",
+      "variants_description": "此与张志和《渔歌子》极为宋人传诵。黄庭坚、徐俯曾取二词合为《浣溪沙》歌之。见《乐府雅词》注。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3
+        ],
+        "lines": [
+          "平仄/平平/仄平",
+          "仄平/仄仄/平平",
+          "平平/仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

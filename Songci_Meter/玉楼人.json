@@ -1,0 +1,43 @@
+{
+  "name": "玉楼人",
+  "aliases": [],
+  "description": "调见《梅苑》词选本。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 715,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 715,
+      "length_category": "short",
+      "variants_description": "此词前段第二句，《花草粹编》本多一“又”字，今照《梅苑》词校正。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平仄仄、平平/仄仄",
+          "平平/平仄/平平",
+          "仄平平、平仄/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄平、仄仄/平仄",
+          "仄平/仄仄/平平",
+          "仄平平、仄仄/平仄"
+        ]
+      }
+    }
+  ]
+}

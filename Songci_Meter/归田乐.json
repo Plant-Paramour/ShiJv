@@ -1,0 +1,326 @@
+{
+  "name": "归田乐",
+  "aliases": [],
+  "description": "黄庭坚词名《归田乐引》。",
+  "default_variant": "晁补之",
+  "default_variant_source_id": 562,
+  "variants": [
+    {
+      "name": "晁补之",
+      "source_id": 562,
+      "length_category": "short",
+      "variants_description": "此调名《归田乐》，无引字。惟晁词、蔡词二体，然两词亦各不同，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          6
+        ],
+        "lines": [
+          "平仄仄",
+          "仄仄/平平/平仄仄",
+          "平平仄",
+          "仄平仄、平仄仄",
+          "仄平平/仄仄",
+          "仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄仄、平平仄",
+          "平平/平平仄",
+          "仄平仄、平平/平仄",
+          "仄平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "蔡伸",
+      "source_id": 563,
+      "length_category": "short",
+      "variants_description": "此词前后段字句相同，极为整齐，然亦无他词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "平仄/仄平/平仄",
+          "仄仄/仄平平",
+          "平仄/平平/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平仄/仄平/平仄",
+          "平仄/仄平/平",
+          "平仄/仄平/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "晏几道",
+      "source_id": 564,
+      "length_category": "medium",
+      "variants_description": "此调名《归田乐引》，有三体，大同小异，可以参校。故此词可平可仄即参无名氏词及黄词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄中中、仄平/中仄",
+          "中中/中平仄",
+          "仄中/仄仄仄",
+          "中仄/中仄",
+          "仄仄/平平/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/中仄仄",
+          "仄仄仄、中平/平仄仄",
+          "仄平/中仄",
+          "中仄/平平仄",
+          "仄中/仄仄仄",
+          "仄中/平仄",
+          "中仄/平平/仄平仄"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 565,
+      "length_category": "medium",
+      "variants_description": "此与晏词同，惟前段第四句、后段第五句各用一叠韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄平平、仄平/平仄",
+          "平平/仄平仄",
+          "仄仄/仄仄仄",
+          "仄仄/平仄",
+          "仄仄/平平/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/平仄仄",
+          "仄仄仄、仄平/平仄仄",
+          "仄平/仄仄",
+          "仄仄/平平仄",
+          "仄仄/仄仄仄",
+          "仄仄/平仄",
+          "平仄/平平/仄平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                2
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                4
+              ],
+              "end": [
+                5,
+                4
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                2
+              ],
+              "end": [
+                6,
+                2
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                4
+              ],
+              "end": [
+                6,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "黄庭坚",
+      "source_id": 566,
+      "length_category": "medium",
+      "variants_description": "此亦晏词体，惟前段第二句不押韵，后段第二句减一字作七字句异。其用叠韵，则与无名氏词同。\n按黄词别首后段第五、六句“拌了又舍了，一定是这回休了”，多衬字三字，因词俚不录，",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "lines": [
+          "仄仄/平平仄",
+          "仄仄平、仄平/仄仄",
+          "仄仄/平平仄",
+          "仄仄/仄仄仄",
+          "仄仄/仄仄",
+          "仄仄/平平/仄平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7
+        ],
+        "lines": [
+          "平平/仄仄仄",
+          "仄平/平平/平平仄",
+          "仄平/平仄",
+          "平仄/平平仄",
+          "仄仄/仄仄仄",
+          "仄仄/平仄",
+          "仄仄/平平/仄平仄"
+        ]
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                2
+              ],
+              "end": [
+                5,
+                2
+              ]
+            },
+            {
+              "stanza": 1,
+              "start": [
+                5,
+                4
+              ],
+              "end": [
+                5,
+                4
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                2
+              ],
+              "end": [
+                6,
+                2
+              ]
+            },
+            {
+              "stanza": 2,
+              "start": [
+                6,
+                4
+              ],
+              "end": [
+                6,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

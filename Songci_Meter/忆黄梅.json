@@ -1,0 +1,55 @@
+{
+  "name": "忆黄梅",
+  "aliases": [],
+  "description": "调见《梅苑》。",
+  "default_variant": "王观",
+  "default_variant_source_id": 1163,
+  "variants": [
+    {
+      "name": "王观",
+      "source_id": 1163,
+      "length_category": "medium",
+      "variants_description": "此调仅见此词，无他首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          6,
+          7
+        ],
+        "lines": [
+          "平仄/仄平/仄仄",
+          "仄仄/仄平/平仄",
+          "平仄/仄平平",
+          "仄仄仄",
+          "仄仄/平平、仄平/平仄仄",
+          "平平仄",
+          "平仄/平平/仄仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4,
+          5,
+          7,
+          8
+        ],
+        "lines": [
+          "仄平/仄",
+          "仄/平平",
+          "平/仄仄",
+          "仄平/仄仄/平平仄",
+          "仄平/仄仄",
+          "仄平仄、平仄/平平",
+          "仄/平平/平仄",
+          "平仄仄、平仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

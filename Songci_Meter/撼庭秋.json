@@ -1,0 +1,45 @@
+{
+  "name": "撼庭秋",
+  "aliases": [],
+  "description": "唐教坊曲名。一作《感庭秋》。",
+  "default_variant": "晏殊",
+  "default_variant_source_id": 447,
+  "variants": [
+    {
+      "name": "晏殊",
+      "source_id": 447,
+      "length_category": "short",
+      "variants_description": "此调平仄，无别首可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/平仄",
+          "仄/仄平/平仄",
+          "仄平/平仄",
+          "平平/仄仄",
+          "仄平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/平仄",
+          "仄平/平仄",
+          "仄/平平/平仄",
+          "平平/仄仄",
+          "仄平/平仄"
+        ]
+      }
+    }
+  ]
+}

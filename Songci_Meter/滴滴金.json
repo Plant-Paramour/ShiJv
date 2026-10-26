@@ -1,0 +1,148 @@
+{
+  "name": "滴滴金",
+  "aliases": [],
+  "description": "蒋氏《九宫谱目》入黄钟宫。",
+  "default_variant": "李遵勖",
+  "default_variant_source_id": 538,
+  "variants": [
+    {
+      "name": "李遵勖",
+      "source_id": 538,
+      "length_category": "short",
+      "variants_description": "此调以此词及晏词为正体，若杨词之押韵参差，宋媛孙氏词之添字，皆变体也。 按《中吴纪闻》内一词，前后段第二句“引得都来胡道”、“都叫一时閒了”俱不作折腰句法，因属嚯词不列。谱内可平可仄悉参下诸词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/中仄/中平仄",
+          "中中中、仄平仄",
+          "中中/平中/仄中平",
+          "仄/平中/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中中/中中/平中/仄",
+          "中平中、仄平仄",
+          "中中/平中/仄平平",
+          "仄/中平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "晏殊",
+      "source_id": 539,
+      "length_category": "short",
+      "variants_description": "此与李词同，惟前后段第三句俱押韵异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平、仄平仄",
+          "仄仄/平平/仄平仄",
+          "仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平、仄平仄",
+          "平仄/平平/仄平仄",
+          "仄仄/平平仄"
+        ]
+      }
+    },
+    {
+      "name": "杨无咎",
+      "source_id": 540,
+      "length_category": "short",
+      "variants_description": "此即晏词体，惟后段第三句不押韵。杨词别首前段第三、四句“表里冰清谁与比，占无双两地”，后段第三、四句“岁岁今朝捧瑶觞，劝南园桃李”，一押韵、一不押韵， 正与此同。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平仄、仄平仄",
+          "仄仄/平平/平仄仄",
+          "仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄平平、仄平仄",
+          "仄仄/平平/仄平平",
+          "仄/仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "孙道绚",
+      "source_id": 541,
+      "length_category": "short",
+      "variants_description": "此与李词同，惟后段第二句添一字作七字句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平仄仄、仄平仄",
+          "仄仄/平平/仄仄平",
+          "仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/平平仄",
+          "仄仄/平平/仄平仄",
+          "仄仄/平平/仄平平",
+          "仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

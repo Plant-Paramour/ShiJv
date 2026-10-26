@@ -1,0 +1,114 @@
+{
+  "name": "庆金枝",
+  "aliases": [],
+  "description": "《高丽史·乐志》名《庆金枝令》。",
+  "default_variant": "无名氏",
+  "default_variant_source_id": 448,
+  "variants": [
+    {
+      "name": "无名氏",
+      "source_id": 448,
+      "length_category": "short",
+      "variants_description": "此调三体，每体祇有一词，可平可仄即以三词参定。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中中/中仄平",
+          "仄平仄、仄平平",
+          "平平/平仄/仄平仄",
+          "仄仄/仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/仄仄/平平仄",
+          "中中仄、仄平平",
+          "中平/中仄/仄平平",
+          "仄仄/仄平平"
+        ]
+      }
+    },
+    {
+      "name": "张先",
+      "source_id": 449,
+      "length_category": "short",
+      "variants_description": "此词前后段第三句押韵，两结句俱六字折腰。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄平",
+          "仄平仄、仄平平",
+          "仄平/平仄/仄平平",
+          "仄中仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "平仄仄、仄平平",
+          "平平/平仄/仄平平",
+          "仄平仄、仄平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 450,
+      "length_category": "short",
+      "variants_description": "此词换头句押韵，余与张词同。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄平",
+          "仄平仄、仄平平",
+          "仄平/平仄/仄平平",
+          "仄仄仄、仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄平仄、仄平平",
+          "平平/仄仄/仄平平",
+          "仄平仄、仄平平"
+        ]
+      }
+    }
+  ]
+}

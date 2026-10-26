@@ -1,0 +1,866 @@
+{
+  "name": "酒泉子",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 200,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 200,
+      "length_category": "short",
+      "variants_description": "自此至张泌“春雨打窗”词，共八首，皆以平韵为主，前后段间入两仄韵。但前段起句有用韵者，有不用韵者。后段起句有换仄韵者，有仍押前段仄韵者，有押平韵者。后段第二句，或五字，或六字，或七字不同。各以类列。谱内可平可仄，悉参类列诸词，故不复注。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "中仄/中平",
+          "中仄/中平/中仄",
+          "中中平",
+          "平中仄",
+          "中平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_3_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "中平/中仄/中平仄",
+          "中中/平中仄",
+          "中中平",
+          "中中仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 201,
+      "length_category": "short",
+      "variants_description": "此与温庭筠“花映柳条”词同，惟前段起句不用韵，孙词二首皆然。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "rhyme_2_positions": [
+          5
+        ],
+        "lines": [
+          "仄仄/仄平",
+          "仄仄/平平/仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          5
+        ],
+        "rhyme_3_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄平/平仄仄",
+          "仄仄平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "温庭筠",
+      "source_id": 202,
+      "length_category": "short",
+      "variants_description": "此即“花映柳条”词体，惟后段起句仍押前段仄韵，与别换仄韵者不同。词内簪字去声。白居易诗“银篦稳簪乌罗帽”，亦作去声读。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "平仄/平仄仄",
+          "仄仄平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 203,
+      "length_category": "short",
+      "variants_description": "此即“花映柳条”词体，惟后段第二句六字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_3_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄/平平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "李珣",
+      "source_id": 204,
+      "length_category": "short",
+      "variants_description": "此即“花映柳条”词体，惟前后段第二句各七字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平仄/仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_3_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 205,
+      "length_category": "short",
+      "variants_description": "此词后段起句仍押前段平韵。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平",
+          "平仄/平平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_3_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "温庭筠",
+      "source_id": 206,
+      "length_category": "short",
+      "variants_description": "此即“罗带缕金”词体，惟后段第二句六字异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_3_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "张泌",
+      "source_id": 207,
+      "length_category": "short",
+      "variants_description": "此即“罗带缕金”词体，惟前后段第二句各七字异。以上八词，俱前后段间入两仄韵。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/仄平",
+          "平仄/仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_3_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平仄/仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 208,
+      "length_category": "short",
+      "variants_description": "自此至顾夐“小槛日斜”词，共六首，皆前后段间入一仄韵。其前段起句亦有用韵者，不用韵者。后段起句有仄韵者，有平韵者。第二句亦有七字、六字、五字不同。故有类列如左。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_2_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平仄",
+          "仄仄/平平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 209,
+      "length_category": "short",
+      "variants_description": "此即“黛薄红深”词体，但前段第三句四字，第四句用平韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          4,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          3
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/仄平/平仄仄",
+          "平平/平仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          5
+        ],
+        "rhyme_2_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/平平仄",
+          "仄仄/平平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 210,
+      "length_category": "short",
+      "variants_description": "此亦“黛薄红深”词体，但顾词后段第一句押仄韵，冯词押平韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平仄/平平",
+          "仄仄/平平/平仄仄",
+          "平平平",
+          "平平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄仄/仄平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 211,
+      "length_category": "short",
+      "variants_description": "此即“芳草长川”词体。但前后段第四句不押仄韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/仄平/平仄仄",
+          "仄平平",
+          "平平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "rhyme_2_positions": [
+          2
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "平仄/平平/平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "司空图",
+      "source_id": 212,
+      "length_category": "short",
+      "variants_description": "此词后段起句押平韵，与冯词同，但前段起句不用韵异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平",
+          "仄仄/平平/平仄仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2
+        ],
+        "rhyme_2_positions": [
+          1,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 213,
+      "length_category": "short",
+      "variants_description": "此即“买得杏花”词体，惟后段第二句五字异。\n以上六词皆前后段间入一仄韵。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/仄平",
+          "平仄/仄平/平仄仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2
+        ],
+        "rhyme_2_positions": [
+          1
+        ],
+        "rhyme_3_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "牛峤",
+      "source_id": 214,
+      "length_category": "short",
+      "variants_description": "此词惟后段间入仄韵。但“望”与“长”叶，亦是三声叶。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平",
+          "平仄/仄平/平仄仄",
+          "仄平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/仄平仄",
+          "平仄/平平仄",
+          "仄平/平仄/仄平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 215,
+      "length_category": "short",
+      "variants_description": "此词惟前段间入仄韵。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "rhyme_2_positions": [
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平仄/仄平/平仄仄",
+          "平平/仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_2_positions": [
+          1,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄平/平仄仄",
+          "平平/仄仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "张泌",
+      "source_id": 216,
+      "length_category": "short",
+      "variants_description": "自此至冯延巳“深院空帏”词共四首，俱全押平韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平仄仄平/平仄",
+          "仄平/仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄仄/仄平/平仄",
+          "仄平/仄仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "毛文锡",
+      "source_id": 217,
+      "length_category": "short",
+      "variants_description": "此即“紫陌青门”词体，惟前后段第二句各七字异。宋晏殊、晁补之、辛弃疾、曹勛词俱照此填。\n晏词前段起句“三月暖风”，“三”字平声，“暖”字仄声。第二句“閒却好花无限了”，“閒”字平声，“好”字仄声。第三句“流莺粉蝶鬭翻飞”，“流”字平声，“粉”字仄声。后段起句“长安多少利名身”，“长”字平声。又“劝君莫惜金缕衣”，“莫” 字仄声。第二句“把酒看花须强饮”，“把”字仄声。又曹词“常记孤山残雪路”，“孤” 字平声。晏词第三句“明朝后日渐离披”，“明”字平声，“后”字仄声。谱内可平可仄据此。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/中平",
+          "中仄/中平/平仄仄",
+          "中平/中仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          4
+        ],
+        "lines": [
+          "中平/中仄/仄平平",
+          "中仄/中平/平仄仄",
+          "中平/中仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "李珣",
+      "source_id": 218,
+      "length_category": "short",
+      "variants_description": "此词亦全押平韵。但前段与张泌词同，后段第一、二句与毛文锡同，第三、四、五 句作三字三句，又异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "仄仄/平平/平仄仄",
+          "仄平平",
+          "仄平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "冯延巳",
+      "source_id": 219,
+      "length_category": "short",
+      "variants_description": "此词亦全押平韵，但句读与前词异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "lines": [
+          "平仄/平平",
+          "平仄/平平/平仄仄",
+          "平仄平",
+          "平仄仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          5
+        ],
+        "lines": [
+          "仄平/平仄/仄平平",
+          "平平/平平/平仄",
+          "平平平",
+          "平仄仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 220,
+      "length_category": "short",
+      "variants_description": "此词亦全押平韵，而后结则又换韵。在《花间集》亦仅见两体。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "仄仄/平平",
+          "仄仄/仄平/平仄仄",
+          "仄平/仄仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1
+        ],
+        "rhyme_2_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平平/平仄/仄平平",
+          "仄平/平仄仄",
+          "仄平/仄仄/仄平平",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "李珣",
+      "source_id": 221,
+      "length_category": "short",
+      "variants_description": "此即“水碧风清”词体，惟换头作三字两句，及第三句作六字句异。\n按《花间》、《尊前》及《阳春》诸集，《酒泉子》词诸家大同小异者，二十二阕，约计不过五体。有前段间入仄韵、后段换仄韵者，如温庭筠“花映柳条”以下八词是也。有前段间入仄韵、后段即押前仄韵者，如顾夐“黛薄红深”以下六词是也。有前段全押平韵、后段间入仄韵，后段全押平韵、前段间入仄韵者，如牛峤之“记得去年”、顾夐之“掩却菱花”二词是也。有全押平韵者，如张泌“紫陌青门”以下四词是也。有全押平韵、结又换韵者，如李珣之“秋月婵娟”、顾夐之“水碧风清”二词是也。谱内各以类列，凡旧谱淆乱者，悉为校定。至《词律》所收潘阆“长忆孤山”与“长忆西湖湖上水”二词，按《湘山野录》，本名《忆余杭》，且与以上诸词体制不合，故仍按字数，另列在后。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平",
+          "仄仄/仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2
+        ],
+        "rhyme_2_positions": [
+          4,
+          5
+        ],
+        "lines": [
+          "平仄/仄",
+          "仄平平",
+          "平仄/仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "name": "喜团圆",
+  "aliases": [],
+  "description": "调见《小山乐府》。《花草粹编》无名氏词有“与箇团圆”句，更名《与团圆》。",
+  "default_variant": "晏几道",
+  "default_variant_source_id": 466,
+  "variants": [
+    {
+      "name": "晏几道",
+      "source_id": 466,
+      "length_category": "short",
+      "variants_description": "此与《梅苑》词同，惟前段第四、五句句读不同耳。其余字句同者，可平可仄，可以参校。\n《花草粹编》无名氏词前段第三、四句“孜孜觑著，算前生、只结得眼因缘”，句读虽异，因词俚不录。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄",
+          "平平/仄仄",
+          "中仄/平平",
+          "平平/仄仄/平平仄",
+          "仄平仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "中中/中中",
+          "中平/中仄",
+          "中仄/平平",
+          "中平/仄仄",
+          "平平/中仄",
+          "仄仄/平平"
+        ]
+      }
+    },
+    {
+      "name": "无名氏",
+      "source_id": 467,
+      "length_category": "short",
+      "variants_description": "此亦晏词体，前段第四、五句摊破句法，作四字三句异。《花草粹编》前段第四、五、 六句作“殢东君，先点破，压群花”，今从《梅苑》改定。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "中中/仄仄",
+          "平平/仄仄",
+          "仄仄/平平",
+          "平仄/中中",
+          "仄平/仄仄",
+          "仄仄/平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          3,
+          6
+        ],
+        "lines": [
+          "仄仄/平平",
+          "平平/仄仄",
+          "平仄/平平",
+          "平平/仄仄",
+          "平平/平仄",
+          "仄仄/平平"
+        ]
+      }
+    }
+  ]
+}

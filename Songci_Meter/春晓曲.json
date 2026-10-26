@@ -1,0 +1,52 @@
+{
+  "name": "春晓曲",
+  "aliases": [],
+  "description": "朱敦儒词有“西楼月落鸡声急”句，又名《西楼月》。",
+  "default_variant": "朱敦儒",
+  "default_variant_source_id": 69,
+  "variants": [
+    {
+      "name": "朱敦儒",
+      "source_id": 69,
+      "length_category": "short",
+      "variants_description": "此词见《花草粹编》，第二句本六字，乃旧谱于“香”字下增一“寒”字，作七言四句，名《阿那曲》。查唐宋词并无“阿那曲”名，自明杨慎以唐诗绝句讹託为词，今正之。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄仄/平平/仄仄",
+          "仄平/中仄/仄平平",
+          "仄仄/仄平/平仄仄"
+        ]
+      }
+    },
+    {
+      "name": "张元干",
+      "source_id": 70,
+      "length_category": "short",
+      "variants_description": "此与朱词同，惟第二句作三字两句异。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          3,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/平平仄",
+          "仄平平",
+          "平仄仄",
+          "仄平/平仄/仄平平",
+          "仄仄/平平/平仄仄"
+        ]
+      }
+    }
+  ]
+}

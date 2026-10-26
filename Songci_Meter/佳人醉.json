@@ -1,0 +1,55 @@
+{
+  "name": "佳人醉",
+  "aliases": [],
+  "description": "《乐章集》注“双调”。",
+  "default_variant": "柳永",
+  "default_variant_source_id": 1032,
+  "variants": [
+    {
+      "name": "柳永",
+      "source_id": 1032,
+      "length_category": "medium",
+      "variants_description": "汲古阁本《乐章集》，前段于“临轩砌”句分段，后段第四句少二字，今从《花草粹编》，亦无别首宋词可校。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          5,
+          7
+        ],
+        "lines": [
+          "仄仄/平平/仄仄",
+          "平仄/平平/平仄",
+          "仄仄平/平仄",
+          "平平/平仄",
+          "仄仄/平仄",
+          "仄仄/平平/仄仄",
+          "仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          5,
+          6,
+          7,
+          8
+        ],
+        "lines": [
+          "平平/仄",
+          "仄平/平仄",
+          "平仄/仄平",
+          "仄仄/平平/平仄",
+          "平仄/平平仄",
+          "仄平仄",
+          "平平/平仄",
+          "仄仄/平平/仄仄"
+        ]
+      }
+    }
+  ]
+}

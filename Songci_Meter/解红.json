@@ -1,0 +1,31 @@
+{
+  "name": "解红",
+  "aliases": [],
+  "description": "按《宋史·乐志》，小儿舞队有《解红》，其曲失传。陈旸《乐书》载和凝作，乃唐词也。若《鸣鹤余音》有《解红儿慢》，系元人所制，与此不同。",
+  "default_variant": "和凝",
+  "default_variant_source_id": 56,
+  "variants": [
+    {
+      "name": "和凝",
+      "source_id": 56,
+      "length_category": "short",
+      "variants_description": "此与《赤枣子》、《捣练子》、《桂殿秋》诸词字句悉同，所辨在每句平仄之间，皆昔 人音律所寓，填者宜悉遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄仄",
+          "仄平平",
+          "仄平/仄仄/平仄平",
+          "仄仄/平平/仄平仄",
+          "仄平/仄仄/仄平平"
+        ]
+      }
+    }
+  ]
+}

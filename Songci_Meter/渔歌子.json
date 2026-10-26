@@ -1,0 +1,177 @@
+{
+  "name": "渔歌子",
+  "aliases": [],
+  "description": "唐教坊曲名。按《唐书·张志和传》，志和居江湖，自称江波钓徒，每垂钓不设铒， 志不在鱼也。宪宗图真，求其人不能致。尝撰《渔歌》，即此词也。单调体实始于此。至双调体，昉自《花间集》顾夐、孙光宪。有魏承班、",
+  "default_variant": "张志和",
+  "default_variant_source_id": 44,
+  "variants": [
+    {
+      "name": "张志和",
+      "source_id": 44,
+      "length_category": "short",
+      "variants_description": "按张志和所撰《渔歌子》词五首，体调如一，可以参校。其一首起句“钓台渔父褐 为裘”，“钓”字仄声。第二句“两两三三舴艋舟”，上“两”字仄声。又一首第三句“钓车子”，“钓”字仄声，“车”字平声。谱内据之。其余可平可仄，参后“松江蟹舍”一词。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "中中/中中/仄中平",
+          "中中/平中/仄中平",
+          "中中仄",
+          "仄平平",
+          "中中/中中/仄中平"
+        ]
+      }
+    },
+    {
+      "name": "张志和",
+      "source_id": 45,
+      "length_category": "short",
+      "variants_description": "此词第一、二句及第五句，平仄与前词异。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "平平/仄仄/仄平平",
+          "平仄/平平/仄仄平",
+          "平仄仄",
+          "仄平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "（南唐）李煜",
+      "source_id": 46,
+      "length_category": "short",
+      "variants_description": "此词起句不用韵。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          4,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄仄",
+          "平仄/平平/仄仄平",
+          "仄平仄",
+          "仄平平",
+          "仄仄/平平/仄仄平"
+        ]
+      }
+    },
+    {
+      "name": "苏轼",
+      "source_id": 47,
+      "length_category": "short",
+      "variants_description": "此与顾夐、孙光宪两段词中一段略同，惟第三句六字，第四句作七字一句耳。因其单调，故列于前。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 1,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5
+        ],
+        "lines": [
+          "平仄仄",
+          "平平仄",
+          "平仄/仄平/平仄",
+          "仄平/平仄/仄平平",
+          "仄仄/仄平/平仄"
+        ]
+      }
+    },
+    {
+      "name": "顾夐",
+      "source_id": 48,
+      "length_category": "short",
+      "variants_description": "按李珣词四首，其一首前段第三句“春风淡荡看不足”，间作拗句。又一首前段第二句“潇湘夜”，“湘”字平声。第五句“明月下”，“明”字平声，“月”字仄声。后段结句“名利不将心挂”，“不”字仄声。又一首前段结句“渔艇棹歌相续”，“渔” 字平声，“棹”字仄声。谱内可平可仄据此，余参后词。",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平中仄",
+          "中平/中仄/平中仄",
+          "中中中",
+          "中中仄",
+          "中仄/中平/中仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "lines": [
+          "仄中平",
+          "平仄仄",
+          "中平/中仄/平平仄",
+          "中中中",
+          "中中仄",
+          "中仄/中平/中仄"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 49,
+      "length_category": "short",
+      "variants_description": "此词前后段第五句俱不用韵。《花间集》孙词皆然。\n=",
+      "rhyme_type": "仄韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "仄平平",
+          "平仄仄",
+          "仄平/仄仄/平平仄",
+          "平仄仄",
+          "仄平平",
+          "仄仄/平平/平仄"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          3,
+          6
+        ],
+        "lines": [
+          "仄仄平",
+          "平仄仄",
+          "仄平/仄仄/平平/仄",
+          "平仄仄",
+          "仄平平",
+          "仄仄/平平/平仄"
+        ]
+      }
+    }
+  ]
+}

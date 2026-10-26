@@ -1,0 +1,187 @@
+{
+  "name": "定西番",
+  "aliases": [],
+  "description": "唐教坊曲名。",
+  "default_variant": "温庭筠",
+  "default_variant_source_id": 147,
+  "variants": [
+    {
+      "name": "温庭筠",
+      "source_id": 147,
+      "length_category": "short",
+      "variants_description": "此词前后段起句及后段第三句俱间押仄韵。温庭筠别首“海燕欲飞”词与此同，其平仄如一。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "rhyme_2_positions": [
+          1
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "rhyme_2_positions": [
+          1,
+          3
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄平/平仄平",
+          "平仄/仄平/平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "温庭筠",
+      "source_id": 148,
+      "length_category": "short",
+      "variants_description": "此词前后段起句间押仄韵，后段第三句不用韵，与前首异。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "rhyme_2_positions": [
+          1
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "rhyme_2_positions": [
+          1
+        ],
+        "lines": [
+          "平仄/仄平/平仄",
+          "仄平/平仄平",
+          "平仄/仄平/平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "韦庄",
+      "source_id": 149,
+      "length_category": "short",
+      "variants_description": "此词前段起句不用韵，后段第一句、第三句间押仄韵。牛峤“紫塞月明”词正与此同。按牛词前段起句“紫塞月明千里”，“紫”字、“月”字俱仄声。后段起句“乡思望中天阔”，“望”字仄声。第二句“漏残星亦残”，“漏”字仄声，“星”字平声。第三句“画角数声呜咽”，“数”字仄声。",
+      "rhyme_type": "平仄转换韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "中仄/中平/平仄",
+          "平仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "rhyme_2_positions": [
+          1,
+          3
+        ],
+        "lines": [
+          "平仄/中平/平仄",
+          "中平/中仄平",
+          "仄仄/中平/平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "孙光宪",
+      "source_id": 150,
+      "length_category": "short",
+      "variants_description": "此词不间入仄韵。韦庄“芳草丛生”词、毛熙震“苍翠浓阴”词皆与此同。\n按韦词前段第一句“芳草丛生缕结”，“缕”字仄声。毛词后段第一句“斜日倚阑风好”，“斜”字平声，“倚”字仄声，“风”字平声。第三句“未得玉郎消息”，“玉” 字仄声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          4
+        ],
+        "lines": [
+          "平仄/平平/中仄",
+          "平仄仄",
+          "仄平平",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "中仄/中平/中仄",
+          "平平/仄仄平",
+          "仄仄/中平/平仄",
+          "仄平平"
+        ]
+      }
+    },
+    {
+      "name": "张先",
+      "source_id": 151,
+      "length_category": "short",
+      "variants_description": "此词亦不间入仄韵。前段第三句下多六字一句，与孙词异。\n按张词三首皆然。其一首前段第四句“尽带江南春色”，“尽”字仄声，“江”字平声。换头句“鸳鸯愿从今夜”，“鸯”字平声。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          3,
+          5
+        ],
+        "lines": [
+          "仄仄/仄平/平仄",
+          "平仄仄",
+          "仄平平",
+          "中仄/中平/平仄",
+          "仄平平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          2,
+          4
+        ],
+        "lines": [
+          "平中仄平/平仄",
+          "仄平/平仄平",
+          "仄仄/平平/平仄",
+          "仄平平"
+        ]
+      }
+    }
+  ]
+}

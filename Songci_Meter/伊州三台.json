@@ -1,0 +1,45 @@
+{
+  "name": "伊州三台",
+  "aliases": [],
+  "description": "按唐有《宫中三台》、《江南三台》等曲，此云“伊州”者，亦本唐曲，取边地为名也。《三台》皆用六字成句，观赵师侠词前后起两句亦作六言，犹沿唐人旧体。若两结摊 破六字二句为五字一句、七字一句，则新声矣，",
+  "default_variant": "赵师侠",
+  "default_variant_source_id": 481,
+  "variants": [
+    {
+      "name": "赵师侠",
+      "source_id": 481,
+      "length_category": "short",
+      "variants_description": "此调见金元曲子，注”正宫”。平仄一定，填者宜遵之。",
+      "rhyme_type": "平韵",
+      "number_of_stanzas": 2,
+      "stanza1": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平",
+          "仄仄/平平/仄平",
+          "平仄/仄平平",
+          "仄平平、仄平/仄平"
+        ]
+      },
+      "stanza2": {
+        "rhyme_1_positions": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "lines": [
+          "仄平/平仄/平平",
+          "仄仄/平平/仄平",
+          "仄仄/仄平平",
+          "仄平平、仄平/仄平"
+        ]
+      }
+    }
+  ]
+}
