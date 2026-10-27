@@ -5,8 +5,8 @@ import {
   evaluatePailv,
   evaluateSongci,
   flattenMeter,
-} from "./core.js?v=12";
-import { getDatasetJson } from "./dataset-cache.js?v=2";
+} from "./core.js?v=13";
+import { getDatasetJson } from "./dataset-cache.js?v=3";
 
 export const RHYME_BOOKS = {
   Xinyun: { file: "Xinyun.json", name: "中华新韵" },

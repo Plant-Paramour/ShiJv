@@ -36,6 +36,11 @@ def export_environment(plan, destination):
         summary = 'Python==3.12.10\npip==25.0.1\n' + ''.join(
             f"{item['name']}=={item['version']}\n" for item in dependencies)
         (root / 'dependency-versions.txt').write_text(summary, encoding='utf-8')
+        offline = ['--require-hashes', '--only-binary=:all:'] + [f"{i['name']}=={i['version']} --hash=sha256:{i['sha256']}" for i in dependencies]
+        (root / 'requirements-offline.lock').write_text('\n'.join(offline) + '\n', encoding='utf-8')
+        for name in ('download_transport.py', 'deployment_profiles.py'):
+            shutil.copy2(Path(__file__).with_name(name), root / name)
+        shutil.copy2(Path(__file__).resolve().parents[2] / 'deploy/environment-tool/vc-runtime.json', root / 'vc-runtime.json')
         save(root / 'plan.json', plan)
         save(root / 'expected-packages.json', {i['name']: i['version'] for i in dependencies})
         templates = Path(__file__).with_name('export_templates')
@@ -48,7 +53,9 @@ def export_environment(plan, destination):
         readme = f'''# 诗矩 Windows x64 环境安装文件
 
 模型：{plan['model']['model_id']}。模型不包含在本目录中。
-Python：3.12.10；推理方式：BNB 4bit。仅支持 Windows x64 NVIDIA 候选组合。
+Python：3.12.10；依赖组合：{plan['profile']}；推理方式：{plan['hardware']['device']} / {plan['inference']['precision']}。支持 Windows x64；以本机真实推理验收为准。
+CPU 和 GPU 均需要 Microsoft Visual C++ x64 运行库。脚本会先检查，缺失时自动补装；手动修复可双击 install-vc-runtime.cmd，
+核验固定摘要与微软签名后安装，可能出现系统权限提示。如要求重启，请重启后继续部署。
 模型约 {plan['model_bytes']/10**9:.2f} GB；Python 与 wheel 下载约 {plan['download_bytes']/10**9:.2f} GB；
 专用环境空间预算约 {plan['environment_required_bytes']/10**9:.1f} GB，另需下载/Conda/编译缓存。
 
@@ -68,7 +75,11 @@ Python：3.12.10；推理方式：BNB 4bit。仅支持 Windows x64 NVIDIA 候选
 
     powershell -NoProfile -ExecutionPolicy Bypass -File install-conda.ps1 -TargetPath D:\\ShiJuEnv -Resume
 
-脚本先用 conda-bootstrap.yml 创建 Python，再用 requirements.lock 安装精确 wheel。
+脚本先用 conda-bootstrap.yml 创建 Python，再下载精确 wheel 到 wheels/，通过大小与 SHA256 后离线安装。
+下载默认国内镜像优先、失败回退官方；使用 -Source official 可仅走官方。
+也可把缺少的精确版本 .whl 手动放入 wheels/，再次运行会校验并复用。
+断点按文件保留，Windows HTTPS 后备路径失败后重新下载当前文件。
+直接 conda env create -f environment.yml 使用官方直链，不具备脚本的镜像切换和阶段恢复功能。
 失败后会保留阶段、日志和本目录的缓存；缺包、版本不符或 pip check 失败不会标记成功。
 requirements-windows-x64.lock 是 pip 锁文件，不能传给 conda create --file。
 

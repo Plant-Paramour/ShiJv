@@ -1005,8 +1005,8 @@ def _generation_schema() -> dict[str, Any]:
             "candidate_count": {
                 "type": "integer",
                 "minimum": 1,
-                "maximum": 5,
-                "description": "候选版本数量，支持 1 至 5；用户说一首时必须填 1",
+                "maximum": 20,
+                "description": "候选版本数量，支持 1 至 20；用户说一首时必须填 1",
             },
             "task_options": {
                 "type": "object",
@@ -1049,8 +1049,8 @@ def _rewrite_schema() -> dict[str, Any]:
         },
     }
     properties["candidate_count"] = {
-        "type": "integer", "minimum": 1, "maximum": 20,
-        "description": "rewrite 最多 20 个候选；默认 1",
+        "type": "integer", "minimum": 1, "maximum": 50,
+        "description": "rewrite 最多 50 个候选；默认 1",
     }
     properties["requirement"] = {
         "type": "string",

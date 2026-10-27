@@ -11,16 +11,16 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import platform
 import shutil
 import subprocess
 import sys
-import threading
 import time
-import urllib.request
+from urllib.parse import urlencode
 import uuid
 import zipfile
 
+from .download_transport import DownloadTransport, Cancelled
+from .deployment_profiles import PROFILES, CUDA_ARCHITECTURES, wheels
 from .runtime_manager import inspect_host
 from .runtime_manifest import relative_path, sha256_file, version_tuple
 from .model_catalog import validate_model
@@ -55,10 +55,6 @@ def engine_digest():
         digest.update(name.encode())
         digest.update(path.read_bytes())
     return digest.hexdigest()
-
-
-def wheels():
-    return read(ROOT / 'deploy/managed-runtime/windows-qwen35-bnb4-wheels.json')
 
 
 def official_model(model_id='Qwen/Qwen3.5-4B'):
@@ -126,16 +122,73 @@ def _flags():
     return subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
 
 
-class Cancelled(RuntimeError):
-    pass
+class DeploymentFailure(RuntimeError):
+    def __init__(self, message, **details):
+        super().__init__(message)
+        self.details = details
 
 
-class Operation:
+def process_failure(stage, log, message):
+    limit = 64 * 1024
+    with Path(log).open('rb') as stream:
+        stream.seek(0, 2)
+        size = stream.tell()
+        stream.seek(max(0, size - limit))
+        content = stream.read().decode('utf-8-sig', errors='replace')
+    return DeploymentFailure(f'阶段“{stage}”失败：{message}，日志：{log}',
+                             log_path=str(log), log_content=content, log_truncated=size > limit)
+
+
+def failure_details(exc):
+    seen = set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        if getattr(exc, 'details', None):
+            return exc.details
+        exc = exc.__cause__ or exc.__context__
+    return {}
+
+
+def verification_failure(exc, paths):
+    details = dict(failure_details(exc))
+    summaries, reports = [], []
+    # The model report explains the user-facing failure; the wrapper traceback
+    # often only says "Actual model acceptance failed".
+    for path in reversed(list(paths)):
+        path = Path(path)
+        if not path.is_file():
+            continue
+        try:
+            report = read(path)
+            summary = dict(path=str(path), ok=report.get('ok'), error=report.get('error'),
+                           environment_errors=report.get('environment', {}).get('errors', []),
+                           failed_checks=[c for c in report.get('checks', []) if c.get('state') == 'failed'])
+            reports.append(summary)
+            if summary['error']:
+                summaries.append(str(summary['error']))
+            summaries.extend(str(error) for error in summary['environment_errors'])
+            for check in summary['failed_checks']:
+                detail = str(check.get('detail', check))
+                if detail not in summaries:
+                    summaries.append(detail)
+        except (OSError, ValueError, TypeError, AttributeError) as error:
+            summaries.append(f'无法读取验证报告 {path}：{error}')
+    details['verification_reports'] = reports
+    details['verification_error'] = '\n\n'.join(summaries) or '验证进程未留下可读错误报告，请保留整个 reports 目录。'
+    message = str(exc)
+    if summaries:
+        message = '本机验证未通过：' + summaries[0] + '\n' + message
+    return DeploymentFailure(message, **details)
+
+
+class Operation(DownloadTransport):
     def __init__(self, report, cancel=None):
         self.report = Path(report)
         self.cancel = Path(cancel) if cancel else None
         self.stage = '准备'
         self.events = []
+        self.context = {}
+        self.source_preference = 'auto'
 
     def check(self):
         if self.cancel and self.cancel.exists():
@@ -144,7 +197,8 @@ class Operation:
     def update(self, stage, **details):
         self.check()
         self.stage = stage
-        save(self.report, dict(ok=False, state='running', stage=stage, **details))
+        save(self.report, dict(ok=False, state='running', stage=stage, **(self.context | details)))
+
 
     def run(self, command, *, env=None, timeout=1800):
         self.check()
@@ -159,57 +213,19 @@ class Operation:
                     if time.monotonic() - start > timeout:
                         raise RuntimeError('本阶段超时，请查看日志后重试')
                     time.sleep(.2)
-            except BaseException:
+            except BaseException as exc:
                 if os.name == 'nt':
                     subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True, creationflags=_flags())
                 else:
                     process.kill()
                 process.wait(timeout=30)
-                raise
+                if isinstance(exc, Cancelled):
+                    raise
+                stream.flush()
+                raise process_failure(self.stage, log, str(exc)) from exc
         if process.returncode:
-            raise RuntimeError(f'阶段“{self.stage}”失败（退出码 {process.returncode}），日志：{log}')
+            raise process_failure(self.stage, log, f'退出码 {process.returncode}')
         return log
-
-    def download(self, url, destination, digest, size=None):
-        """Hash every reused file. Resume only on a correct Content-Range."""
-        destination = Path(destination)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        self.check()
-        if destination.is_file() and (size is None or destination.stat().st_size == size) and sha256_file(destination) == digest:
-            return
-        part = destination.with_name(destination.name + '.part')
-        offset = part.stat().st_size if part.exists() else 0
-        if size is not None and offset >= size:
-            if offset == size and sha256_file(part) == digest:
-                part.replace(destination)
-                return
-            part.unlink()
-            offset = 0
-        request = urllib.request.Request(url, headers={'Range': f'bytes={offset}-'} if offset else {})
-        with urllib.request.urlopen(request, timeout=30) as source:
-            if offset and (source.status != 206 or not source.headers.get('Content-Range', '').startswith(f'bytes {offset}-')):
-                if source.status != 200:
-                    raise ValueError('服务器返回无效断点范围，请重试')
-                offset = 0
-            received = offset
-            last = 0
-            with part.open('ab' if offset else 'wb') as target:
-                while True:
-                    self.check()
-                    block = source.read(1024 * 1024)
-                    if not block:
-                        break
-                    target.write(block)
-                    received += len(block)
-                    if size is not None and received > size:
-                        raise ValueError('下载内容超过清单大小')
-                    if time.monotonic() - last > .5:
-                        self.update(self.stage, file=destination.name, received_bytes=received, total_bytes=size)
-                        last = time.monotonic()
-        if (size is not None and part.stat().st_size != size) or sha256_file(part) != digest:
-            part.unlink()  # corrupt partial data must not be appended on retry
-            raise ValueError(f'{destination.name} 下载校验失败，请重试重新获取')
-        part.replace(destination)
 
 
 def check_space(path, required):
@@ -288,8 +304,9 @@ def download_model(directory, operation, model_id='Qwen/Qwen3.5-4B'):
     check_space(directory, missing + 512 * 1024**2)
     for name, item in spec['files'].items():
         relative_path(name)
-        operation.update('下载官方模型', file=name)
-        url = f"https://huggingface.co/{spec['model_id']}/resolve/{spec['revision']}/{name}?download=true"
+        operation.update('从 ModelScope 下载推荐模型', file=name)
+        url = f"https://modelscope.cn/api/v1/models/{spec['model_id']}/repo?" + urlencode(
+            dict(Revision=spec['revision'], FilePath=name))
         operation.download(url, directory / name, item['sha256'], item['bytes'])
     operation.update('核验完整模型')
     verify_model(directory, spec)
@@ -316,49 +333,92 @@ def local_model(directory):
     return dict(model_id=root.name, revision=revision, source_url='local', model_type=config['model_type'], files=files)
 
 
-def requirements():
-    # Until broader target tests exist, only the observed GPU generation is
-    # offered as a candidate. Neither driver floor nor VRAM is a release claim.
+def requirements(device='cuda'):
     return dict(os='windows', arch='x64', min_windows_build=19041,
-                min_driver='560.76', compute_capabilities=['8.9'], min_vram_bytes=8_000_000_000,
-                scope='开发机候选规则，其他 GPU 尚未验证')
+                device=device, min_driver='560.76', compute_capabilities=CUDA_ARCHITECTURES,
+                min_vram_bytes=2_000_000_000,
+                scope='GPU 按本机实测验收；不符合条件时使用 CPU FP32')
 
 
 def compatibility(host, rules):
-    problems = []
     if host.os != rules['os'] or host.arch != rules['arch']:
-        problems.append('目前只支持 Windows x64')
+        raise ValueError('目前只支持 Windows x64')
     if host.windows_build < rules['min_windows_build']:
-        problems.append('Windows 版本过低')
+        raise ValueError('Windows 版本过低')
+    if rules['device'] == 'cpu':
+        return None
     devices = [g for g in host.gpus if g.compute_capability in rules['compute_capabilities']
                and version_tuple(g.driver_version) >= version_tuple(rules['min_driver'])
                and g.memory_bytes >= rules['min_vram_bytes']]
     if not devices:
-        problems.append('没有符合候选规则的 NVIDIA GPU：需要计算能力 8.9、至少 8GB 显存和 560.76 以上驱动；其他 GPU 尚未验证')
-    if problems:
-        raise ValueError('；'.join(problems + list(host.errors)))
-    return devices[0]
+        raise ValueError('此 GPU 清单不适用于当前硬件，请重新生成清单以使用 CPU')
+    return max(devices, key=lambda g: g.memory_bytes)
 
 
-def make_plan(model, route, model_id='Qwen/Qwen3.5-4B'):
+def inference_policy(profile):
+    selected = PROFILES[profile]
+    return dict(precision=selected['precision'], reason=selected['label'] + '；硬件预算仅供预选，须通过本机真实生成验收')
+
+
+def verification_policy(profile):
+    checks = ['cpu-fp32'] if profile == 'cpu' else ['cuda-fp16']
+    if profile == 'cuda-bnb':
+        checks += ['bnb-nf4', 'triton-jit']
+    return ['pip-check', 'exact-versions'] + checks + ['model-load', 'short-inference', 'poetry-constraints']
+
+
+def plan_policy(spec, route, profile):
+    if profile not in PROFILES:
+        raise ValueError('未知依赖组合')
+    return dict(schema_version=2, kind='shiju-environment-plan', route=route, profile=profile,
+                warning=WARNING if route == 'local' else '推荐固定模型；环境仍须在本机真实验证',
+                hardware=requirements(PROFILES[profile]['device']), python=dict(version='3.12.10', method='isolated-nuget', sha256=PYTHON_SHA256),
+                model=spec, inference=inference_policy(profile),
+                framework=dict(engine_sha256=engine_digest()), dependencies=wheels(profile),
+                creation=dict(method='isolated-python', global_path=False),
+                verification=verification_policy(profile),
+                download_bytes=sum(w['bytes'] for w in wheels(profile)) + 14515433,
+                model_bytes=model_bytes(spec),
+                environment_required_bytes=PROFILES[profile]['disk_gib'] * 1024**3)
+
+
+def choose_profile(host, spec, requested='auto'):
+    if requested != 'auto' and requested not in PROFILES:
+        raise ValueError('未知依赖组合')
+    if requested == 'cpu':
+        compatibility(host, requirements('cpu'))
+        return 'cpu'
+    try:
+        gpu = compatibility(host, requirements())
+    except ValueError:
+        if requested != 'auto':
+            raise
+        compatibility(host, requirements('cpu'))
+        return 'cpu'
+    fp16_fits = gpu.memory_bytes > model_bytes(spec) * 1.3 + 1536 * 1024**2
+    bnb_fits = gpu.memory_bytes > model_bytes(spec) * .35 + 1536 * 1024**2
+    if requested != 'auto':
+        if not (fp16_fits if requested == 'cuda-fp16' else bnb_fits):
+            raise ValueError('所选组合的显存预算不足，请选择更小模型或 CPU')
+        return requested
+    if fp16_fits:
+        return 'cuda-fp16'
+    if bnb_fits:
+        return 'cuda-bnb'
+    return 'cpu'
+
+
+def make_plan(model, route, model_id='Qwen/Qwen3.5-4B', host=None, profile='auto'):
     if route not in {'official', 'local'}:
         raise ValueError('未知模型路线')
     spec = official_model(model_id) if route == 'official' else local_model(model)
     verify_model(model, spec)
-    return dict(schema_version=1, kind='shiju-environment-plan', route=route,
-                warning=WARNING if route == 'local' else '官方固定模型；环境仍须在本机真实验证',
-                hardware=requirements(), python=dict(version='3.12.10', method='isolated-nuget', sha256=PYTHON_SHA256),
-                model=spec, inference=dict(precision='4bit', reason='采用已有 8GB GPU 实测的 BNB NF4 组合'),
-                framework=dict(engine_sha256=engine_digest()), dependencies=wheels(),
-                creation=dict(method='isolated-python', global_path=False),
-                verification=['pip-check', 'exact-versions', 'cuda-fp16', 'bnb-nf4', 'triton-jit', 'model-load', 'short-inference', 'poetry-constraints'],
-                download_bytes=sum(w['bytes'] for w in wheels()) + 14515433,
-                model_bytes=model_bytes(spec),
-                environment_required_bytes=18 * 1024**3)
+    profile = choose_profile(host or inspect_host(model), spec, profile)
+    return plan_policy(spec, route, profile)
 
 
 def validate_plan(plan):
-    if not isinstance(plan, dict) or plan.get('schema_version') != 1:
+    if not isinstance(plan, dict) or plan.get('schema_version') != 2:
         raise ValueError('不支持的清单版本；请用当前工具重新生成')
     model = plan.get('model')
     if not isinstance(model, dict) or not isinstance(model.get('files'), dict) or not model['files']:
@@ -378,17 +438,7 @@ def validate_plan(plan):
             raise ValueError('本地模型内容修订与文件摘要不符')
     else:
         raise ValueError('未知模型路线')
-    # Construct the complete expected policy without evaluating imported code.
-    expected = dict(schema_version=1, kind='shiju-environment-plan', route=plan['route'],
-        warning=WARNING if plan['route'] == 'local' else '官方固定模型；环境仍须在本机真实验证',
-        hardware=requirements(), python=dict(version='3.12.10', method='isolated-nuget', sha256=PYTHON_SHA256),
-        model=model, inference=dict(precision='4bit', reason='采用已有 8GB GPU 实测的 BNB NF4 组合'),
-        framework=dict(engine_sha256=engine_digest()), dependencies=wheels(),
-        creation=dict(method='isolated-python', global_path=False),
-        verification=['pip-check', 'exact-versions', 'cuda-fp16', 'bnb-nf4', 'triton-jit', 'model-load', 'short-inference', 'poetry-constraints'],
-        download_bytes=sum(w['bytes'] for w in wheels()) + 14515433,
-        model_bytes=model_bytes(model),
-        environment_required_bytes=18 * 1024**3)
+    expected = plan_policy(model, plan['route'], plan.get('profile'))
     if plan != expected:
         raise ValueError('清单的依赖、硬件、框架或安装规则与当前工具不符，请重新生成；不执行外部清单命令')
     return plan
@@ -425,7 +475,7 @@ def process_env(environment, report):
         ('PYTHON', 'CONDA', 'CUDA', 'TRITON', 'VIRTUAL_ENV', 'PIP_', 'HF_', 'HUGGINGFACE', 'TORCH', 'NVIDIA', 'VCINSTALL', 'VCTOOLS', 'WINDOWSSDK', 'VSINSTALL'))
         and k.upper() not in {'CC', 'CXX', 'INCLUDE', 'LIB', 'LIBPATH', 'CMAKE_PREFIX_PATH', 'CPATH'}}
     windows = Path(os.getenv('SystemRoot', 'C:/Windows'))
-    env.update(PATH=os.pathsep.join(map(str, (environment, windows / 'System32', windows))),
+    env.update(PATH=os.pathsep.join(map(str, (environment, environment / 'Scripts', environment / 'Library/bin', windows / 'System32', windows))),
                PYTHONNOUSERSITE='1', PYTHONIOENCODING='utf-8', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
                TRITON_CACHE_DIR=str(Path(report).parent / 'jit-cache/triton'),
                TORCHINDUCTOR_CACHE_DIR=str(Path(report).parent / 'jit-cache/inductor'),
@@ -433,8 +483,151 @@ def process_env(environment, report):
     return env
 
 
-def install(plan, model, target, cache, operation, data_directory):
+def dependency_versions(python, operation, env):
+    actual_path = operation.report.parent / 'actual-dependencies.json'
+    operation.run([python, '-I', '-c',
+        'import importlib.metadata,json,pathlib,sys;pathlib.Path(sys.argv[1]).write_text(json.dumps({d.metadata["Name"].lower().replace("_","-"):d.version for d in importlib.metadata.distributions()},sort_keys=True),encoding="utf-8")', actual_path], env=env)
+    return read(actual_path)
+
+
+def versions_match(actual, items):
+    expected = {w['name'].lower().replace('_', '-'): w['version'] for w in items}
+    return all(actual.get(name) == version for name, version in expected.items()) and not (set(actual) - set(expected) - {'pip', 'setuptools', 'wheel'})
+
+
+def check_vc_runtime(operation, installer=None, digest=None, required=True):
+    report = operation.report.parent / 'vc-runtime.json'
+    powershell = Path(os.environ.get('SystemRoot', 'C:/Windows')) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+    command = [powershell, '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File',
+               ROOT / 'apps/launcher/export_templates/ensure-vc-runtime.ps1', '-ReportPath', report]
+    if installer:
+        command += ['-Mode', 'Install', '-InstallerPath', installer, '-ExpectedSha256', digest]
+    operation.run(command, timeout=900 if installer else 60)
+    result = read(report)
+    if required and (not result.get('ok') or result.get('restart_required')):
+        message = ('VC++ 运行库安装要求重启 Windows，请重启后恢复部署。' if result.get('restart_required') else
+                   'Microsoft Visual C++ x64 运行库尚不可用。部署时会自动安装；若安装失败或取消，请查看下方详情，并在重试时允许 Windows 权限提示。'
+                   '也可在浏览器打开 https://aka.ms/vc14/vc_redist.x64.exe 下载微软安装包，运行后选择“安装”或“修复”。'
+                   '安装完成后，如要求重启则先重启，再回到工具点击“创建 / 继续部署”，无需重新下载已有依赖。')
+        raise DeploymentFailure(message, prerequisite='vc-runtime', prerequisite_details=result,
+                                download_url='https://aka.ms/vc14/vc_redist.x64.exe',
+                                instructions=[
+                                    '方法一：点击“创建 / 继续部署”，工具会自动补装运行库；允许 Windows 权限提示，等待安装完成。',
+                                    '方法二：将下方微软官方下载链接复制到浏览器，下载 vc_redist.x64.exe，运行后选择“安装”或“修复”。',
+                                    '如安装程序要求重启，请先重启；然后打开部署工具，必要时点击“恢复上次部署”，再点击“创建 / 继续部署”。',
+                                    '若正在 Windows 沙箱或虚拟机中测试，运行库应安装在沙箱或虚拟机内部，宿主机安装不能代替。'],
+                                help_url='https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/')
+    return result
+
+
+def install_vc_runtime(cache, operation):
+    spec = read(POLICY / 'vc-runtime.json')
+    operation.update('下载 Microsoft Visual C++ x64 运行库')
+    installer = Path(cache) / spec['filename']
+    operation.download(spec['source_url'], installer, spec['sha256'], spec['bytes'])
+    operation.update('核验微软签名并安装 VC++ 运行库（可能出现系统权限提示）')
+    return check_vc_runtime(operation, installer, spec['sha256'])
+
+
+def ensure_vc_runtime(cache, operation):
+    operation.update('检查 Microsoft Visual C++ x64 运行库')
+    result = check_vc_runtime(operation, required=False)
+    if result.get('ok') and not result.get('restart_required'):
+        return result
+    return install_vc_runtime(cache, operation)
+
+
+def import_wheels(plan, directory, cache, operation):
     validate_plan(plan)
+    root = Path(directory).resolve()
+    if not root.is_dir():
+        raise ValueError('请选择包含 wheel 文件的目录')
+    wheelhouse = Path(cache).resolve() / 'wheels'
+    wheelhouse.mkdir(parents=True, exist_ok=True)
+    accepted, rejected = [], []
+    for item in plan['dependencies']:
+        source = root / item['filename']
+        if not source.is_file():
+            continue
+        operation.update('核验本地依赖包', file=item['filename'])
+        if source.stat().st_size != item['bytes'] or sha256_file(source) != item['sha256']:
+            rejected.append(item['filename'])
+            continue
+        destination = wheelhouse / item['filename']
+        if source.resolve() != destination.resolve():
+            temporary = destination.with_name(destination.name + '.import.part')
+            shutil.copyfile(source, temporary)
+            if temporary.stat().st_size != item['bytes'] or sha256_file(temporary) != item['sha256']:
+                temporary.unlink()
+                rejected.append(item['filename'])
+                continue
+            temporary.replace(destination)
+        accepted.append(item['filename'])
+    return dict(accepted=accepted, rejected=rejected, message='仅接受当前清单中大小与 SHA256 均匹配的包；原文件未改动')
+
+
+def restore_session(target, data_directory, latest=False):
+    session_path = Path(target) / 'deployment-session.json' if target and not latest else Path(data_directory) / 'deployment/last-session.json'
+    if not session_path.is_file():
+        session_path = Path(data_directory) / 'deployment/last-session.json'
+    if not session_path.is_file():
+        raise ValueError('没有找到可恢复的部署记录，请先生成清单并创建环境')
+    session = read(session_path)
+    plan = validate_plan(session['plan'])
+    installed = Path(session['target'])
+    state = read(installed / 'shiju-install.json')
+    if state.get('plan_id') != hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest():
+        raise ValueError('部署记录与目标目录不一致，请重新选择对应清单')
+    verify_model(session['model'], plan['model'])
+    return session | dict(state=state.get('state'), stage=state.get('stage', '准备'))
+
+
+def inspect_existing_target(plan, target, operation):
+    target = Path(target).resolve()
+    if not target.exists() or (target.is_dir() and next(target.iterdir(), None) is None):
+        return dict(kind='empty', missing=[])
+    plan_id = hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()
+    state = target / 'shiju-install.json'
+    saved = read(state) if state.is_file() else {}
+    if saved.get('plan_id') == plan_id and saved.get('state') != 'verified':
+        return dict(kind='resume', missing=[], external=saved.get('external', False))
+    # Our NuGet Python is independent: it has neither conda-meta nor pyvenv.cfg.
+    # A changed model, engine, or path changes plan_id without changing the
+    # installed Python/dependencies. Recognize ownership using the old session,
+    # then check the actual interpreter and packages against the new plan.
+    session_path = target / 'deployment-session.json'
+    owned = False
+    if saved.get('plan_id') and session_path.is_file():
+        previous = read(session_path).get('plan')
+        owned = isinstance(previous, dict) and hashlib.sha256(
+            json.dumps(previous, sort_keys=True).encode()).hexdigest() == saved['plan_id']
+    python = target / 'python.exe'
+    if not python.is_file():
+        python = target / 'Scripts/python.exe'
+    if not python.is_file() or not (owned or (target / 'conda-meta').is_dir() or (target / 'pyvenv.cfg').is_file()):
+        raise ValueError('目标目录非空，且不是可识别的虚拟环境；请选择空目录创建环境')
+    if not owned and any((target / name).exists() for name in ('app', 'probe_candidate.py', 'requirements.lock', 'verified-inputs.json', 'deployment-session.json')):
+        raise ValueError('已有环境包含部署同名文件，无法安全继续；请选择空目录创建环境')
+    output = operation.report.parent / 'existing-environment.json'
+    operation.run([python, '-I', '-c',
+        'import sys,struct,json,pathlib;pathlib.Path(sys.argv[1]).write_text(json.dumps(dict(version=list(sys.version_info[:3]),bits=struct.calcsize("P")*8,prefix=sys.prefix)),encoding="utf-8")', output],
+        env=process_env(target, operation.report), timeout=60)
+    info = read(output)
+    if info['version'][:2] != [3, 12] or info['bits'] != 64 or Path(info['prefix']).resolve() != target:
+        raise ValueError('已有环境不符合清单要求：需要独立的 Python 3.12 x64 环境；请选择空目录创建环境')
+    actual = dependency_versions(python, operation, process_env(target, operation.report))
+    expected = {w['name'].lower().replace('_', '-'): w['version'] for w in plan['dependencies']}
+    conflicts = [f'{name}: 已安装 {actual[name]}，需要 {version}' for name, version in expected.items() if name in actual and actual[name] != version]
+    extras = sorted(set(actual) - set(expected) - {'pip', 'setuptools', 'wheel'})
+    if conflicts or extras:
+        raise ValueError('已有环境不符合清单要求；请选择空目录创建环境。' + '\n' + '\n'.join(conflicts + (['清单外依赖：' + ', '.join(extras)] if extras else [])))
+    return dict(kind='existing', external=saved.get('external', False) if owned else True,
+                python=str(python), missing=[f'{name}=={version}' for name, version in expected.items() if name not in actual])
+
+
+def install(plan, model, target, cache, operation, data_directory, continue_existing=False):
+    validate_plan(plan)
+    ensure_vc_runtime(cache, operation)
     model = verify_model(model, plan['model'])
     if plan['route'] == 'local' and local_model(model) != plan['model']:
         raise ValueError('自带模型配置或内容已变动，请重新生成清单')
@@ -464,47 +657,81 @@ def install(plan, model, target, cache, operation, data_directory):
             import fcntl
             fcntl.flock(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
         state_path = target / 'shiju-install.json'
-        if target.exists():
-            if not state_path.is_file() or read(state_path).get('plan_id') != plan_id:
-                raise ValueError('目标目录已存在且不是本清单的安装半成品；请选择新的空目录')
-            if read(state_path).get('state') == 'verified':
-                raise ValueError('此环境已经验证成功，不重复覆盖安装；可直接进入诗矩，或选择新的环境目录')
-        else:
-            target.mkdir()
-        save(state_path, dict(plan_id=plan_id, state='installing', ok=False))
+        existing = inspect_existing_target(plan, target, operation)
+        external = existing.get('external', False)
+        if existing['kind'] == 'existing' and not continue_existing:
+            raise ValueError('已有兼容环境需要先确认后才能继续配置')
+        target.mkdir(exist_ok=True)
+        checkpoint_path = target / 'deployment-checkpoints.json'
+        checkpoints = read(checkpoint_path) if checkpoint_path.is_file() else {}
+        if checkpoints.get('plan_id') != plan_id:
+            checkpoints = dict(plan_id=plan_id)
+        session = dict(plan=plan, model=str(model), target=str(target), cache=str(cache))
+        save(target / 'deployment-session.json', session)
+        save(Path(data_directory) / 'deployment/last-session.json', session)
+        save(state_path, dict(plan_id=plan_id, state='installing', ok=False, external=external))
         try:
             operation.update('准备独立 Python')
-            package = cache / 'python.3.12.10.nupkg'
-            operation.download(PYTHON_URL, package, PYTHON_SHA256, 14515433)
-            # Re-extract known base files on retry: python.exe alone does not
-            # prove a previously interrupted extraction was complete.
-            extract_python(package, target)
-            python = target / 'python.exe'
+            python = Path(existing.get('python') or (target / 'Scripts/python.exe' if external and (target / 'Scripts/python.exe').is_file() else target / 'python.exe'))
+            reuse_existing = existing['kind'] == 'existing'
+            python_ready = python.is_file() and (external or reuse_existing or checkpoints.get('python_sha256') == sha256_file(python))
+            if python_ready:
+                try:
+                    operation.run([python, '-I', '-c', 'import ssl,json,zipfile,importlib.metadata'],
+                                  env=process_env(target, operation.report), timeout=30)
+                except (OSError, RuntimeError):
+                    if external or reuse_existing:
+                        raise ValueError('已有环境的 Python 无法正常运行，请选择空目录创建环境')
+                    python_ready = False
+                    checkpoints.pop('dependencies', None)
+            if not python_ready:
+                package = cache / 'python.3.12.10.nupkg'
+                operation.download(PYTHON_URL, package, PYTHON_SHA256, 14515433)
+                extract_python(package, target)
+                checkpoints['python_sha256'] = sha256_file(python)
+                save(checkpoint_path, checkpoints)
+            elif reuse_existing:
+                checkpoints['python_sha256'] = sha256_file(python)
+                save(checkpoint_path, checkpoints)
             env = process_env(target, operation.report)
-            env['CUDA_VISIBLE_DEVICES'] = gpu.uuid
-            wheelhouse = cache / 'wheels'
-            for item in wheels():
-                operation.update('下载固定依赖', file=item['filename'])
-                operation.download(item['source_url'], wheelhouse / item['filename'], item['sha256'], item['bytes'])
-            lock = target / 'requirements.lock'
-            lock.write_text(''.join(f"{w['name']}=={w['version']} --hash=sha256:{w['sha256']}\n" for w in wheels()), encoding='utf-8')
-            operation.update('安装固定依赖')
-            operation.run([python, '-m', 'pip', '--isolated', 'install', '--no-index', '--find-links', wheelhouse,
-                           '--require-hashes', '--only-binary=:all:', '-r', lock], env=env)
-            operation.update('检查依赖一致性')
-            operation.run([python, '-m', 'pip', '--isolated', 'check'], env=env)
-            actual_path = operation.report.parent / 'actual-dependencies.json'
-            operation.run([python, '-I', '-c',
-                'import importlib.metadata,json,pathlib,sys;pathlib.Path(sys.argv[1]).write_text(json.dumps({d.metadata["Name"].lower().replace("_","-"):d.version for d in importlib.metadata.distributions()},sort_keys=True),encoding="utf-8")', actual_path], env=env)
-            actual = read(actual_path)
-            for item in wheels():
-                if actual.get(item['name'].lower().replace('_', '-')) != item['version']:
-                    raise ValueError('实际依赖版本不符：' + item['name'])
-            unexpected = set(actual) - {w['name'].lower().replace('_', '-') for w in wheels()} - {'pip'}
-            if unexpected:
-                raise ValueError('专用环境中出现未登记依赖：' + ', '.join(sorted(unexpected)))
-            save(target / 'actual-lock.json', dict(plan_id=plan_id, packages=actual, wheels=wheels()))
-            operation.update('验证 GPU、编译与真实约束生成')
+            env['CUDA_VISIBLE_DEVICES'] = gpu.uuid if gpu else '-1'
+            items = plan['dependencies']
+            dependencies_ready = False
+            if python_ready and (reuse_existing or checkpoints.get('dependencies')):
+                operation.update('复核已安装依赖以继续部署')
+                try:
+                    dependencies_ready = versions_match(dependency_versions(python, operation, env), items)
+                    if dependencies_ready:
+                        operation.run([python, '-m', 'pip', '--isolated', 'check'], env=env)
+                except RuntimeError:
+                    dependencies_ready = False
+            if not dependencies_ready:
+                checkpoints.pop('dependencies', None)
+                save(checkpoint_path, checkpoints)
+                wheelhouse = cache / 'wheels'
+                for index, item in enumerate(items, 1):
+                    operation.context = dict(file_index=index, file_count=len(items))
+                    operation.update('下载固定依赖', file=item['filename'])
+                    operation.download_item(item, wheelhouse)
+                operation.context = {}
+                lock = target / 'requirements.lock'
+                lock.write_text(''.join(f"{w['name']}=={w['version']} --hash=sha256:{w['sha256']}\n" for w in items), encoding='utf-8')
+                operation.update('安装固定依赖')
+                operation.run([python, '-m', 'pip', '--isolated', 'install', '--no-index', '--find-links', wheelhouse,
+                               '--require-hashes', '--only-binary=:all:', '-r', lock], env=env)
+                operation.update('检查依赖一致性')
+                operation.run([python, '-m', 'pip', '--isolated', 'check'], env=env)
+                actual = dependency_versions(python, operation, env)
+                if not versions_match(actual, items):
+                    raise ValueError('实际依赖版本与清单不符；保留环境供重试')
+                save(target / 'actual-lock.json', dict(plan_id=plan_id, packages=actual, wheels=items))
+                checkpoints['dependencies'] = True
+                save(checkpoint_path, checkpoints)
+            if dependencies_ready:
+                checkpoints['dependencies'] = True
+                save(checkpoint_path, checkpoints)
+                save(target / 'actual-lock.json', dict(plan_id=plan_id, packages=dependency_versions(python, operation, env), wheels=items))
+            operation.update('验证 CPU / GPU 与真实约束生成')
             # Reuse the genuine CUDA/BNB/JIT/model/poetry checks. Copy source,
             # never an existing inference environment or its installed packages.
             app = target / 'app'
@@ -516,11 +743,22 @@ def install(plan, model, target, cache, operation, data_directory):
             shutil.copy2(ROOT / 'pyproject.toml', app / 'pyproject.toml')
             shutil.copy2(ROOT / 'launcher.ps1', app / 'launcher.ps1')
             shutil.copy2(ROOT / 'tools/probe_managed_candidate.py', target / 'probe_candidate.py')
-            (target / 'python312._pth').write_text('.\nLib\nDLLs\nLib/site-packages\napp\n', encoding='ascii')
+            if not external:
+                (target / 'python312._pth').write_text('.\nLib\nDLLs\nLib/site-packages\napp\n', encoding='ascii')
+                # Persist the selected device for later launcher probes and workers.
+                (target / 'Lib/site-packages/sitecustomize.py').write_text(
+                    'import os\nos.environ["CUDA_VISIBLE_DEVICES"] = ' + repr(env['CUDA_VISIBLE_DEVICES']) + '\n', encoding='utf-8')
+                with (target / 'python312._pth').open('a', encoding='ascii') as stream:
+                    stream.write('import site\n')
             verification = operation.report.parent / 'verification.json'
             model_report = operation.report.parent / 'model-verification.json'
-            operation.run([python, '-I', target / 'probe_candidate.py', '--output', verification,
-                           '--model', model, '--model-report', model_report], env=env, timeout=1800)
+            try:
+                operation.run([python, '-I', target / 'probe_candidate.py', '--output', verification,
+                               '--model', model, '--model-report', model_report, '--device', plan['hardware']['device'], '--precision', plan['inference']['precision']], env=env, timeout=7200 if plan['hardware']['device'] == 'cpu' else 1800)
+            except Cancelled:
+                raise
+            except (OSError, RuntimeError) as exc:
+                raise verification_failure(exc, [verification, model_report]) from exc
             if not read(verification).get('ok') or not read(model_report).get('ok'):
                 raise ValueError('真实运行验证没有全部通过，保留环境供重试')
             operation.update('保存环境选择')
@@ -530,45 +768,50 @@ def install(plan, model, target, cache, operation, data_directory):
             # Cache the genuine result under the target interpreter's own
             # fingerprint, then select it via the existing validation API.
             operation.run([python, '-c',
-                'import json,pathlib,sys;from apps.launcher.model_catalog import report_path;p=report_path(sys.argv[1],sys.argv[2],sys.executable);p.parent.mkdir(parents=True,exist_ok=True);p.write_text(pathlib.Path(sys.argv[3]).read_text(encoding="utf-8"),encoding="utf-8")',
+                'import json,pathlib,sys;sys.path.insert(0,'+repr(str(app))+');from apps.launcher.model_catalog import report_path;p=report_path(sys.argv[1],sys.argv[2],sys.executable);p.parent.mkdir(parents=True,exist_ok=True);p.write_text(pathlib.Path(sys.argv[3]).read_text(encoding="utf-8"),encoding="utf-8")',
                 data_directory, model, model_report], env=env)
             # Activation uses the existing launcher memory validation path.
-            operation.run([python, '-m', 'apps.api.launcher_memory', '--action', 'remember',
+            operation.run([python, app / 'apps/launcher/python_entry.py', '-m', 'apps.api.launcher_memory', '--action', 'remember',
                            '--data-dir', data_directory, '--application-python', python,
                            '--inference-python', python, '--model', model, '--local',
                            '--output', operation.report.parent / 'activation.json'], env=env)
             activation = read(operation.report.parent / 'activation.json')
             if activation.get('ok') is False:
                 raise ValueError('启动器环境登记失败')
-            operation.run([python, '-m', 'apps.api.launcher_memory', '--action', 'select',
+            operation.run([python, app / 'apps/launcher/python_entry.py', '-m', 'apps.api.launcher_memory', '--action', 'select',
                            '--data-dir', data_directory, '--application-python', python,
                            '--inference-python', python, '--model', model, '--local',
                            '--output', operation.report.parent / 'selection.json'], env=env)
             if not read(operation.report.parent / 'selection.json').get('ok'):
                 raise ValueError('启动器环境与模型配对复核失败')
-            integrity = {str(target / 'python.exe'): sha256_file(target / 'python.exe')}
+            integrity = {str(python): sha256_file(python)}
+            for name in ('python312._pth', 'Lib/site-packages/sitecustomize.py'):
+                if (target / name).is_file():
+                    integrity[str(target / name)] = sha256_file(target / name)
             for folder in ('shiju', 'apps/gpu_worker', 'Rhyme', 'Songci_Meter'):
                 for path in (app / folder).rglob('*'):
                     if path.is_file() and '__pycache__' not in path.parts:
                         integrity[str(path)] = sha256_file(path)
             for path in (target / 'Lib/site-packages').glob('*.dist-info/METADATA'):
                 integrity[str(path)] = sha256_file(path)
-            integrity.update({str(model / name): item['sha256'] for name, item in plan['model']['files'].items()})
-            save(target / 'verified-inputs.json', integrity)
+            # Environment paths are relative so host/sandbox mappings remain
+            # valid. Model contents are independently checked for each pair.
+            save(target / 'verified-inputs.json', dict(schema_version=2, files={
+                Path(name).relative_to(target).as_posix(): digest for name, digest in integrity.items()}))
             directory = Path(data_directory)
             launcher = directory / 'launcher.json'
             settings = read(launcher) if launcher.exists() else {}
             save(launcher, settings | dict(application_python=str(python), inference_python=str(python), local_enabled=True))
             runtime = directory / 'runtime.json'
             settings = read(runtime) if runtime.exists() else {}
-            save(runtime, settings | dict(model_path=str(model), quantization='4bit', allow_unverified=False))
+            save(runtime, settings | dict(model_path=str(model), quantization=plan['inference']['precision'], allow_unverified=False))
             save(state_path, dict(plan_id=plan_id, state='verified', ok=True, python=str(python), model=str(model),
-                                 precision='4bit', gpu_uuid=gpu.uuid, engine_sha256=engine_digest(),
+                                 precision=plan['inference']['precision'], gpu_uuid=gpu.uuid if gpu else None, engine_sha256=engine_digest(),
                                  verification=str(verification)))
             return dict(python=str(python), model=str(model), verification=str(verification),
                         installed_bytes=sum(p.stat().st_size for p in target.rglob('*') if p.is_file()))
         except BaseException as exc:
-            save(state_path, dict(plan_id=plan_id, state='incomplete', ok=False, stage=operation.stage, failure_type=type(exc).__name__))
+            save(state_path, dict(plan_id=plan_id, state='incomplete', ok=False, stage=operation.stage, failure_type=type(exc).__name__, profile=plan['profile'], external=external))
             raise
     finally:
         lock_handle.close()
@@ -576,7 +819,12 @@ def install(plan, model, target, cache, operation, data_directory):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['inspect', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'diagnostics'])
+    parser.add_argument('action', choices=['inspect', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'install-vc-runtime', 'resume', 'import-wheels', 'inspect-target', 'diagnostics'])
+    parser.add_argument('--profile', choices=['auto', *PROFILES], default='auto')
+    parser.add_argument('--source', choices=['auto', 'mirror', 'official'], default='auto')
+    parser.add_argument('--continue-existing', action='store_true')
+    parser.add_argument('--latest', action='store_true')
+    parser.add_argument('--wheel-dir')
     parser.add_argument('--model')
     parser.add_argument('--route', choices=['official', 'local'], default='official')
     parser.add_argument('--model-id', default='Qwen/Qwen3.5-4B')
@@ -589,10 +837,12 @@ def main():
     parser.add_argument('--export-dir')
     args = parser.parse_args()
     operation = Operation(args.report, args.cancel)
+    operation.source_preference = args.source
     try:
         operation.update('准备')
         if args.action == 'inspect':
-            result = dict(host=asdict(inspect_host(args.target or args.data_dir)), models=discover_models(args.data_dir), **discover_environments())
+            result = dict(host=asdict(inspect_host(args.target or args.data_dir)), models=discover_models(args.data_dir),
+                          vc_runtime=check_vc_runtime(operation, required=False), **discover_environments())
         elif args.action == 'verify-model':
             operation.update('检查已有模型文件，请稍候')
             result = inspect_selected_model(args.model)
@@ -600,7 +850,7 @@ def main():
             result = dict(model=download_model(args.model, operation, args.model_id))
         elif args.action == 'plan':
             operation.update('核验模型并生成清单')
-            result = make_plan(args.model, args.route, args.model_id)
+            result = make_plan(args.model, args.route, args.model_id, profile=args.profile)
             compatibility(inspect_host(args.target or args.data_dir), result['hardware'])
             save(args.plan, result)
         elif args.action == 'import':
@@ -612,8 +862,19 @@ def main():
             from .environment_export import export_environment
             operation.update('导出 Conda 安装文件和精确依赖锁')
             result = export_environment(read(args.plan), args.export_dir)
+        elif args.action == 'resume':
+            operation.update('恢复上次部署清单与目录')
+            result = restore_session(args.target, args.data_dir, args.latest)
+            save(args.plan, result['plan'])
+        elif args.action == 'import-wheels':
+            result = import_wheels(read(args.plan), args.wheel_dir, args.cache, operation)
+        elif args.action == 'inspect-target':
+            validate_plan(read(args.plan))
+            result = inspect_existing_target(read(args.plan), args.target, operation)
         elif args.action == 'install':
-            result = install(read(args.plan), args.model, args.target, args.cache, operation, args.data_dir)
+            result = install(read(args.plan), args.model, args.target, args.cache, operation, args.data_dir, args.continue_existing)
+        elif args.action == 'install-vc-runtime':
+            result = install_vc_runtime(args.cache, operation)
         else:
             # Whitelist diagnostics; never zip arbitrary runtime logs/configs.
             result = dict(schema_version=1, host=asdict(inspect_host(args.data_dir)),
@@ -628,7 +889,7 @@ def main():
         save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result))
         return 0
     except Exception as exc:
-        save(args.report, dict(ok=False, state='cancelled' if isinstance(exc, Cancelled) else 'failed', stage=operation.stage, error=str(exc)))
+        save(args.report, dict(ok=False, state='cancelled' if isinstance(exc, Cancelled) else 'failed', stage=operation.stage, error=str(exc), **failure_details(exc)))
         return 1
 
 

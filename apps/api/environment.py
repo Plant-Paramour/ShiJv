@@ -16,7 +16,8 @@ _lock = threading.Lock()
 
 def python_process_env(python):
     env = os.environ.copy()
-    prefix = Path(python).parent
+    executable = Path(python)
+    prefix = executable.parent.parent if executable.parent.name.lower() == 'scripts' else executable.parent
     env["PATH"] = os.pathsep.join(map(str, [prefix, prefix / "Library" / "bin", prefix / "Scripts"])) + os.pathsep + env.get("PATH", "")
     env.pop("PYTHONHOME", None)
     env.pop("PYTHONPATH", None)
@@ -25,7 +26,7 @@ def python_process_env(python):
     if deployment.is_file():
         state = json.loads(deployment.read_text(encoding='utf-8'))
         if state.get('state') == 'verified' and state.get('ok'):
-            env['CUDA_VISIBLE_DEVICES'] = state['gpu_uuid']
+            env['CUDA_VISIBLE_DEVICES'] = state.get('gpu_uuid') or '-1'
             backend = prefix / 'Lib/site-packages/triton/backends/nvidia'
             env['CC'] = str(prefix / 'Lib/site-packages/triton/runtime/tcc/tcc.exe')
             env['CUDA_PATH'] = str(backend)
@@ -41,41 +42,78 @@ def selected_environment(directory):
             "local_enabled": config.get("local_enabled", True)}
 
 
+def check_managed_runtime(python):
+    """Check deployment runtime inputs; a model is validated as a separate pair."""
+    python = Path(python)
+    prefix = python.parent.parent if python.parent.name.lower() == 'scripts' else python.parent
+    deployment = prefix / 'shiju-install.json'
+    if not deployment.is_file():
+        return
+    state = json.loads(deployment.read_text(encoding='utf-8'))
+    if state.get('state') != 'verified' or not state.get('ok'):
+        raise ValueError('诗矩专用环境尚未完成验证，请返回部署工具重试')
+    from apps.launcher.runtime_manifest import sha256_file
+    integrity = json.loads((prefix / 'verified-inputs.json').read_text(encoding='utf-8'))
+    if not isinstance(integrity, dict) or not integrity:
+        raise ValueError('专用环境缺少验证指纹，请通过部署工具重新验证')
+    from pathlib import PureWindowsPath
+    portable = integrity.get('schema_version') == 2
+    files = integrity.get('files') if portable else integrity
+    if not isinstance(files, dict) or not files:
+        raise ValueError('专用环境缺少验证指纹，请通过部署工具重新验证')
+    # Legacy deployments stored sandbox/host absolute names. Relocate only
+    # entries beneath the interpreter recorded in that same installation.
+    old_python = state.get('python')
+    path_type = PureWindowsPath if old_python and PureWindowsPath(old_python).drive else Path
+    old_prefix = path_type(old_python).parent if old_python else prefix
+    if old_prefix.name.lower() == 'scripts':
+        old_prefix = old_prefix.parent
+    original_model = path_type(state['model']) if state.get('model') else None
+    for filename, digest in files.items():
+        recorded = path_type(filename)
+        # A deployment's original model may have been replaced by another fully
+        # tested pair. Its files are not dependencies of the Python environment.
+        if not portable and original_model and recorded.is_relative_to(original_model):
+            continue
+        if portable:
+            from apps.launcher.runtime_manifest import relative_path
+            relative_path(filename)
+            path = prefix / filename
+        else:
+            try:
+                path = prefix.joinpath(*recorded.relative_to(old_prefix).parts)
+            except ValueError as exc:
+                raise ValueError('部署校验记录包含环境目录之外的文件，请通过部署工具重新验证') from exc
+        if not path.resolve().is_relative_to(prefix.resolve()):
+            raise ValueError('部署校验文件超出所选环境目录，请通过部署工具重新验证')
+        if not path.is_file() or sha256_file(path) != digest:
+            raise ValueError('部署环境文件缺失或已变化：' + str(path) + '。请通过部署工具修复；本次模型验收未通过。')
+
+
 def inspect_environment(directory, *, refresh=False):
     selected = selected_environment(directory)
     if not selected["local_enabled"]:
         return selected | {"ok": False, "errors": ["请在启动器中勾选本地诗词生成，并选择推理环境后重新启动软件"], "quantization": []}
     python = Path(selected["inference_python"])
     if not python.is_absolute() or not python.is_file() or python.name.lower() not in {"python.exe", "python"}:
-        return selected | {"ok": False, "errors": ["所选推理环境的 Python 不存在，请在启动器中重新选择"], "quantization": []}
+        return selected | {"ok": False, "errors": [f"所选推理环境的 Python 路径无效：{python}。请在启动器中重新选择该环境实际存在的 python.exe"], "quantization": []}
     key = (str(python), python.stat().st_mtime_ns)
     with _lock:
         if not refresh and key in _cache and time.monotonic() - _cache[key][0] < 60:
             return selected | _cache[key][1]
         script = Path(__file__).resolve().parents[1] / "launcher" / "environment_probe.py"
         try:
-            deployment = python.parent / 'shiju-install.json'
-            if deployment.is_file():
-                state = json.loads(deployment.read_text(encoding='utf-8'))
-                if state.get('state') != 'verified' or not state.get('ok'):
-                    raise ValueError('诗矩专用环境尚未完成验证，请返回部署工具重试')
-                from apps.launcher.runtime_manifest import sha256_file
-                integrity = json.loads((python.parent / 'verified-inputs.json').read_text(encoding='utf-8'))
-                if not isinstance(integrity, dict) or not integrity:
-                    raise ValueError('专用环境缺少验证指纹，请重新验证')
-                for filename, digest in integrity.items():
-                    if not Path(filename).is_file() or sha256_file(filename) != digest:
-                        raise ValueError('模型、依赖或生成代码已变化，需要重新验证：' + Path(filename).name)
+            check_managed_runtime(python)
             with tempfile.TemporaryDirectory(prefix="shiju-probe-") as temp:
                 output = Path(temp) / "result.json"
                 result = subprocess.run([str(python), str(script), "--mode", "inference", "--output", str(output)],
-                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=90,
+                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600,
                     env=python_process_env(python),
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
                 report = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {
                     "ok": False, "errors": [f"环境检查进程退出，退出码 {result.returncode}，请检查 Python 或 DLL 依赖"]}
         except subprocess.TimeoutExpired:
-            report = {"ok": False, "errors": ["环境检查超过 90 秒，请检查虚拟环境是否能正常运行"]}
+            report = {"ok": False, "errors": ["环境检查超过 10 分钟，已停止检查。请确认所选环境可以正常运行后重试"]}
         except (OSError, ValueError) as exc:
             report = {"ok": False, "errors": [f"环境检查失败：{exc}"]}
         _cache[key] = (time.monotonic(), report)
@@ -105,10 +143,15 @@ def assess_model(model, environment):
     options = environment.get("quantization", [])
     if environment.get("cuda") is False:
         free = environment.get("cpu_memory_available_bytes") or 0
-        if "none" in options and size * 2.6 + reserve < free:
+        required = size * 2.6 + reserve
+        if "none" in options and required < free:
             return {"quantization": "none", "label": "CPU FP32（原始权重）",
                     "estimated": True, "note": "CPU 内存估算仅供参考；必须通过实际加载和短推理后才会就绪"}
-        raise ValueError("系统可用内存不足以估算运行此模型所需空间，请关闭其他程序或选择更小模型。")
+        raise ValueError(
+            f"系统可用内存不足，暂时无法加载模型。当前可用 {free / 1024**3:.2f} GiB，"
+            f"预计需要至少 {required / 1024**3:.2f} GiB（含运行余量，并非实测峰值）。"
+            "请释放内存后重试，或选择占用内存更少的模型。"
+        )
     free = environment.get("gpu", {}).get("free_bytes", 0)
     if "none" in options and size * 1.3 + reserve < free:
         precision = "none"

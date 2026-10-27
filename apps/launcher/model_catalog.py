@@ -9,15 +9,22 @@ from pathlib import Path
 def fingerprint(model, python=None):
     root = Path(model).resolve()
     interpreter = Path(python or sys.executable).resolve()
-    files = [interpreter, Path(__file__), *root.glob('*.json'), *root.glob('*.safetensors'), *root.glob('*.bin'), *root.glob('*.model')]
+    files = [interpreter, *root.glob('*.json'), *root.glob('*.safetensors'), *root.glob('*.bin'), *root.glob('*.model')]
+    files.extend(interpreter.parent.glob('python*._pth'))
+    custom = interpreter.parent / 'Lib/site-packages/sitecustomize.py'
+    if custom.is_file():
+        files.append(custom)
     packages = interpreter.parent / 'Lib' / 'site-packages'
     for name in ('transformers', 'torch', 'accelerate', 'bitsandbytes', 'tokenizers'):
         files.extend(packages.glob(name + '-*.dist-info/METADATA'))
     # Changes to the decoding implementation invalidate earlier acceptance.
     project = Path(__file__).resolve().parents[2]
-    for folder in ('shiju', 'apps/launcher'):
-        files.extend((project / folder).rglob('*.py'))
-    entries = [(str(p), p.stat().st_size, p.stat().st_mtime_ns) for p in sorted(set(files)) if p.is_file()]
+    entries = [(os.path.normcase(str(p.resolve())), p.stat().st_size, p.stat().st_mtime_ns) for p in sorted(set(files)) if p.is_file()]
+    # An identical deployment copy is the same code, regardless of its path or
+    # copy timestamps. Actual source edits still invalidate acceptance.
+    for folder in ('shiju', 'apps/launcher', 'apps/gpu_worker'):
+        for path in sorted((project / folder).rglob('*.py')):
+            entries.append((path.relative_to(project).as_posix(), hashlib.sha256(path.read_bytes()).hexdigest()))
     return hashlib.sha256(json.dumps(entries).encode()).hexdigest()
 
 

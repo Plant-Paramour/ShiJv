@@ -1,0 +1,8 @@
+{
+  "name": "torch",
+  "version": "2.8.0+cpu",
+  "filename": "torch-2.8.0+cpu-cp312-cp312-win_amd64.whl",
+  "sha256": "2be20b2c05a0cce10430cc25f32b689259640d273232b2de357c35729132256d",
+  "bytes": 619352539,
+  "source_url": "https://download-r2.pytorch.org/whl/cpu/torch-2.8.0%2Bcpu-cp312-cp312-win_amd64.whl"
+}

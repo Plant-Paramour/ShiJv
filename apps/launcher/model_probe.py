@@ -4,7 +4,29 @@ import json
 import os
 import sys
 import time
+import subprocess
 from pathlib import Path
+
+
+def check_application_environment(python):
+    from apps.api.environment import python_process_env
+    from apps.launcher.environment_probe import probe
+    path = Path(python)
+    if not path.is_absolute() or not path.is_file():
+        raise ValueError('所选软件环境的 Python 不存在：' + str(path))
+    if path.resolve() == Path(sys.executable).resolve():
+        return probe('core')
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix='shiju-core-') as temporary:
+        output = Path(temporary) / 'report.json'
+        process = subprocess.run([str(path), str(Path(__file__).with_name('environment_probe.py')),
+                                  '--mode', 'core', '--output', str(output)],
+                                 env=python_process_env(path), capture_output=True, timeout=600,
+                                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        if not output.is_file():
+            raise ValueError(f'软件环境检查未返回报告（退出码 {process.returncode}）：' +
+                             process.stderr.decode('utf-8', errors='replace')[-4000:])
+        return json.loads(output.read_text(encoding='utf-8'))
 
 
 def check_runner(runner, engine, report):
@@ -61,18 +83,20 @@ def main():
     parser.add_argument('--root', default='')
     parser.add_argument('--precision', choices=['auto', 'none', '4bit'], default='auto')
     parser.add_argument('--device-uuid', default='')
+    parser.add_argument('--application-python', default='')
     args = parser.parse_args()
     if args.device_uuid:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device_uuid
         os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
     from apps.launcher.environment_probe import probe
-    from apps.launcher.model_catalog import validate_model, scan, report_path
-    from apps.api.environment import assess_model
+    from apps.launcher.model_catalog import validate_model, scan, report_path, fingerprint
+    from apps.api.environment import assess_model, check_managed_runtime
     result = {'ok': False, 'python': sys.executable, 'model': args.model, 'checks': [], 'started_at': time.time(),
               'device_uuid': args.device_uuid or os.getenv('CUDA_VISIBLE_DEVICES', '')}
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     runner = None
+    initial_fingerprint = None
     def write():
         temporary = output.with_suffix('.tmp')
         temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -84,6 +108,17 @@ def main():
             started_at=started, elapsed_seconds=time.time() - started)]
         write()
     try:
+        if args.application_python and not args.scan:
+            report('application', '软件环境与部署文件', 'running', '检查所选软件环境和推理环境文件')
+            check_managed_runtime(sys.executable)
+            core = check_application_environment(args.application_python)
+            result['application_environment'] = core
+            if not core.get('ok'):
+                raise ValueError('软件环境检查失败：' + '; '.join(core.get('errors', [])))
+            from apps.api.launcher_memory import environment_stamp
+            result['application_stamp'] = environment_stamp(args.application_python)
+            result['inference_stamp'] = environment_stamp(sys.executable)
+            report('application', '软件环境与部署文件', 'passed', '软件环境和推理环境文件可用')
         report('environment', '依赖、CUDA 与模型架构', 'running', '检查当前所选环境')
         environment = probe('inference')
         result['environment'] = environment
@@ -100,6 +135,7 @@ def main():
             write()
             return 0
         model = validate_model(args.model)
+        initial_fingerprint = fingerprint(model)
         result['plan'] = assess_model(model, environment)
         if args.precision != 'auto':
             if args.precision not in environment.get('quantization', []):
@@ -118,6 +154,8 @@ def main():
             torch.cuda.reset_peak_memory_stats()
         runner = ModelRunner(ModelSettings(str(model), quantization=result['plan']['quantization'], local_files_only=True))
         check_runner(runner, GenerationEngine(runner), report)
+        if fingerprint(model) != initial_fingerprint:
+            raise ValueError('模型、依赖或生成代码在测试期间发生变化，请重新完整测试')
         result['ok'] = True
     except Exception as exc:
         result['error'] = f'{type(exc).__name__}: {exc}'
@@ -144,6 +182,8 @@ def main():
                     result['ok'] = False
                     result['code'] = 'MODEL_ACCEPTANCE_FAILED'
                     result['error'] = f'模型资源释放失败：{type(exc).__name__}: {exc}'
+    if result['ok'] and initial_fingerprint and fingerprint(args.model) != initial_fingerprint:
+        result.update(ok=False, code='PAIR_INPUTS_CHANGED', error='模型、依赖或生成代码在测试期间发生变化，请重新完整测试')
     result['finished_at'] = time.time()
     write()
     if args.model:
@@ -152,6 +192,16 @@ def main():
         temporary = target.with_suffix('.tmp')
         temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
         temporary.replace(target)
+        if args.application_python and result['ok']:
+            try:
+                check_managed_runtime(sys.executable)
+                from apps.api.launcher_memory import LauncherMemory
+                LauncherMemory(args.data_dir).adopt_verified_pair(args.application_python, sys.executable, args.model)
+                result['pair_saved'] = True
+            except (OSError, ValueError) as exc:
+                result.update(ok=False, error=str(exc), code='PAIR_SAVE_FAILED')
+                target.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+            write()
     return 0 if result['ok'] else 1
 
 

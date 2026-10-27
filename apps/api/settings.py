@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 import os
-from .data_directory import default_data_directory
+from .data_directory import default_data_directory, default_database_path
 
 
 @dataclass(frozen=True)
@@ -20,7 +20,9 @@ class ApiSettings:
         database_url = os.getenv('DATABASE_URL', '').strip()
         if database_url and not database_url.startswith('sqlite:///'):
             raise ValueError('单机版仅支持 SQLite 本地文件')
-        path = Path(database_url.removeprefix('sqlite:///')) if database_url else Path(os.getenv('SHIJU_DATABASE_PATH', str(directory / 'shiju.db')))
+        explicit_path = os.getenv('SHIJU_DATABASE_PATH', '').strip()
+        path = (Path(database_url.removeprefix('sqlite:///')) if database_url else
+                Path(explicit_path) if explicit_path else default_database_path(directory))
         path = path.expanduser().resolve()
         os.environ['SHIJU_DATABASE_PATH'] = str(path)
         return cls(database_path=path, database_url='sqlite:///' + path.as_posix(),

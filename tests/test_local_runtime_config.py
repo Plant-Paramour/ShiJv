@@ -1,5 +1,6 @@
 import json
 import time
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -117,3 +118,85 @@ def test_scan_lists_models_even_when_inference_is_disabled(runtime_client, monke
     assert not result["models"][0]["supported"]
     assert "启用本地生成" in result["models"][0]["reason"]
     assert result["scanned_roots"] == [str(model.resolve())]
+
+
+def test_managed_environment_can_start_a_different_verified_model(runtime_client, monkeypatch):
+    client, app, tmp_path = runtime_client
+    from apps.api import local_runtime
+    from apps.launcher import model_catalog
+    model = tmp_path / 'new-model'
+    model.mkdir()
+    (model / 'config.json').write_text('{"model_type":"qwen3"}')
+    (model / 'tokenizer.json').write_text('{}')
+    (model / 'model.safetensors').write_bytes(b'fixture')
+    python = tmp_path / 'python.exe'
+    python.write_bytes(b'fixture interpreter')
+    (tmp_path / 'shiju-install.json').write_text(json.dumps(dict(model=str(tmp_path / 'old-model'), precision='4bit')))
+    monkeypatch.setattr(local_runtime, 'inspect_environment', lambda *a, **kw: dict(ok=True, errors=[],
+        inference_python=str(python), cuda=False, cpu_memory_available_bytes=8 * 1024**3,
+        supported_model_types=['qwen3'], quantization=['none']))
+    monkeypatch.setattr(model_catalog, 'verified_report', lambda *a: dict(ok=True, plan=dict(quantization='none')))
+    launched = {}
+    class Process:
+        code = None
+        def __init__(self, args, **kw): launched.update(args=args, **kw)
+        def poll(self): return self.code
+        def terminate(self): self.code = 0
+        def wait(self, timeout): return self.code
+    monkeypatch.setattr(local_runtime.subprocess, 'Popen', Process)
+    assert client.put('/v1/local-runtime', json=dict(model_path=str(model))).status_code == 200
+    response = client.post('/v1/local-runtime/start')
+    assert response.status_code == 200, response.text
+    assert launched['args'][0] == str(python)
+    assert Path(launched['args'][1]).name == 'python_entry.py'
+    assert launched['env']['SHIJU_MODEL_PATH'] == str(model)
+    assert launched['env']['SHIJU_QUANTIZATION'] == 'none'
+
+
+def test_local_worker_exit_after_claim_fails_running_task(runtime_client):
+    client, app, _ = runtime_client
+    runtime = app.state.local_runtime
+    class Process:
+        code = None
+        def poll(self): return self.code
+    process = Process()
+    runtime.process = process
+    runtime.ready.touch()
+    runtime.log.write_text('native failure details', encoding='utf-8')
+    user = app.state.users.local_profile()
+    job = app.state.jobs.submit('generate', dict(meter_type='唐诗',form_name='五言绝句',theme='春'),user_id=user['id'])
+    app.state.jobs.claim('local-poetry', dict(tasks=['generate']))
+    runtime.watch_submission(job.id)
+    assert job.id in runtime.watched_jobs
+    process.code = -1073741819
+    deadline = time.monotonic()+4
+    while time.monotonic()<deadline and app.state.jobs.get(job.id).status != 'failed':
+        time.sleep(.05)
+    result=app.state.jobs.get(job.id).to_dict()
+    assert result['status'] == 'failed'
+    assert result['error']['code'] == 'LOCAL_WORKER_EXITED'
+    assert '-1073741819' in result['error']['message']
+    assert 'native failure details' in result['error']['message']
+    assert str(runtime.log) in result['error']['message']
+    runtime.process = None
+
+
+def test_local_worker_watch_does_not_overwrite_completed_task(runtime_client):
+    client, app, _ = runtime_client
+    runtime = app.state.local_runtime
+    class Process:
+        code = None
+        def poll(self): return self.code
+    process=Process()
+    runtime.process=process
+    runtime.ready.touch()
+    user=app.state.users.local_profile()
+    job=app.state.jobs.submit('generate',dict(meter_type='唐诗',form_name='五言绝句',theme='春'),user_id=user['id'])
+    app.state.jobs.claim('local-poetry',dict(tasks=['generate']))
+    runtime.watch_submission(job.id)
+    app.state.jobs.complete(job.id,'local-poetry',dict(candidates=[]))
+    process.code=1
+    deadline=time.monotonic()+3
+    while job.id in runtime.watched_jobs and time.monotonic()<deadline: time.sleep(.05)
+    assert app.state.jobs.get(job.id).status == 'succeeded'
+    runtime.process=None

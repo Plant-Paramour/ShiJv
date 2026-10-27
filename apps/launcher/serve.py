@@ -6,6 +6,7 @@ import sys
 import traceback
 import json
 import uuid
+from datetime import datetime
 
 
 def main():
@@ -18,13 +19,18 @@ def main():
     os.environ["SHIJU_INSTANCE_ID"] = instance_id
     record = {"pid": os.getpid(), "port": args.port, "instance_id": instance_id}
     with (directory / "api-startup.log").open("a", encoding="utf-8", buffering=1) as output:
+        original_stdout, original_stderr = sys.stdout, sys.stderr
         sys.stdout = output
         sys.stderr = output
+        print(f"\n启动服务 {datetime.now().isoformat()} · Python: {sys.executable}", flush=True)
+        from apps.launcher.build_info import build_info
+        print('应用版本：' + json.dumps(build_info(), ensure_ascii=False), flush=True)
         try:
             import uvicorn
             from apps.api.main import create_app
             app = create_app()
-            server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port))
+            server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port,
+                                                  timeout_graceful_shutdown=10))
             app.state.launcher_shutdown = lambda: setattr(server, "should_exit", True)
             instance_file = directory / "instance.json"
             temporary = instance_file.with_suffix(".tmp")
@@ -41,6 +47,7 @@ def main():
                     instance_file.unlink()
             except (OSError, ValueError):
                 pass
+            sys.stdout, sys.stderr = original_stdout, original_stderr
 
 
 if __name__ == "__main__":

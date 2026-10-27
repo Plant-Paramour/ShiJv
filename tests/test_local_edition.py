@@ -2,6 +2,7 @@ import ast
 import hashlib
 import io
 import json
+import mimetypes
 from pathlib import Path
 import sqlite3
 import threading
@@ -25,6 +26,50 @@ def local_app(tmp_path, monkeypatch):
     for name in ('DATABASE_URL', 'SHIJU_DATABASE_PATH', 'SHIJU_CONTROL_URL'):
         monkeypatch.delenv(name, raising=False)
     return create_app()
+
+
+def test_web_modules_ignore_system_plain_text_association(local_app, monkeypatch):
+    mimetypes.init()
+    monkeypatch.setitem(mimetypes.types_map, '.js', 'text/plain')
+    with TestClient(local_app) as client:
+        for name in ('site.js', 'app.js', 'sentence-search.js', 'core.js',
+                     'prosody-evaluation.js', 'dataset-cache.js', 'chat-markdown.js',
+                     'stream-text.js', 'local-rhyme.js'):
+            response = client.get('/web/prosody-checker/' + name + '?v=mime-test')
+            assert response.status_code == 200, name
+            assert response.headers['content-type'].split(';')[0] == 'text/javascript', name
+            assert response.headers['cache-control'] == 'no-cache'
+        assert client.get('/', follow_redirects=False).headers['location'].endswith('#chat')
+
+
+def test_static_types_cache_and_missing_files(tmp_path, monkeypatch):
+    from fastapi import FastAPI
+    from apps.api.static_files import ApplicationStaticFiles
+    from starlette.responses import FileResponse
+    mimetypes.init()
+    app = FastAPI()
+    for suffix in ApplicationStaticFiles.MEDIA_TYPES:
+        monkeypatch.setitem(mimetypes.types_map, suffix, 'text/plain')
+        (tmp_path / ('asset' + suffix)).write_bytes(b'fixture')
+    (tmp_path / 'index.html').write_text('<p>fixture</p>', encoding='utf-8')
+    app.mount('/assets', ApplicationStaticFiles(directory=tmp_path, html=True))
+    with TestClient(app) as client:
+        for suffix, expected in ApplicationStaticFiles.MEDIA_TYPES.items():
+            url = '/assets/asset' + suffix
+            response = client.get(url)
+            assert response.status_code == 200
+            assert response.headers['content-type'].split(';')[0] == expected
+            head = client.head(url)
+            assert head.content == b''
+            assert head.headers['content-type'] == response.headers['content-type']
+            old_etag = FileResponse(tmp_path / ('asset' + suffix), stat_result=(tmp_path / ('asset' + suffix)).stat()).headers['etag']
+            assert client.get(url, headers={'If-None-Match': old_etag}).status_code == 200
+            cached = client.get(url, headers={'If-None-Match': response.headers['etag']})
+            assert cached.status_code == 304
+            assert cached.headers['cache-control'] == 'no-cache'
+        assert client.get('/assets/').headers['content-type'].startswith('text/html')
+        assert client.get('/assets/missing.js').status_code == 404
+        assert client.get('/assets/%2e%2e/outside.js').status_code == 404
 
 
 def test_local_worker_plain_transport_preserves_jobs_without_authentication(local_app):
@@ -102,6 +147,36 @@ def test_old_database_is_rejected_without_modification(tmp_path):
     with pytest.raises(ValueError, match='旧版数据目录'):
         Database('sqlite:///' + path.as_posix()).initialize()
     assert path.read_bytes() == before
+
+
+def test_default_legacy_database_starts_with_separate_persistent_local_database(tmp_path, monkeypatch):
+    monkeypatch.setenv('SHIJU_DATA_DIR', str(tmp_path))
+    for name in ('DATABASE_URL', 'SHIJU_DATABASE_PATH'):
+        monkeypatch.delenv(name, raising=False)
+    legacy = tmp_path / 'shiju.db'
+    with sqlite3.connect(legacy) as db:
+        db.execute('CREATE TABLE users(id TEXT)')
+        db.execute("INSERT INTO users VALUES ('legacy-user')")
+    before = legacy.read_bytes()
+    app = create_app()
+    assert app.state.settings.database_path == tmp_path / 'shiju-local.db'
+    with TestClient(app) as client:
+        assert client.get('/health/live').json()['data_root'] == str(tmp_path)
+        assert client.patch('/v1/local-profile', json={'display_name': '新档案'}).status_code == 200
+    monkeypatch.delenv('SHIJU_DATABASE_PATH', raising=False)
+    reopened = create_app()
+    assert reopened.state.users.local_profile()['display_name'] == '新档案'
+    assert legacy.read_bytes() == before
+
+
+def test_explicit_legacy_database_still_requires_conversion(tmp_path, monkeypatch):
+    legacy = tmp_path / 'shiju.db'
+    with sqlite3.connect(legacy) as db:
+        db.execute('CREATE TABLE users(id TEXT)')
+    monkeypatch.setenv('SHIJU_DATABASE_PATH', str(legacy))
+    monkeypatch.delenv('DATABASE_URL', raising=False)
+    with pytest.raises(ValueError, match='旧版数据目录'):
+        create_app()
 
 
 def test_source_is_plain_and_has_no_management_implementation():

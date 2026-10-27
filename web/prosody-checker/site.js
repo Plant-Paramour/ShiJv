@@ -1,12 +1,13 @@
-import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=9";
-import { flattenMeter } from "./core.js?v=12";
-import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=2";
-import { getDatasetJson } from "./dataset-cache.js?v=2";
-import { renderChatMarkdown } from "./chat-markdown.js?v=1";
-import { createStreamingText } from "./stream-text.js?v=1";
+import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=10";
+import { flattenMeter } from "./core.js?v=13";
+import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
+import { getDatasetJson } from "./dataset-cache.js?v=3";
+import { renderChatMarkdown } from "./chat-markdown.js?v=2";
+import { createStreamingText } from "./stream-text.js?v=2";
+
+window.ShijuStartup?.mark("入口模块及静态依赖执行成功");
 
 const routeTitles = {
-  home: "诗矩 · 中文诗词创作空间",
   chat: "AI 对话 · 诗矩",
   prosody: "格律检测 · 诗矩",
   "sentence-search": "佳句检索 · 诗矩",
@@ -85,9 +86,8 @@ function openDrawer(drawer) {
 }
 
 function showRoute(route, options = {}) {
-  if (!currentUser && route !== "home") route = "home";
-  const resolvedRoute = route === "home" && currentUser ? "chat" : (views.has(route) ? route : "home");
-  if (route === "home" && currentUser && !window.location.hash && window.location.hash !== "#chat") window.history.replaceState(null, "", "#chat");
+  const resolvedRoute = views.has(route) ? route : "chat";
+  if (!window.location.hash || route === "home" || !views.has(route)) window.history.replaceState(null, "", "#chat");
   for (const [name, view] of views) view.hidden = name !== resolvedRoute;
   if (resolvedRoute === "profile") activateProfileTab(profileTabFromHash());
   for (const link of navLinks) {
@@ -115,7 +115,7 @@ function showRoute(route, options = {}) {
 function routeFromHash() {
   const parts = window.location.hash.slice(1).split("/");
   if (parts[0] === "poem" && parts[1]) return "poem";
-  return parts[0] || "home";
+  return parts[0] || "chat";
 }
 
 const profileTabNames = new Set(["account", "poems", "favorites", "archive"]);
@@ -2296,6 +2296,9 @@ async function requestApi(url, options = {}) {
   if (!response.ok) {
     const error = new Error(responseError(payload, response.status));
     error.status = response.status;
+    if (["/v1/local-profile", "/v1/model-config", "/v1/local-runtime"].includes(path)) {
+      window.ShijuStartup?.fail(new Error(`${path}：HTTP ${response.status}；${error.message}`));
+    }
     error.retryAfterSeconds = Number(response.headers.get("Retry-After")) || null;
     if (response.status === 401) announce("软件服务暂时不可用，请检查启动器运行状态。");
     throw error;
@@ -2313,8 +2316,6 @@ function requireLocalProfile() {
 function updateProfileUi() {
   const accountLabel = document.querySelector("#account-entry-label");
   if (accountLabel) accountLabel.textContent = currentUser ? currentUser.display_name : "本地档案";
-  document.querySelector("#home-nav-link").hidden = Boolean(currentUser);
-  document.querySelector(".site-brand").href = currentUser ? "#chat" : "#home";
   const profileUserLabel = document.querySelector("#profile-user-label");
   if (profileUserLabel) profileUserLabel.textContent = currentUser ? `${currentUser.display_name} 的创作档案` : "本地创作档案";
   const displayName = document.querySelector("#profile-display-name");
@@ -2338,18 +2339,24 @@ function setUserAvatar(element, user) {
   const url = user?.avatar_url;
   if (url && /^\/media\/avatars\/[\w.-]+$/.test(url)) {
     const img = document.createElement("img"); img.src = url; img.alt = ""; element.append(img);
-  } else element.textContent = (user?.display_name || user?.username || "诗").slice(0, 1);
+  } else element.textContent = "客";
 }
 
 async function loadCurrentUser({ restore = true } = {}) {
   try {
+    window.ShijuStartup?.mark("开始读取本地档案");
     const result = await apiFetch("/v1/local-profile");
     if (!result.profile) throw new Error('软件没有返回本地唯一档案');
     currentUser = result.profile;
+    window.ShijuStartup?.mark("本地档案读取成功");
     updateProfileUi();
+    window.ShijuStartup?.mark("开始加载运行设置");
     await loadModelConfig();
+    window.ShijuStartup?.mark("运行设置加载完成");
     showRoute(routeFromHash(), { scroll: false, restore });
+    window.ShijuStartup?.ready();
   } catch (error) {
+    window.ShijuStartup?.fail(error);
     announce(`无法连接本地档案：${error.message}。请检查启动器运行状态。`);
   }
 }
@@ -2439,6 +2446,7 @@ async function loadModelConfig() {
     await loadLocalRuntime(data.endpoints);
   } catch (error) {
     modelConfigLoaded = false;
+    window.ShijuStartup?.fail(error);
     document.querySelector("#model-config-status").textContent = error.message;
   }
 }
@@ -2833,7 +2841,7 @@ function openProposalHelpDialog() {
           <p>这些字段会和“编辑创作要求”一起提交给本地创作模型。复杂配置也可以在对话框中用自然语言告诉 Agent。</p>
           <dl>
             <div><dt>编辑创作要求</dt><dd>给模型的具体写作指令，可直接用自然语言描述意象、情绪、结构和格律要求。</dd></div>
-            <div><dt>候选数量</dt><dd>整首创作和部分生成最多 5 个，rewrite 最多 20 个。</dd></div>
+            <div><dt>候选数量</dt><dd>整首创作和部分生成最多 20 个，rewrite 最多 50 个。</dd></div>
             <div><dt>诗体</dt><dd>选择唐诗、宋词、汉俳或排律。</dd></div>
             <div><dt>篇式 / 词牌</dt><dd>填写具体的诗体形式或词牌名称。</dd></div>
             <div><dt>生成韵书</dt><dd>选择判定押韵时使用的韵书。</dd></div>
@@ -3094,13 +3102,13 @@ function appendProposalEditor(prepared, anchor = null) {
   const count = document.createElement("input");
   count.type = "number";
   count.min = "1";
-  count.max = "5";
+  count.max = "20";
   count.step = "1";
   count.value = String(prepared.candidate_count || proposal.candidate_count || 1);
   const countHint = document.createElement("small");
   field("候选数量", count);
   count.closest("label").append(countHint);
-  const candidateLimit = () => isLocalRewrite ? 20 : 5;
+  const candidateLimit = () => isLocalRewrite ? 50 : 20;
   const refreshCandidateLimit = () => {
     const limit = candidateLimit();
     count.max = String(limit);
@@ -3429,24 +3437,26 @@ function appendProposalEditor(prepared, anchor = null) {
   submit.type = "button"; submit.className = "primary-button";
        submit.textContent = isLocalRewrite ? "提交改写" : isPartial ? "提交补完" : "提交生成";
   const draftKey = prepared.draft_key || `shiju:proposal-draft:${prepared.proposal_id}`;
-  let submittedClickCount = 0;
-  let submittedPressTimer = null;
-  let submittedPressActive = false;
-  const originalSubmitText = submit.textContent;
+  const edit = document.createElement("button");
+  edit.type = "button";
+  edit.className = "quiet-button proposal-editor__edit";
+  edit.textContent = "编辑";
+  edit.hidden = true;
   const resetForResubmit = () => {
-    const oldJobId = prepared.submitted_job_id || panel.dataset.jobId;
-    if (oldJobId) {
-      chatThread.querySelectorAll(`.job-progress[data-job-id="${CSS.escape(oldJobId)}"]`).forEach((node) => node.remove());
+    const next = appendProposalEditor({
+      ...structuredClone(prepared),
+      proposal_id: crypto.randomUUID(),
+      proposal: structuredClone(proposal),
+      submitted_job_id: null,
+      direct: true,
+      draft_key: undefined,
+      initial_draft: readDraft(),
+      created_at: Date.now() / 1000,
+    });
+    if (next) {
+      next.open = true;
+      next.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
-    prepared.submitted_job_id = null;
-    prepared.direct = true;
-    panel.removeAttribute("data-job-id");
-    panel.classList.remove("is-submitted");
-    panel.querySelectorAll("textarea, input, select, button").forEach((control) => { control.disabled = false; });
-    if (isRevision) meterType.disabled = formName.disabled = variant.disabled = numLines.disabled = true;
-    if (isLocalRewrite) renderSentenceInputs();
-    submit.textContent = originalSubmitText;
-    state.textContent = "已解除提交锁定，可以重新提交。";
   };
   const showResubmitDialog = () => {
     let dialog = document.querySelector("#proposal-resubmit-dialog");
@@ -3454,23 +3464,17 @@ function appendProposalEditor(prepared, anchor = null) {
       dialog = document.createElement("dialog");
       dialog.id = "proposal-resubmit-dialog";
       dialog.className = "proposal-resubmit-dialog";
-      dialog.innerHTML = `<form method="dialog" class="proposal-resubmit-dialog__shell"><h2>重新提交测试</h2><p>这项操作仅用于测试，将解除当前方案的“已提交”状态。</p><div class="proposal-resubmit-dialog__actions"><button value="cancel" class="quiet-button">取消</button><button value="confirm" class="primary-button">确认重新提交</button></div></form>`;
+      dialog.innerHTML = `<form method="dialog" class="proposal-resubmit-dialog__shell"><h2>确认重新提交</h2><p>将根据当前方案创建新的编辑面板，原面板和生成进度会保留。</p><div class="proposal-resubmit-dialog__actions"><button value="cancel" class="quiet-button">取消</button><button value="confirm" class="primary-button">确认重新提交</button></div></form>`;
       document.body.append(dialog);
     }
     dialog.returnValue = "cancel";
     dialog.addEventListener("close", () => { if (dialog.returnValue === "confirm") resetForResubmit(); }, { once: true });
     if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
   };
-  const stopSubmittedPress = () => { if (submittedPressTimer) clearTimeout(submittedPressTimer); submittedPressTimer = null; submittedPressActive = false; };
-  submit.addEventListener("pointerdown", (event) => {
-    if (!panel.classList.contains("is-submitted") || submittedClickCount < 3) return;
-    event.preventDefault(); submittedPressActive = true;
-    submittedPressTimer = setTimeout(() => { submittedPressTimer = null; submittedPressActive = false; showResubmitDialog(); submittedClickCount = 0; }, 3000);
-  });
-  ["pointerup", "pointerleave", "pointercancel"].forEach((type) => submit.addEventListener(type, stopSubmittedPress));
+  edit.addEventListener("click", showResubmitDialog);
   let rewriteDraftToRestore = null;
   try {
-    const draft = JSON.parse(localStorage.getItem(draftKey) || "null");
+    const draft = prepared.initial_draft || JSON.parse(localStorage.getItem(draftKey) || "null");
     if (draft && typeof draft === "object") {
       if (isLocalRewrite && rewriteSourceInput && draft.sourcePoemId && !prepared.submitted_job_id) {
         rewriteSourceInput.value = draft.sourcePoemId;
@@ -3523,12 +3527,7 @@ function appendProposalEditor(prepared, anchor = null) {
     else updateFormOptions();
     loadRhymeOptions();
   })();
-  const saveDraft = () => {
-    if (panel.classList.contains("is-submitted")) return;
-    if (!prompt.value.trim()) {
-      try { localStorage.removeItem(draftKey); } catch (_) { /* storage may be unavailable */ }
-      return;
-    }
+  const readDraft = () => {
     const draft = { prompt: prompt.value, count: count.value, meterType: meterType.value, formNameChoice: formName.value, variant: variant.value, rhymeBook: rhymeBook.value, rhymeMode: rhymeMode.value, rhymeParts: readRhymeParts(), taskOptions: taskOptions.value, taskType: songciTaskType.value, fixedLines: fixedLines.value, polyphonic: polyphonic.value, numLines: numLines.value, allowAoJiu: allowAoJiu.checked };
     if (isPartial) {
       draft.sentenceInputs = { ...sentenceValues };
@@ -3539,6 +3538,15 @@ function appendProposalEditor(prepared, anchor = null) {
       draft.sourcePoemId = proposal.source_poem_id || null;
       draft.sourceVersion = proposal.source_version || null;
     }
+    return draft;
+  };
+  const saveDraft = () => {
+    if (panel.classList.contains("is-submitted")) return;
+    if (!prompt.value.trim()) {
+      try { localStorage.removeItem(draftKey); } catch (_) { /* storage may be unavailable */ }
+      return;
+    }
+    const draft = readDraft();
     try { localStorage.setItem(draftKey, JSON.stringify(draft)); state.textContent = "已自动保存草稿"; } catch (_) { /* storage may be unavailable */ }
   };
   panel.addEventListener("input", saveDraft);
@@ -3628,10 +3636,7 @@ function appendProposalEditor(prepared, anchor = null) {
     const submitVersion = conversationLoadVersion;
     let submitConversationId = panel.dataset.conversationId || currentConversationId;
     const isCurrentSubmission = () => submitVersion === conversationLoadVersion && panel.parentElement === chatThread;
-    if (panel.classList.contains("is-submitted")) {
-      if (!submittedPressActive) submittedClickCount = Math.min(3, submittedClickCount + 1);
-      return;
-    }
+    if (panel.classList.contains("is-submitted")) return;
      const requirement = prompt.value.trim();
     if (!requirement || !selectedFormName()) {
       state.textContent = "编辑创作要求和篇式不能为空。也可以直接在对话中用自然语言让 Agent 重新生成方案。";
@@ -3800,6 +3805,7 @@ function appendProposalEditor(prepared, anchor = null) {
       state.textContent = "已提交，开始生成。";
       try { localStorage.removeItem(draftKey); } catch (_) { /* ignore */ }
       submit.textContent = "已提交";
+      edit.hidden = false;
       startJobProgress(payload.job_id, payload, panel, submitConversationId);
     } catch (error) {
       if (createdConversationId && !taskAccepted) {
@@ -3816,7 +3822,7 @@ function appendProposalEditor(prepared, anchor = null) {
       state.textContent = `提交失败：${error.message}`;
     }
   });
-  actions.append(state, submit);
+  actions.append(state, edit, submit);
   body.prepend(meta, promptLabel);
   body.append(config, actions);
   panel.append(summary, body);
@@ -3825,6 +3831,7 @@ function appendProposalEditor(prepared, anchor = null) {
     panel.querySelectorAll("textarea, input, select, .proposal-editor__import-source").forEach((control) => { control.disabled = true; });
     state.textContent = "已提交，生成进度如下。";
     submit.textContent = "已提交";
+    edit.hidden = false;
   }
   insertChatTimelineNode(panel, prepared.created_at || anchor?.dataset.createdAt, anchor);
   chatThreadScroll.scrollTop = chatThreadScroll.scrollHeight;
@@ -4714,99 +4721,8 @@ document.querySelector("#conversation-list").addEventListener("click", async (ev
 
 document.querySelector("#profile-form").addEventListener("submit", async (event) => { event.preventDefault(); if (!requireLocalProfile()) return; const status = document.querySelector("#profile-status"); status.textContent = "保存中……"; try { currentUser = await apiFetch("/v1/profile/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ display_name: document.querySelector("#profile-display-name").value.trim(), bio: document.querySelector("#profile-bio").value.trim() }) }); updateProfileUi(); status.textContent = "已保存"; } catch (error) { status.textContent = error.message; } });
 
-function setupInkLandscape() {
-  const canvas = document.querySelector("#ink-landscape");
-  const hero = canvas.closest(".home-hero");
-  const context = canvas.getContext("2d");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let offset = 0;
-  let frame;
-
-  function seeded(index) {
-    const value = Math.sin(index * 931.17 + 17.31) * 43758.5453;
-    return value - Math.floor(value);
-  }
-
-  function drawMountain(width, height, base, amplitude, alpha, phase) {
-    context.beginPath();
-    context.moveTo(-40, height);
-    context.lineTo(-40, base);
-    for (let x = -40; x <= width + 40; x += 36) {
-      const wave = Math.sin((x + phase + offset) / 118) * amplitude;
-      const detail = Math.sin((x + phase) / 43) * amplitude * 0.26;
-      context.lineTo(x, base - wave - detail);
-    }
-    context.lineTo(width + 40, height);
-    context.closePath();
-    context.fillStyle = `rgba(35, 34, 31, ${alpha})`;
-    context.fill();
-  }
-
-  function draw() {
-    const rect = canvas.getBoundingClientRect();
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    const width = Math.max(1, Math.round(rect.width));
-    const height = Math.max(1, Math.round(rect.height));
-    if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
-    }
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    context.clearRect(0, 0, width, height);
-    context.fillStyle = "#eee8d8";
-    context.fillRect(0, 0, width, height);
-
-    context.lineWidth = 0.55;
-    for (let index = 0; index < Math.min(700, Math.round(width * height / 1500)); index += 1) {
-      const x = seeded(index) * width;
-      const y = seeded(index + 900) * height;
-      const length = 3 + seeded(index + 1700) * 13;
-      context.strokeStyle = `rgba(82, 72, 56, ${0.018 + seeded(index + 2100) * 0.022})`;
-      context.beginPath();
-      context.moveTo(x, y);
-      context.lineTo(x + length, y + seeded(index + 3300) * 2 - 1);
-      context.stroke();
-    }
-
-    drawMountain(width, height, height * 0.58, height * 0.12, 0.09, 30);
-    drawMountain(width, height, height * 0.69, height * 0.15, 0.14, 170);
-    drawMountain(width, height, height * 0.82, height * 0.11, 0.21, 315);
-
-    context.strokeStyle = "rgba(32, 31, 29, 0.23)";
-    context.lineCap = "round";
-    for (let index = 0; index < 7; index += 1) {
-      const y = height * (0.79 + index * 0.022);
-      context.lineWidth = 1 + index * 0.55;
-      context.beginPath();
-      context.moveTo(width * 0.47 + offset * 0.5, y);
-      context.bezierCurveTo(width * 0.62, y - 11, width * 0.78, y + 8, width * 1.04, y - 4);
-      context.stroke();
-    }
-  }
-
-  const observer = new ResizeObserver(draw);
-  observer.observe(hero);
-
-  hero.addEventListener("pointermove", (event) => {
-    if (reduceMotion.matches) return;
-    const rect = hero.getBoundingClientRect();
-    offset = ((event.clientX - rect.left) / rect.width - 0.5) * 16;
-    window.cancelAnimationFrame(frame);
-    frame = window.requestAnimationFrame(draw);
-  });
-
-  hero.addEventListener("pointerleave", () => {
-    offset = 0;
-    window.cancelAnimationFrame(frame);
-    frame = window.requestAnimationFrame(draw);
-  });
-
-  draw();
-}
-
-showRoute("home", { scroll: false });
+showRoute(routeFromHash(), { scroll: false });
 loadCurrentUser();
-setupInkLandscape();
 
 let localRuntimeConfig = {};
 let runtimeModels = [];

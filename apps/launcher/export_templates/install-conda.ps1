@@ -1,4 +1,4 @@
-﻿param([string]$TargetPath='', [string]$CondaPath='', [switch]$Resume)
+﻿param([string]$TargetPath='', [string]$CondaPath='', [switch]$Resume, [ValidateSet('auto','mirror','official')][string]$Source='auto')
 $ErrorActionPreference='Stop'
 $env:PYTHONIOENCODING='utf-8'
 [Console]::OutputEncoding=New-Object Text.UTF8Encoding($false)
@@ -28,6 +28,17 @@ function Run-Stage([string]$name,[string]$command,[string[]]$commandArgs) {
 }
 try {
     if([Environment]::Is64BitOperatingSystem -ne $true) { throw '仅支持 Windows x64。' }
+    $stage='00-vc-runtime-check'
+    $vcReport=Join-Path $logRoot 'vc-runtime-check.json'
+    & (Join-Path $root 'ensure-vc-runtime.ps1') -ReportPath $vcReport | Out-Null
+    $vc=Get-Content -LiteralPath $vcReport -Raw -Encoding UTF8 | ConvertFrom-Json
+    if(-not $vc.ok) {
+        Write-Host '缺少 VC++ x64 运行库，正在自动安装；请允许系统权限提示。'
+        & (Join-Path $root 'ensure-vc-runtime.ps1') -Mode Install -ReportPath $vcReport | Out-Null
+        $vc=Get-Content -LiteralPath $vcReport -Raw -Encoding UTF8 | ConvertFrom-Json
+        if($vc.restart_required) { throw 'VC++ 运行库要求重启 Windows，请重启后重试部署。' }
+        if(-not $vc.ok) { throw ('VC++ x64 运行库自动安装未完成；可重试并允许权限提示，或双击 install-vc-runtime.cmd 手动安装。详情：'+($vc.problems -join '; ')) }
+    }
     if(-not $TargetPath) {
         Add-Type -AssemblyName System.Windows.Forms
         $picker=New-Object Windows.Forms.FolderBrowserDialog
@@ -74,7 +85,8 @@ try {
         if(Test-Path -LiteralPath $TargetPath) { throw 'Conda 引导未完成且目录已存在；请保留日志，选择新的空目录。' }
         Run-Stage '01-conda-create' $CondaPath @('env','create','--yes','--prefix',$TargetPath,'--file',(Join-Path $root 'conda-bootstrap.yml'))
     }
-    Run-Stage '02-install-locked-wheels' $CondaPath @('run','--no-capture-output','--prefix',$TargetPath,'python','-m','pip','--isolated','install','--require-hashes','--only-binary=:all:','--retries','5','--timeout','30','--cache-dir',(Join-Path $root 'pip-cache'),'-r',(Join-Path $root 'requirements.lock'),'--report',(Join-Path $root 'pip-install-report.json'))
+    Run-Stage '02-download-locked-wheels' $CondaPath @('run','--no-capture-output','--prefix',$TargetPath,'python',(Join-Path $root 'download-dependencies.py'),'--source',$Source)
+    Run-Stage '02-install-locked-wheels' $CondaPath @('run','--no-capture-output','--prefix',$TargetPath,'python','-m','pip','--isolated','install','--no-index','--find-links',(Join-Path $root 'wheels'),'--require-hashes','--only-binary=:all:','-r',(Join-Path $root 'requirements-offline.lock'),'--report',(Join-Path $root 'pip-install-report.json'))
     Run-Stage '03-check-dependencies' $CondaPath @('run','--no-capture-output','--prefix',$TargetPath,'python',(Join-Path $root 'check-environment.py'))
     Run-Stage '04-freeze-conda' $CondaPath @('list','--prefix',$TargetPath,'--explicit')
     Copy-Item -LiteralPath (Join-Path $logRoot '04-freeze-conda.log') -Destination (Join-Path $root 'conda-explicit.txt')

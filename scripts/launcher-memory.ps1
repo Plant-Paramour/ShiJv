@@ -11,7 +11,7 @@
         $watch = [Diagnostics.Stopwatch]::StartNew()
         while (-not $process.HasExited) {
             if ($script:form) { [Windows.Forms.Application]::DoEvents() }
-            if ($watch.Elapsed.TotalSeconds -gt 20 -or $script:cancelled) { $process.Kill(); throw '读取启动记忆超时或已取消' }
+            if ($watch.Elapsed.TotalSeconds -gt 120 -or $script:cancelled) { $process.Kill(); throw '读取启动记忆超时或已取消' }
             Start-Sleep -Milliseconds 40
         }
         if (-not (Test-Path -LiteralPath $reportFile)) { throw '无法读取启动记忆，请检查软件环境，或重新检测' }

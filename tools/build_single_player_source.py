@@ -22,22 +22,25 @@ FILES = {
     'README.md', '.gitignore', 'pyproject.toml', 'requirements-api.txt', 'requirements-gpu.txt',
     'launcher.ps1', 'start-single-player.ps1', '诗矩单机版.bat', '单机版使用说明.md',
     'scripts/launcher-instance.ps1', 'scripts/launcher-memory.ps1', 'scripts/launcher-models.ps1',
+    'scripts/data-directory.ps1',
+    'scripts/export-startup-diagnostics.ps1',
     'tools/environment-tool.ps1', 'tools/probe_managed_candidate.py',
     'tools/build_environment_tool.py', 'tools/EnvironmentDeployer.cs',
     'tools/build_single_player_source.py',
     'deploy/environment-tool/model.json', 'deploy/environment-tool/recommended-plan.json',
-    'deploy/environment-tool/small-models.json', 'tests/test_cpu_inference_support.py',
+    'deploy/environment-tool/small-models.json', 'deploy/environment-tool/cpu-torch.json', 'deploy/environment-tool/vc-runtime.json', 'tests/test_cpu_inference_support.py', 'tests/test_deployer_download.py', 'tests/test_deployer_install_target.py', 'tests/test_deployment_profiles.py', 'tests/test_deployer_diagnostics.py',
     'deploy/managed-runtime/windows-qwen35-bnb4-wheels.json',
     'docs/single-player-launcher.html', 'docs/environment-tool-user.md',
     'tests/test_single_player_runtime.py', 'tests/test_single_local_identity.py',
     'tests/test_local_runtime_config.py', 'tests/test_local_edition.py',
+    'tests/test_startup_diagnostics.py', 'tests/test_launcher_instance.py',
     'tests/conftest.py', 'tests/test_constraints.py', 'tests/test_rewrite_source.py', 'tests/test_tasks.py',
 }
 EXCLUDED = set()
 PUBLIC_HOSTS = {
     '127.0.0.1', 'localhost', '::1', 'testserver', 'www.w3.org', 'www.nvidia.com',
-    'modelscope.cn', 'www.modelscope.cn', 'api.nuget.org', 'pypi.org',
-    'files.pythonhosted.org', 'download.pytorch.org', 'download-r2.pytorch.org',
+    'modelscope.cn', 'www.modelscope.cn', 'api.nuget.org', 'aka.ms', 'download.visualstudio.microsoft.com', 'learn.microsoft.com', 'pypi.org',
+    'mirror.sjtu.edu.cn', 'mirrors.tuna.tsinghua.edu.cn', 'files.pythonhosted.org', 'download.pytorch.org', 'download-r2.pytorch.org',
     'docs.conda.io', 'pytorch.org', 'github.com', 'www.python.org', 'huggingface.co',
 }
 

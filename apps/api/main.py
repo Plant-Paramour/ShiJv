@@ -16,7 +16,7 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     from fastapi import FastAPI, Request
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-    from fastapi.staticfiles import StaticFiles
+    from .static_files import ApplicationStaticFiles
     from apps.agent.web_service import WebAgentService
     from .routes.agent import router as agent_router
     from .routes.conversations import router as conversations_router
@@ -41,6 +41,10 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     app.add_middleware(CORSMiddleware, allow_origin_regex='https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$', allow_credentials=False, allow_methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'], allow_headers=['Content-Type', 'Idempotency-Key'])
     app.router.on_shutdown.append(database.close)
     app.state.settings = active
+    from apps.launcher.build_info import build_info
+    app.state.build_info = build_info()
+    from .startup_diagnostics import router as diagnostics_router
+    app.include_router(diagnostics_router)
     app.state.database = database
     app.state.users = users
     app.state.turn_controller = TurnController()
@@ -59,9 +63,10 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     app.router.on_shutdown.append(app.state.local_runtime.stop)
 
     def auto_start_local_worker():
-        if read_config(active.database_path.parent)['auto_start']:
+        from .environment import selected_environment
+        if read_config(active.database_path.parent)['auto_start'] and selected_environment(active.database_path.parent)['local_enabled']:
             try:
-                app.state.local_runtime.start(os.getenv('SHIJU_CONTROL_URL', 'http://127.0.0.1:18763'))
+                app.state.local_runtime.start(os.getenv('SHIJU_CONTROL_URL', 'http://127.0.0.1:18763'), background=True)
             except Exception:
                 logging.getLogger(__name__).exception('本地生成器自动启动失败')
     app.router.on_startup.append(auto_start_local_worker)
@@ -138,7 +143,7 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     @app.get('/health/live', tags=['health'])
     def live():
         import sys
-        return {'status': 'ok', 'application': 'ShiJu', 'pid': os.getpid(), 'python': sys.executable, 'instance_id': os.getenv('SHIJU_INSTANCE_ID', ''), 'workspace': str(project_root), 'data_root': str(active.database_path.parent)}
+        return {'status': 'ok', 'application': 'ShiJu', 'pid': os.getpid(), 'python': sys.executable, 'instance_id': os.getenv('SHIJU_INSTANCE_ID', ''), 'workspace': os.getenv('SHIJU_LAUNCHER_WORKSPACE_ROOT', str(project_root)), 'data_root': str(active.database_path.parent), 'build': app.state.build_info}
 
     @app.get('/health/ready', tags=['health'])
     def ready():
@@ -165,10 +170,10 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
 
     @app.get('/', include_in_schema=False)
     def website():
-        return RedirectResponse('/web/prosody-checker/#home')
-    app.mount('/Rhyme', StaticFiles(directory=project_root / 'Rhyme'), name='rhyme-data')
-    app.mount('/Songci_Meter', StaticFiles(directory=project_root / 'Songci_Meter'), name='meter-data')
-    app.mount('/web', StaticFiles(directory=project_root / 'web', html=True), name='web')
+        return RedirectResponse('/web/prosody-checker/#chat')
+    app.mount('/Rhyme', ApplicationStaticFiles(directory=project_root / 'Rhyme'), name='rhyme-data')
+    app.mount('/Songci_Meter', ApplicationStaticFiles(directory=project_root / 'Songci_Meter'), name='meter-data')
+    app.mount('/web', ApplicationStaticFiles(directory=project_root / 'web', html=True), name='web')
     avatar_dir = active.database_path.parent / 'avatars'
     avatar_dir.mkdir(parents=True, exist_ok=True)
     app.add_middleware(RequestBodyLimitMiddleware, settings=active)

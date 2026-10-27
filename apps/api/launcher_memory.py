@@ -13,12 +13,18 @@ def environment_stamp(python):
     if not executable.is_file():
         raise ValueError('虚拟环境已不存在，请重新选择环境')
     files = [executable]
+    files += list(executable.parent.glob('python*._pth'))
+    custom = executable.parent / 'Lib/site-packages/sitecustomize.py'
+    if custom.is_file():
+        files.append(custom)
     packages = executable.parent / 'Lib' / 'site-packages'
     files += list(packages.glob('*.dist-info/METADATA'))
     project = Path(__file__).resolve().parents[2]
-    files += list((project / 'apps/api').rglob('*.py'))
-    files += [project / 'pyproject.toml', project / 'apps/launcher/environment_probe.py']
     records = [(str(p), p.stat().st_size, p.stat().st_mtime_ns) for p in sorted(set(files)) if p.is_file()]
+    sources = list((project / 'apps/api').rglob('*.py'))
+    sources += [project / 'pyproject.toml', project / 'apps/launcher/environment_probe.py']
+    records += [(p.relative_to(project).as_posix(), hashlib.sha256(p.read_bytes()).hexdigest())
+                for p in sorted(sources) if p.is_file()]
     return hashlib.sha256(json.dumps(records).encode()).hexdigest()
 
 
@@ -70,6 +76,27 @@ class LauncherMemory:
             if not report or not report.get('ok'):
                 return {'ok': False, 'reason': '请选择已通过完整验收的环境—模型配对；文件变更后需重新测试模型'}
         return {'ok': True, 'entry': target | {'model_path': model}}
+
+    def adopt_verified_pair(self, app, inference, model):
+        """Register both environments from one completed, current model test."""
+        report = verified_report(self.directory, model, inference)
+        core = (report or {}).get('application_environment', {})
+        if (not report or not report.get('ok') or not report.get('environment', {}).get('ok')
+                or not core.get('ok') or Path(core.get('python', '')).resolve() != Path(app).resolve()
+                or Path(report.get('python', '')).resolve() != Path(inference).resolve()
+                or report.get('application_stamp') != environment_stamp(app)
+                or report.get('inference_stamp') != environment_stamp(inference)):
+            raise ValueError('模型或环境在验收后发生变化，未保存配对；请重新完整测试模型')
+        self.remember(app, inference, True)
+        result = self.check(app, inference, True, model)
+        if not result['ok']:
+            raise ValueError(result['reason'])
+        data = self.read()
+        data['last_pair'] = result['entry']
+        entry = next(e for e in data['environments'] if self.key(e) == self.key(result['entry']))
+        if model not in entry['models']:
+            entry['models'].append(model)
+        self.save(data)
 
     def select_unverified(self, app, inference, local, model):
         if not Path(app).is_file() or (local and not Path(inference).is_file()):

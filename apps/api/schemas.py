@@ -49,7 +49,7 @@ class AgentProposalSubmitModel(BaseModel):
     model_config = ConfigDict(extra='forbid')
     conversation_id: str = Field(min_length=1, max_length=128)
     requirement: str = Field(max_length=12000)
-    candidate_count: int = Field(default=1, ge=1, le=20)
+    candidate_count: int = Field(default=1, ge=1, le=50)
     meter_type: str
     form_name: str
     variant_name: str | None = None
@@ -162,7 +162,7 @@ class GenerateJobModel(BaseModel):
     cipai_data_path: str = 'PoeTone-main/data/cipai_data.json'
     num_lines: int | None = None
     strict_polyphonic: bool = False
-    candidate_count: int = Field(default=1, ge=1, le=5)
+    candidate_count: int = Field(default=1, ge=1, le=20)
     task_options: dict[str, Any] = Field(default_factory=dict)
     sampling: SamplingModel = Field(default_factory=SamplingModel)
 
@@ -190,17 +190,23 @@ class RewriteJobModel(BaseModel):
     num_lines: int | None = None
     strict_polyphonic: bool = False
     strict_context: bool = True
-    candidate_count: int = Field(default=1, ge=1, le=20)
+    candidate_count: int = Field(default=1, ge=1, le=50)
     task_options: dict[str, Any] = Field(default_factory=dict)
     sampling: RewriteSamplingModel = Field(default_factory=lambda: RewriteSamplingModel(max_new_tokens=512))
 
 class PartialGenerateJobModel(RewriteJobModel):
     """统一的部分生成契约；补全场景不要求原诗和目标句号。"""
     original_text: str = ''
-    candidate_count: int = Field(default=1, ge=1, le=5)
+    candidate_count: int = Field(default=1, ge=1, le=50)
     sentence_inputs: dict[str, str] | None = None
     target_line_numbers: list[int] = Field(default_factory=list, max_length=64)
     theme: str = ''
+
+    @model_validator(mode='after')
+    def check_partial_candidate_count(self):
+        if self.candidate_count > 20 and not self.source_poem_id:
+            raise ValueError('部分生成的 candidate_count 必须在 1 到 20 之间')
+        return self
 
 class WorkerClaimModel(BaseModel):
     worker_id: str

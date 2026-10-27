@@ -1,9 +1,40 @@
 ﻿# Port and process ownership helpers. Never terminate an unidentified listener.
+function Get-LauncherBuildFingerprint([string]$Workspace) {
+    $names = @('apps/api/main.py','apps/api/static_files.py','apps/api/startup_diagnostics.py','web/prosody-checker/index.html','web/prosody-checker/site.js')
+    $hashes = foreach ($name in $names) {
+        $path = Join-Path $Workspace $name
+        if (Test-Path -LiteralPath $path -PathType Leaf) {
+            $fileSha = [Security.Cryptography.SHA256]::Create()
+            try { ([BitConverter]::ToString($fileSha.ComputeHash([IO.File]::ReadAllBytes($path)))).Replace('-','').ToLowerInvariant() } finally { $fileSha.Dispose() }
+        } else { 'missing' }
+    }
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($hashes -join '|'))))).Replace('-','').ToLowerInvariant() } finally { $sha.Dispose() }
+}
 function Get-LauncherHealth([int]$ServicePort) {
     try { return Invoke-RestMethod "http://127.0.0.1:$ServicePort/health/live" -TimeoutSec 2 } catch { return $null }
 }
+function Test-LauncherPathEqual([string]$Left, [string]$Right) {
+    if (-not $Left -or -not $Right) { return $false }
+    try {
+        return [IO.Path]::GetFullPath($Left).TrimEnd('\', '/') -ieq [IO.Path]::GetFullPath($Right).TrimEnd('\', '/')
+    } catch { return $false }
+}
 function Test-OurInstance($Health) {
-    return ($null -ne $Health -and $Health.application -eq 'ShiJu' -and $Health.workspace -ieq $root -and $Health.data_root -ieq $dataRoot)
+    if ($null -eq $Health -or $Health.application -ne 'ShiJu') { return $false }
+    $sameData = Test-LauncherPathEqual $Health.data_root $dataRoot
+    if ($sameData -and (Test-LauncherPathEqual $Health.workspace $root)) { return $true }
+    # Updated/extracted packages share the same data directory. Verify the running
+    # service rather than requiring its previous package location to match ours.
+    try {
+        $servicePid = 0
+        if (-not [int]::TryParse([string]$Health.pid, [ref]$servicePid) -or $servicePid -le 0) { return $false }
+        if (-not $Health.data_root -or -not $Health.workspace) { return $false }
+        # instance.json may have been overwritten by a later failed startup.
+        # The live endpoint and OS process identity are authoritative here.
+        $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId=$servicePid" -ErrorAction Stop
+        return ($null -ne $processInfo -and (Test-LauncherPathEqual $processInfo.ExecutablePath $Health.python) -and $processInfo.CommandLine -match '(?i)(?:^|\s)-m\s+apps\.(?:launcher\.serve|api\.main)(?:\s|$)')
+    } catch { return $false }
 }
 function Test-PortAvailable([int]$ServicePort) {
     $listener = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, $ServicePort)
@@ -42,6 +73,16 @@ function Show-LauncherInstanceChoice([bool]$Owned, [string]$Description) {
 }
 function Stop-LauncherInstance([int]$ServicePort) {
     $health = Get-LauncherHealth $ServicePort
+    if (-not (Test-OurInstance $health)) {
+        $instanceFile = Join-Path $dataRoot 'instance.json'
+        if (Test-Path -LiteralPath $instanceFile) {
+            $saved = Get-Content -LiteralPath $instanceFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            $candidate = Get-LauncherHealth ([int]$saved.port)
+            if ((Test-OurInstance $candidate) -and $candidate.pid -eq $saved.pid -and $candidate.instance_id -eq $saved.instance_id) {
+                $ServicePort = [int]$saved.port; $script:Port = $ServicePort; $health = $candidate
+            }
+        }
+    }
     if (-not (Test-OurInstance $health)) { throw '此端口未识别为当前诗矩的软件服务，未关闭任何其他程序。' }
     $before = Get-CimInstance Win32_Process -Filter "ProcessId=$($health.pid)"
     if (-not $before -or $before.ExecutablePath -ine $health.python -or $before.CommandLine -notmatch 'apps\.(launcher\.serve|api\.main)') { throw '无法核对服务进程身份，未停止任何进程。' }
@@ -62,12 +103,22 @@ function Stop-LauncherInstance([int]$ServicePort) {
         if (-not $after -or $after.CreationDate -ne $before.CreationDate -or $after.ExecutablePath -ine $before.ExecutablePath) { throw '进程身份已改变，未停止服务。' }
         Stop-Process -Id $health.pid -ErrorAction Stop
     }
-    for ($attempt = 0; $attempt -lt 100; $attempt++) {
+    for ($attempt = 0; $attempt -lt 300; $attempt++) {
         if (Test-PortAvailable $ServicePort) { return }
         if ($script:form) { [Windows.Forms.Application]::DoEvents() }
         Start-Sleep -Milliseconds 100
     }
-    throw '已发出退出请求，服务仍在关闭。请稍后再试；没有强制结束其他进程。'
+    # An open streaming connection can delay the HTTP server's graceful exit.
+    # Only terminate the same process whose identity was checked before shutdown.
+    $after = Get-CimInstance Win32_Process -Filter "ProcessId=$($health.pid)"
+    if ($after -and $after.CreationDate -eq $before.CreationDate -and $after.ExecutablePath -ieq $before.ExecutablePath -and $after.CommandLine -eq $before.CommandLine) {
+        Stop-Process -Id $health.pid -ErrorAction Stop
+        for ($attempt = 0; $attempt -lt 50; $attempt++) {
+            if (Test-PortAvailable $ServicePort) { return }
+            Start-Sleep -Milliseconds 100
+        }
+    }
+    throw '服务尚未释放端口，请查看启动日志中的退出信息。'
 }
 function Resolve-LauncherInstance([string]$AppPython, [string]$ModelPython, [bool]$Local) {
     # Find an owned service on its last saved port before considering a second instance.
@@ -82,10 +133,12 @@ function Resolve-LauncherInstance([string]$AppPython, [string]$ModelPython, [boo
     $health = Get-LauncherHealth $script:Port
     if (Test-OurInstance $health) {
         $runtime = Invoke-RestMethod "http://127.0.0.1:$script:Port/v1/local-runtime" -TimeoutSec 3
-        $sameEnvironment = ($health.python -ieq $AppPython -and $runtime.environment.local_enabled -eq $Local -and ((-not $Local) -or $runtime.environment.inference_python -ieq $ModelPython))
+        $sameBuild = ($health.build -and $health.build.fingerprint -eq (Get-LauncherBuildFingerprint $root))
+        $sameEnvironment = ($sameBuild -and (Test-LauncherPathEqual $health.data_root $dataRoot) -and $health.python -ieq $AppPython -and $runtime.environment.local_enabled -eq $Local -and ((-not $Local) -or $runtime.environment.inference_python -ieq $ModelPython))
         if ($sameEnvironment) { return $health }
-        if ($Headless) { throw '已有诗矩实例使用其他环境。请在启动器中选择“停止并重新启动”。' }
-        $choice = Show-LauncherInstanceChoice $true "诗矩已在运行，使用的环境与当前选择不同。`r`n$($health.python)`r`n地址：http://127.0.0.1:$script:Port`r`n打开已有软件，或等待任务完成后停止并使用当前环境重新启动。"
+        if ($Headless) { throw '已有诗矩实例的应用版本、环境或数据目录不同。请在启动器中选择“停止并重新启动”。' }
+        $versionNote = if ($sameBuild) { '应用版本一致；运行配置不同' } else { '旧版或不同版本服务：重新启动后才会应用本包修复' }
+        $choice = Show-LauncherInstanceChoice $true "$versionNote`r`n$($health.python)`r`n数据：$($health.data_root)`r`n地址：http://127.0.0.1:$script:Port`r`n打开已有软件，或等待任务完成后停止并使用当前配置重新启动。"
         if ($choice -eq 'open') { return $health }
         if ($choice -ne 'restart') { throw '已取消，原服务继续运行。' }
         Stop-LauncherInstance $script:Port

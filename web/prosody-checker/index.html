@@ -4,11 +4,116 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <base href="/web/prosody-checker/">
+  <meta name="shiju-release" content="20261027-startup-diagnostics-1">
+  <script id="shiju-startup-recorder">
+(function () {
+  "use strict";
+  var report = {schema: 1, release: "20261027-startup-diagnostics-1", page: location.origin + location.pathname + location.hash.split("?")[0], browser: navigator.userAgent, started_at: new Date().toISOString(), events: [], resources: [], health: null};
+  var failed = false, ready = false, panel, details, status, saveTimer;
+  function clean(value) {
+    return String(value == null ? "" : value).replace(/(Bearer\s+)[\w.\-]+/gi, "$1[redacted]").replace(/\bsk-[A-Za-z0-9_-]+/g, "[redacted]").replace(/((?:api[_-]?key|authorization|access[_-]?token|password|secret)["\s]*[:=]["\s]*)[^\s,";}]+/gi, "$1[redacted]").replace(/(https?:\/\/[^\s?"<>]+)\?[^\s"<>]+/g, "$1?[redacted]").slice(0, 4000);
+  }
+  function text() { return JSON.stringify(report, null, 2); }
+  function xhr(url, method, body, callback, blob) {
+    try {
+      var request = new XMLHttpRequest(); request.open(method, url, true); request.timeout = 5000;
+      if (blob) request.responseType = "blob";
+      if (body) request.setRequestHeader("Content-Type", "application/json");
+      request.onload = function () { callback(request, null); };
+      request.onerror = request.ontimeout = function () { callback(request, "连接失败或超时"); };
+      request.send(body || null);
+    } catch (error) { callback(null, clean(error.message)); }
+  }
+  function persist() {
+    while (new Blob([text()]).size > 44000 && report.events.length > 1) { report.events.shift(); report.truncated = true; }
+    try { localStorage.setItem("shiju:startup-diagnostics", text()); } catch (_) {}
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { xhr("/v1/startup-diagnostics/browser", "POST", text(), function () {}); }, 400);
+    if (details) details.textContent = text();
+  }
+  function record(kind, message, stack) {
+    report.events.push({time: new Date().toISOString(), kind: kind, message: clean(message), stack: clean(stack)});
+    if (report.events.length > 40) report.events.shift();
+    if (window.console) (kind === "error" ? console.error : console.info).call(console, "[ShiJu 启动诊断]", report.events[report.events.length - 1]);
+    if (kind === "error") { failed = true; if (panel) panel.open = true; }
+    if (status) status.textContent = failed ? "启动异常：请导出诊断文件发送给开发者" : (ready ? "启动完成 · 导出诊断" : "启动检查中 · 导出诊断");
+    persist();
+  }
+  window.ShijuStartup = {mark: function (stage) { record("stage", stage); }, fail: function (error) { record("error", error && error.message || error, error && error.stack); }, ready: function () { ready = true; record("stage", "初始化完成"); }, report: function () { return JSON.parse(text()); }};
+  window.addEventListener("error", function (event) {
+    if (event.target && event.target !== window) {
+      var resource = event.target.src || event.target.href;
+      if (resource && resource.indexOf(location.origin) === 0) record("error", "资源加载失败：" + resource);
+    } else {
+      var source = event.filename || "";
+      if (source && source.indexOf(location.origin) !== 0) return;
+      record("error", event.message + " @ " + source + ":" + event.lineno + ":" + event.colno, event.error && event.error.stack);
+    }
+  }, true);
+  window.addEventListener("unhandledrejection", function (event) { record("error", event.reason && event.reason.message || event.reason, event.reason && event.reason.stack); });
+  function download(blob, name) {
+    var url = URL.createObjectURL(blob), link = document.createElement("a");
+    link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  }
+  function exportReport() {
+    record("stage", "用户导出启动诊断");
+    xhr("/v1/startup-diagnostics/browser", "POST", text(), function (saved, error) {
+      if (error || !saved || saved.status !== 200) { download(new Blob([text()], {type: "application/json"}), "shiju-browser-diagnostics.json"); return; }
+      xhr("/v1/startup-diagnostics/export", "GET", null, function (result, failure) {
+        if (!failure && result && result.status === 200 && /application\/zip/i.test(result.getResponseHeader("Content-Type") || "")) download(result.response, "shiju-startup-diagnostics.zip");
+        else download(new Blob([text()], {type: "application/json"}), "shiju-browser-diagnostics.json");
+      }, true);
+    });
+  }
+  function inspect(url, health) {
+    xhr(url, "GET", null, function (response, error) {
+      if (health) {
+        if (error || !response || response.status !== 200) { record("error", "健康检查失败：" + (error || response.status)); return; }
+        try {
+          var data = JSON.parse(response.responseText);
+          report.health = {application:data.application, pid:data.pid, python:clean(data.python), workspace:clean(data.workspace), data_root:clean(data.data_root), instance_id:data.instance_id, build:data.build || null};
+          if (!data.build || data.build.release !== report.release) record("error", "前端与服务版本不一致，或正在运行不含诊断版本信息的旧服务");
+          persist();
+        } catch (failure) { record("error", "健康检查响应格式错误", failure.stack); }
+        return;
+      }
+      var type = response && response.getResponseHeader("Content-Type") || "";
+      var item = {url:url, status:response && response.status, content_type:type, cache_control:response && response.getResponseHeader("Cache-Control"), etag:response && response.getResponseHeader("ETag"), error:error};
+      var okay = !error && response && response.status === 200 && /^(text|application)\/(javascript|ecmascript)(;|$)/i.test(type);
+      if (!okay && response) item.error_body = clean(response.responseText.slice(0, 400));
+      report.resources.push(item);
+      if (!okay) record("error", "脚本响应异常：" + url + "；HTTP " + item.status + "；Content-Type=" + type + "；" + (error || ""));
+      else persist();
+    });
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    panel = document.createElement("details"); panel.id = "shiju-startup-diagnostics";
+    panel.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;max-width:calc(100vw - 24px);width:440px;box-sizing:border-box;background:#fffaf0;color:#29251f;border:1px solid #a99477;padding:12px;font:13px/1.6 sans-serif;box-shadow:0 4px 20px #0003";
+    status = document.createElement("summary"); status.textContent = "启动诊断 · 导出诊断"; panel.appendChild(status);
+    var explanation = document.createElement("p"); explanation.textContent = "包含启动错误、版本、资源响应及本机路径；不读取对话、数据库或模型密钥配置。展开下方可检查内容。"; panel.appendChild(explanation);
+    var button = document.createElement("button"); button.type = "button"; button.textContent = "导出诊断"; button.onclick = exportReport; panel.appendChild(button);
+    var copy = document.createElement("button"); copy.type = "button"; copy.textContent = "复制诊断"; copy.style.marginLeft = "10px";
+    copy.onclick = function () { if (navigator.clipboard) navigator.clipboard.writeText(text()).catch(function () { details.focus(); details.select(); }); else { details.focus(); details.select(); } }; panel.appendChild(copy);
+    details = document.createElement("textarea"); details.readOnly = true; details.style.cssText = "display:block;width:100%;height:220px;box-sizing:border-box;margin-top:10px;font:12px monospace"; panel.appendChild(details);
+    document.body.appendChild(panel); panel.open = failed;
+    record("stage", "HTML 诊断就绪（独立于模块）");
+    var modules = document.querySelectorAll('script[type="module"][src]');
+    for (var i = 0; i < modules.length; i++) inspect(modules[i].getAttribute("src"), false);
+    inspect("./core.js?startup-check=1", false);
+    inspect("./prosody-evaluation.js?startup-check=1", false);
+    inspect("/health/live", true);
+    setTimeout(function () { if (!ready) record("error", "启动 15 秒后尚未完成；查看最后成功阶段及资源响应"); }, 15000);
+  });
+  record("stage", "HTML 启动记录器已执行");
+}());
+  </script>
+
   <meta name="description" content="诗矩：面向中文诗词创作、对话与格律检查的前端原型。">
   <title>诗矩 · 中文诗词创作空间</title>
   <link rel="stylesheet" href="./han/han-scoped.css">
-  <link rel="stylesheet" href="./styles.css?v=96">
-  <link rel="stylesheet" href="./prosody-workbook.css?v=17">
+  <link rel="stylesheet" href="./styles.css?v=98">
+  <link rel="stylesheet" href="./prosody-workbook.css?v=18">
 </head>
 <body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
   <a class="han-skip-link" href="#main-content">跳到主要内容</a>
@@ -18,14 +123,13 @@
       <button class="nav-toggle han-navbar__toggle" type="button" aria-expanded="false" aria-controls="site-nav site-left-drawer" aria-label="打开主菜单">
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
       </button>
-      <a class="site-brand han-navbar__brand" href="#home" data-route-link="home" id="home-brand-link" aria-label="诗矩首页">
+      <a class="site-brand han-navbar__brand" href="#chat" data-route-link="chat" aria-label="诗矩 AI 对话">
         <span class="site-brand__name">诗矩</span>
         <span class="site-brand__seal" aria-hidden="true">矩</span>
       </a>
 
       <nav class="site-nav-shell" aria-label="主导航">
         <ul class="site-nav han-navbar__menu" id="site-nav">
-          <li class="han-navbar__item han-navbar__item--active"><a href="#home" data-route-link="home" id="home-nav-link" aria-current="page">首页</a></li>
           <li class="han-navbar__item"><a href="#chat" data-route-link="chat">AI 对话</a></li>
           <li class="han-navbar__item"><a href="#prosody" data-route-link="prosody">格律检测</a></li>
           <li class="han-navbar__item"><a href="#sentence-search" data-route-link="sentence-search">佳句检索</a></li>
@@ -34,7 +138,7 @@
 
       <div class="site-actions">
         <button class="account-entry" type="button" id="login-button" aria-label="打开用户菜单">
-          <span class="header-avatar user-avatar" id="header-avatar" aria-hidden="true">诗</span>
+          <span class="header-avatar user-avatar" id="header-avatar" aria-hidden="true">客</span>
           <span class="account-entry__label" id="account-entry-label">本地档案</span>
           <span class="notification-badge" id="header-notification-badge" hidden>0</span>
         </button>
@@ -58,7 +162,7 @@
   <aside class="site-drawer site-drawer--right" id="site-right-drawer" aria-label="用户菜单" aria-hidden="true">
     <header class="site-drawer__header site-drawer__header--account">
       <div class="drawer-account">
-        <span class="header-avatar user-avatar" id="drawer-avatar" aria-hidden="true">诗</span>
+        <span class="header-avatar user-avatar" id="drawer-avatar" aria-hidden="true">客</span>
         <div><strong id="drawer-user-name">本地档案</strong><small id="drawer-user-handle">仅保存在这台电脑</small></div>
       </div>
       <button class="drawer-close" type="button" data-drawer-close aria-label="关闭用户菜单">×</button>
@@ -68,7 +172,7 @@
       <button type="button" data-profile-drawer-tab="poems"><span class="drawer-menu__icon" aria-hidden="true">作</span><span>我的作品</span></button>
       <button type="button" data-profile-drawer-tab="favorites"><span class="drawer-menu__icon" aria-hidden="true">藏</span><span>收藏作品</span></button>
       <button type="button" data-profile-drawer-tab="archive"><span class="drawer-menu__icon" aria-hidden="true">档</span><span>归档对话</span></button>
-      <a href="#settings" data-drawer-route="settings"><span class="drawer-menu__icon" aria-hidden="true">设</span><span>模型与运行设置</span></a>
+      <a href="#settings" data-drawer-route="settings"><span class="drawer-menu__icon" aria-hidden="true">设</span><span>运行设置</span></a>
     </nav>
     <section class="drawer-notifications" aria-labelledby="drawer-notifications-title" hidden>
       <div class="drawer-section-heading"><h3 id="drawer-notifications-title">你的通知</h3><a href="#notifications" data-drawer-route="notifications">查看全部</a></div>
@@ -83,69 +187,7 @@
   </aside>
 
   <main id="main-content" tabindex="-1">
-    <section class="app-view home-view" data-view="home" aria-labelledby="home-title">
-      <section class="home-hero" aria-labelledby="home-title">
-        <canvas id="ink-landscape" class="ink-landscape" aria-hidden="true"></canvas>
-        <div class="paper-veil" aria-hidden="true"></div>
-        <div class="hero-shell">
-          <div class="hero-copy">
-            <p class="eyebrow">中文诗词创作空间</p>
-            <h1 id="home-title">诗矩</h1>
-            <p class="hero-lead">〔产品核心介绍文案占位〕</p>
-            <p class="hero-note">〔一句简短的产品价值说明占位〕</p>
-            <div class="hero-actions">
-              <a class="primary-button primary-button--large" href="#chat">进入对话</a>
-              <a class="text-link" href="#prosody">查看格律工具</a>
-            </div>
-          </div>
-
-          <aside class="register-panel" id="register" aria-labelledby="register-title">
-            <div class="register-panel__heading">
-              <div>
-                <p class="eyebrow">本地创作档案</p>
-                <h2 id="register-title">开始使用诗矩</h2>
-              </div>
-              <span class="register-mark" aria-hidden="true">矩</span>
-            </div>
-
-
-
-          </aside>
-        </div>
-      </section>
-
-      <section class="product-band" aria-labelledby="product-heading">
-        <div class="content-shell">
-          <header class="section-heading">
-            <p class="eyebrow">关于诗矩</p>
-            <h2 id="product-heading">〔产品介绍标题占位〕</h2>
-            <p>〔此处后续补充产品缘起、使用对象与核心能力。当前仅用于确认信息层级与版式节奏。〕</p>
-          </header>
-          <div class="product-pillars">
-            <article><span>一</span><h3>〔能力一占位〕</h3><p>〔简短说明占位〕</p></article>
-            <article><span>二</span><h3>〔能力二占位〕</h3><p>〔简短说明占位〕</p></article>
-            <article><span>三</span><h3>〔能力三占位〕</h3><p>〔简短说明占位〕</p></article>
-          </div>
-        </div>
-      </section>
-
-      <section class="journey-band" aria-labelledby="journey-heading">
-        <div class="content-shell journey-layout">
-          <div class="journey-intro">
-            <p class="eyebrow">先搭骨架，再添血肉</p>
-            <h2 id="journey-heading">四处入口，一套气韵</h2>
-            <p>当前版本先统一导航、页面密度与交互语言，业务能力将在后续迭代中逐步接入。</p>
-          </div>
-          <div class="journey-links">
-            <a href="#chat"><span>01</span><strong>AI 对话</strong><small>创作与推敲的主界面</small></a>
-            <a href="#prosody"><span>02</span><strong>格律检测</strong><small>保留现有检测能力</small></a>
-            <a href="#profile"><span>03</span><strong>个人作品</strong><small>整理和回看创作记录</small></a>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <section class="app-view chat-view" data-view="chat" aria-labelledby="chat-title" hidden>
+    <section class="app-view chat-view" data-view="chat" aria-labelledby="chat-title">
       <div class="chat-layout">
         <aside class="chat-sidebar" aria-label="对话列表">
           <div class="chat-sidebar__masthead">
@@ -215,7 +257,6 @@
       <div class="tool-shell profile-shell">
         <header class="profile-heading">
           <div class="profile-heading__title"><p class="eyebrow">诗人小笺</p><h1 id="profile-title">个人中心</h1></div>
-          <a class="quiet-button profile-settings-link" href="#settings">模型与运行设置 <span aria-hidden="true">↗</span></a>
         </header>
         <div class="profile-layout">
           <nav class="profile-sidebar" aria-label="个人中心导航">
@@ -223,6 +264,7 @@
             <button type="button" class="profile-tab" data-profile-tab="poems" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">作</span><span>我的作品</span></button>
             <button type="button" class="profile-tab" data-profile-tab="favorites" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">藏</span><span>我的收藏</span></button>
             <button type="button" class="profile-tab" data-profile-tab="archive" aria-current="false"><span class="profile-tab__mark" aria-hidden="true">卷</span><span>归档对话</span></button>
+            <a class="profile-tab profile-settings-link" href="#settings"><span class="profile-tab__mark" aria-hidden="true">设</span><span>运行设置</span></a>
           </nav>
           <div class="profile-content">
             <section class="profile-panel" data-profile-panel="account">
@@ -542,8 +584,8 @@
   </dialog>
 
   <div id="site-status" class="site-status" role="status" aria-live="polite"></div>
-  <script type="module" src="./site.js?v=131"></script>
-  <script type="module" src="./app.js?v=26"></script>
-  <script type="module" src="./sentence-search.js?v=17"></script>
+  <script type="module" src="./site.js?v=133"></script>
+  <script type="module" src="./app.js?v=27"></script>
+  <script type="module" src="./sentence-search.js?v=18"></script>
 </body>
 </html>

@@ -1,18 +1,24 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kind": "shiju-environment-plan",
   "route": "official",
-  "warning": "官方固定模型；环境仍须在本机真实验证",
+  "profile": "cuda-bnb",
+  "warning": "推荐固定模型；环境仍须在本机真实验证",
   "hardware": {
     "os": "windows",
     "arch": "x64",
     "min_windows_build": 19041,
+    "device": "cuda",
     "min_driver": "560.76",
     "compute_capabilities": [
-      "8.9"
+      "7.5",
+      "8.0",
+      "8.6",
+      "8.9",
+      "9.0"
     ],
-    "min_vram_bytes": 8000000000,
-    "scope": "开发机候选规则，其他 GPU 尚未验证"
+    "min_vram_bytes": 2000000000,
+    "scope": "GPU 按本机实测验收；不符合条件时使用 CPU FP32"
   },
   "python": {
     "version": "3.12.10",
@@ -89,10 +95,10 @@
   },
   "inference": {
     "precision": "4bit",
-    "reason": "采用已有 8GB GPU 实测的 BNB NF4 组合"
+    "reason": "GPU BNB NF4 + Triton；硬件预算仅供预选，须通过本机真实生成验收"
   },
   "framework": {
-    "engine_sha256": "3757914d2523608f6e73e6017e33b12dccec90a3ae12b0055a673849a7419e7c"
+    "engine_sha256": "5ab140d0ccdd92e24ca3a169e96251b9a3f9d4f5a75a1525ba7a05c02cec7661"
   },
   "dependencies": [
     {

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 import time
 from collections.abc import Sequence
 
@@ -22,6 +23,8 @@ from ..end_tokens import eos_token_ids, pad_token_id
 from .result import ModelSettings
 from .diagnostics import TimedCallable, runtime_diagnostics
 from .session import CancellationCriteria, GenerationCancelled
+
+logger = logging.getLogger(__name__)
 
 
 class ModelRunner:
@@ -214,6 +217,7 @@ class ModelRunner:
                     if torch.cuda.is_available():
                         torch.cuda.synchronize()
                     timings["first_generated_token_seconds"] = time.perf_counter() - generation_started
+                    logger.info('首个生成 token：%.3f 秒', timings['first_generated_token_seconds'])
                 timings["output_tokens"] += count
                 if count:
                     timings["last_generated_token_seconds"] = time.perf_counter() - generation_started
@@ -221,8 +225,11 @@ class ModelRunner:
             def on_finalized_text(self, text, stream_end=False):
                 if text and timings["first_text_produced_seconds"] is None:
                     timings["first_text_produced_seconds"] = time.perf_counter() - generation_started
+                    logger.info('首段可显示文本：%.3f 秒', timings['first_text_produced_seconds'])
                 return super().on_finalized_text(text, stream_end=stream_end)
         streamer = MeasuredStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+        logger.info('开始流式生成：device=%s input_tokens=%s max_new_tokens=%s cpu_threads=%s',
+                    model.device, inputs['input_ids'].shape[1], sampling.max_new_tokens, torch.get_num_threads())
         measured_processors = [TimedCallable(p) for p in (logits_processors or ())]
         kwargs = dict(inputs, streamer=streamer, max_new_tokens=sampling.max_new_tokens,
                       eos_token_id=self._generation_eos_token_ids(tokenizer, model),
@@ -242,10 +249,12 @@ class ModelRunner:
                 if torch.cuda.is_available(): torch.cuda.synchronize()
                 first_forward_started = time.perf_counter()
                 timings["first_forward_started_seconds"] = first_forward_started - generation_started
+                logger.info('开始首次模型前向计算')
         def after_forward(module, args, output):
             if forward_count == 1 and first_forward_started is not None:
                 if torch.cuda.is_available(): torch.cuda.synchronize()
                 timings["first_forward_seconds"] = time.perf_counter() - first_forward_started
+                logger.info('首次模型前向计算完成：%.3f 秒', timings['first_forward_seconds'])
         before_hook = model.register_forward_pre_hook(before_forward) if hasattr(model, "register_forward_pre_hook") else None
         after_hook = model.register_forward_hook(after_forward) if hasattr(model, "register_forward_hook") else None
         def run():

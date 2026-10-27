@@ -4264,6 +4264,7 @@ body.has-open-drawer { overflow: hidden; }
 }
 .profile-tab {
   display: flex;
+  letter-spacing: 0;
   min-height: 44px;
   align-items: center;
   gap: 11px;
@@ -4283,6 +4284,7 @@ body.has-open-drawer { overflow: hidden; }
   font-family: var(--han-font-song, serif);
   font-size: 12px;
 }
+.profile-settings-link { text-decoration: none; }
 .profile-tab:hover, .profile-tab.is-active {
   border: 0;
   background: color-mix(in srgb, var(--site-surface) 76%, var(--site-paper-deep));
@@ -4342,7 +4344,7 @@ body.has-profile-prosody-inspector .profile-sidebar { display: none; }
 }
 .profile-panel .forum-search { width: min(280px, 100%); }
 .profile-panel .forum-search input { width: 100%; }
-.account-settings-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(230px, .8fr); align-items: start; gap: 18px; }
+.account-settings-grid { display: block; }
 .account-form {
   width: 100%;
   min-width: 0;
@@ -4350,7 +4352,7 @@ body.has-profile-prosody-inspector .profile-sidebar { display: none; }
   background: color-mix(in srgb, var(--site-surface) 78%, transparent);
   padding: 20px;
 }
-.account-form--profile { grid-row: span 2; }
+.account-form--profile { width: 100%; box-sizing: border-box; }
 .account-form--security { align-self: start; }
 .account-form__heading {
   display: flex;
@@ -5455,15 +5457,15 @@ body.has-profile-prosody-inspector .profile-sidebar { display: none; }
 .drawer-account small { margin-top: 3px; font-size: 12px; }
 .site-drawer__header--account .drawer-close { flex: 0 0 34px; color: var(--site-ink-soft); }
 .drawer-menu--account { gap: 3px; padding: 18px 0 20px; }
-.drawer-menu--account button {
+.drawer-menu--account :is(button, a) {
   min-height: 52px;
   gap: 13px;
   border-bottom: 1px solid color-mix(in srgb, var(--site-line) 52%, transparent);
   font-size: 15px;
   transition: background-color 140ms ease, color 140ms ease;
 }
-.drawer-menu--account button:last-child { border-bottom: 0; }
-.drawer-menu--account button:hover { color: var(--site-red-dark); }
+.drawer-menu--account :is(button, a):last-child { border-bottom: 0; }
+.drawer-menu--account :is(button, a):hover { color: var(--site-red-dark); }
 .drawer-menu--account .drawer-menu__icon {
   width: 30px;
   height: 30px;
@@ -5505,7 +5507,7 @@ body.has-profile-prosody-inspector .profile-sidebar { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .site-nav a,
-  .drawer-menu--account button,
+  .drawer-menu--account :is(button, a),
   .drawer-signout { transition: none; }
 }
 

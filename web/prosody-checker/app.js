@@ -5,11 +5,11 @@ import {
   evaluateTang,
   evaluateBestTangForm,
   formatMeterTemplate,
-} from "./core.js?v=12";
+} from "./core.js?v=13";
 import {
   getLexicon,
-} from "./prosody-evaluation.js?v=9";
-import { getDatasetJson } from "./dataset-cache.js?v=2";
+} from "./prosody-evaluation.js?v=10";
+import { getDatasetJson } from "./dataset-cache.js?v=3";
 
 let METER_FILES = [];
 let meterCatalog = [];

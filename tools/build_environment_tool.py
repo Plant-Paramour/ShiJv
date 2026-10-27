@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +52,12 @@ def build(output):
                   python_download_bytes=14515433, wheels_download_bytes=sum(w['bytes'] for w in wheels),
                   model_download_bytes=sum(w['bytes'] for w in json.loads((ROOT / 'deploy/environment-tool/model.json').read_text())['files'].values()),
                   clean_windows_gpu_accepted=False)
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from apps.launcher.deployment_profiles import PROFILES, wheels as profile_wheels
+    report['profiles'] = {name: dict(wheel_count=len(profile_wheels(name)),
+                                    download_bytes=sum(w['bytes'] for w in profile_wheels(name)))
+                          for name in PROFILES}
     output.with_suffix('.build.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps(report))
 

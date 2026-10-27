@@ -97,8 +97,8 @@ class GeneratePoemRequest:
         for name in ("meter_type", "form_name", "rhyme_dict_name"):
             if not str(getattr(self, name)).strip():
                 raise ContractError(f"{name} 不能为空")
-        if not 1 <= self.candidate_count <= 5:
-            raise ContractError("candidate_count 必须在 1 到 5 之间")
+        if not 1 <= self.candidate_count <= 20:
+            raise ContractError("candidate_count 必须在 1 到 20 之间")
         if self.rhyme_mode not in {"auto", "fixed", "random"}:
             raise ContractError("rhyme_mode 必须是 auto、fixed 或 random")
         if self.rhyme_mode == "fixed" and not self.rhyme_parts:
@@ -170,8 +170,8 @@ class RewritePoemRequest:
             raise ContractError("每次必须指定一至六十四句")
         if any(number <= 0 for number in normalized):
             raise ContractError("target_line_numbers 使用从 1 开始的正整数")
-        if not 1 <= self.candidate_count <= 20:
-            raise ContractError("rewrite 的 candidate_count 必须在 1 到 20 之间")
+        if not 1 <= self.candidate_count <= 50:
+            raise ContractError("rewrite 的 candidate_count 必须在 1 到 50 之间")
         if self.rhyme_mode not in {"auto", "fixed", "random"}:
             raise ContractError("rhyme_mode 必须是 auto、fixed 或 random")
         if self.rhyme_mode == "fixed" and not self.rhyme_parts:
@@ -203,8 +203,9 @@ class PartialGeneratePoemRequest(RewritePoemRequest):
         super().__post_init__()
         if "omit_original_target_from_prompt" in self.task_options:
             raise ContractError("omit_original_target_from_prompt 仅适用于 rewrite，不适用于部分生成")
-        if self.candidate_count > 5:
-            raise ContractError("部分生成的 candidate_count 必须在 1 到 5 之间")
+        # The unified sentence editor also uses this request for saved-work rewrites.
+        if self.candidate_count > 20 and not self.source_poem_id:
+            raise ContractError("部分生成的 candidate_count 必须在 1 到 20 之间")
 
 
 @dataclass(frozen=True)

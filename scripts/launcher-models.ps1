@@ -40,14 +40,14 @@
             }
             if (-not $Scanning -and (-not [IO.Path]::IsPathRooted($selected) -or $selected.Contains('"'))) { throw '请先选择模型绝对路径' }
             $arguments = '-m apps.launcher.model_probe --output "{0}" --data-dir "{1}"' -f $reportFile, $dataRoot
-            if ($Scanning) { $arguments += ' --scan' } else { $arguments += (' --model "{0}"' -f $selected) }
+            if ($Scanning) { $arguments += ' --scan' } else { $arguments += (' --model "{0}" --application-python "{1}"' -f $selected, $appBox.Text.Trim()) }
             $info = New-PythonProcessInfo $state.python $arguments
             $state.process = [Diagnostics.Process]::Start($info)
             $state.process.BeginOutputReadLine(); $state.process.BeginErrorReadLine()
             $watch = [Diagnostics.Stopwatch]::StartNew(); $details.Text = '正在检查，请稍候。关闭此窗口可取消测试。'
             while (-not $state.process.HasExited) {
                 [Windows.Forms.Application]::DoEvents()
-                if ($state.cancelled -or $watch.Elapsed.TotalSeconds -gt 900) { $state.process.Kill(); throw '测试取消或超时（15 分钟）；未验收通过' }
+                if ($state.cancelled -or $watch.Elapsed.TotalSeconds -gt 7200) { $state.process.Kill(); throw '测试取消或超时（120 分钟）；未验收通过' }
                 if (Test-Path -LiteralPath $reportFile) {
                     try { $progress = Get-Content $reportFile -Raw -Encoding UTF8 | ConvertFrom-Json; $details.Text = (($progress.checks | ForEach-Object { "$($_.name)：$($_.state)`r`n$($_.detail)`r`n" }) -join "`r`n") } catch {}
                 }
@@ -86,6 +86,8 @@
     }
     if ($Smoke) { $count = $dialog.Controls.Count; $dialog.Dispose(); return $count }
     [void]$dialog.ShowDialog($form)
+    # Keep a successful acceptance when returning with the window close button.
+    if (-not $state.untested -and $state.testedPath -and $state.testedPath -eq $choice.Text.Trim()) { $state.chosen = $true }
     if ($state.chosen) {
         $script:selectedPoetryModel = $state.testedPath
         if ($state.untested) {
@@ -93,11 +95,8 @@
             $statusBox.Text = '已选择未验证模型。点击直接启动时会先提示，再次点击可确认忽略验收。'
             $dialog.Dispose(); return
         }
-        $remembered = Invoke-LauncherMemory 'check' $appBox.Text $modelBox.Text $localCheck.Checked $state.testedPath
-        if (-not $remembered.ok) {
-            $environmentCheck = Test-SelectedEnvironments $appBox.Text $modelBox.Text $localCheck.Checked
-            if (-not $environmentCheck.ok) { $statusBox.Text = '软件环境未通过检查，请重新选择软件环境。'; $dialog.Dispose(); return }
-        }
+        $selectedPair = Invoke-LauncherMemory 'select' $appBox.Text $state.python $localCheck.Checked $state.testedPath
+        if (-not $selectedPair.ok) { $statusBox.Text = $selectedPair.reason; $dialog.Dispose(); return }
         Update-RememberedPairs
         $script:selectedPoetryModel = $state.testedPath
         $poetryButton.Text = '已验证模型：' + (Split-Path $state.testedPath -Leaf) + '（点击可更换）'
