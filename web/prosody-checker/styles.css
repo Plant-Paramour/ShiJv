@@ -1808,6 +1808,7 @@ input[type="search"] {
 .tool-activity__list { display: grid; align-content: start; gap: 6px; }
 .tool-activity__narration { display: block; min-height: 0; height: auto; margin: 0; padding: 0; color: var(--site-ink); font: inherit; font-size: 14px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .tool-activity__narration, .message-text { white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+.message-text .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
 .tool-activity__narration > :first-child, .message-text > :first-child { margin-top: 0; }
 .tool-activity__narration > :last-child, .message-text > :last-child { margin-bottom: 0; }
 .tool-activity__narration p, .message-text p { margin: 0 0 .35em; }
@@ -2022,6 +2023,8 @@ input[type="search"] {
 .proposal-editor__example { color: var(--site-ink-soft); font-size: 10px; line-height: 1.35; opacity: .82; }
 .proposal-editor__rhyme-lock { display: block; margin-top: 4px; color: var(--site-red-dark); font-size: 11px; line-height: 1.45; }
 
+.proposal-editor__checks { display: flex; grid-column: 1 / -1; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
+.proposal-editor__checks[hidden] { display: none; }
 .proposal-editor__check {
   display: flex !important;
   min-height: 39px;
@@ -2034,6 +2037,9 @@ input[type="search"] {
 .proposal-editor__check input {
   width: 16px;
   height: 16px;
+  min-height: 0;
+  margin: 0;
+  flex: 0 0 16px;
 }
 
 .proposal-editor__actions {
@@ -3804,6 +3810,10 @@ input:focus {
 .job-progress__results-heading span { color: var(--site-red-dark); font-size: 10px; letter-spacing: 0; }
 .job-progress__results-heading h3 { font-size: 18px; }
 .job-progress__scrolls { display: grid; gap: 24px; }
+.job-progress__scrolls > .poem-handscroll[hidden], .job-progress__scroll-nav[hidden] { display: none !important; }
+.job-progress__scroll-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+.job-progress__scroll-nav .quiet-button:disabled { color: #888; border-color: #ccc; background: #eee; opacity: 1; cursor: not-allowed; box-shadow: none; }
+.job-progress__scroll-position { color: var(--site-ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
 
 .poem-handscroll {
   position: relative;

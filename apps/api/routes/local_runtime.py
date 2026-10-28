@@ -163,9 +163,18 @@ def stop_worker(request: Request):
 
 @router.post("/shutdown")
 def shutdown_application(request: Request):
+    return _stop_application(request, restart=False)
+
+
+@router.post("/restart")
+def restart_application(request: Request):
+    return _stop_application(request, restart=True)
+
+
+def _stop_application(request: Request, *, restart: bool):
     from starlette.background import BackgroundTask
     from fastapi.responses import JSONResponse
-    callback = getattr(request.app.state, "launcher_shutdown", None)
+    callback = getattr(request.app.state, "launcher_restart" if restart else "launcher_shutdown", None)
     if callback is None:
         raise HTTPException(404, "当前实例未由新启动器管理")
     runtime = request.app.state.local_runtime
@@ -175,4 +184,4 @@ def shutdown_application(request: Request):
         if runtime.status()["state"] in {"ready", "loading", "released"} and db.execute("SELECT 1 FROM jobs WHERE status='queued' LIMIT 1").fetchone():
             raise HTTPException(409, "生成器还有排队任务，请完成或取消后再退出")
     runtime.stop()
-    return JSONResponse({"status": "stopping"}, background=BackgroundTask(callback))
+    return JSONResponse({"status": "restarting" if restart else "stopping"}, background=BackgroundTask(callback))

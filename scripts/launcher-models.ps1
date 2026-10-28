@@ -1,5 +1,5 @@
 ﻿function Show-ModelSelection {
-    param([switch]$Smoke)
+    param([switch]$Smoke, [switch]$Recheck)
     $dialog = New-Object Windows.Forms.Form
     $dialog.Text = '本地模型 · 选择与验收'; $dialog.ClientSize = New-Object Drawing.Size(880, 650)
     $dialog.StartPosition = 'CenterParent'; $dialog.Font = $form.Font; $dialog.BackColor = $form.BackColor
@@ -85,9 +85,13 @@
         if ($choice.Items.Count -lt 1) { throw ("模型窗口扫描自测失败：" + $details.Text) }
     }
     if ($Smoke) { $count = $dialog.Controls.Count; $dialog.Dispose(); return $count }
+    if ($Recheck) {
+        $dialog.Add_Shown({ & $invoke $false })
+    }
     [void]$dialog.ShowDialog($form)
     # Keep a successful acceptance when returning with the window close button.
     if (-not $state.untested -and $state.testedPath -and $state.testedPath -eq $choice.Text.Trim()) { $state.chosen = $true }
+    if ($Recheck -and -not $state.chosen) { $statusBox.Text = '配对未通过检测或检测已取消；请查看测试窗口中的结果后重试。' }
     if ($state.chosen) {
         $script:selectedPoetryModel = $state.testedPath
         if ($state.untested) {
@@ -100,6 +104,7 @@
         Update-RememberedPairs
         $script:selectedPoetryModel = $state.testedPath
         $poetryButton.Text = '已验证模型：' + (Split-Path $state.testedPath -Leaf) + '（点击可更换）'
+        if ($Recheck) { $statusBox.Text = '环境与模型配对已通过完整检测，可以直接启动。' }
     }
     $dialog.Dispose()
 }

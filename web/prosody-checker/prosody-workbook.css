@@ -262,6 +262,23 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
 .settings-steps li > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border: 1px solid var(--site-line-strong); color: var(--site-red-dark); font-family: var(--han-font-song, serif); }
 .settings-steps strong { display: block; font-size: 13px; font-weight: 500; }
 .settings-steps small { display: block; margin-top: 5px; font-size: 11px; color: var(--site-ink-soft); line-height: 1.7; }
+.settings-chat-guide { margin: 24px 0; padding: 20px; border: 1px solid var(--site-line); background: var(--site-paper-deep); }
+.settings-chat-demo { max-width: 560px; margin-inline: auto; padding: 16px; border: 1px solid var(--site-line-strong); border-radius: 14px; background: var(--site-surface); }
+.settings-chat-demo__input { min-height: 48px; color: var(--site-ink-soft); font-size: 14px; }
+.settings-chat-demo__toolbar, .settings-chat-demo__actions { display: flex; align-items: center; gap: 10px; }
+.settings-chat-demo__toolbar { justify-content: space-between; gap: 12px; }
+.settings-chat-demo__model { color: var(--site-ink-soft); font-size: 12px; }
+.settings-chat-demo__actions { flex-shrink: 0; }
+.settings-chat-demo__icon { display: grid; place-items: center; width: 32px; height: 32px; color: var(--site-ink-soft); }
+.settings-chat-demo__icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.settings-chat-demo .settings-chat-demo__target { border: 1px solid var(--site-red); background: color-mix(in srgb, var(--site-red) 8%, var(--site-surface)); color: var(--site-red-dark); cursor: default; }
+.settings-chat-demo__send { border-radius: 50%; background: var(--site-ink); color: var(--site-surface); }
+.settings-chat-guide figcaption { display: grid; gap: 6px; max-width: 560px; margin: 14px auto 0; font-size: 12px; line-height: 1.9; color: var(--site-ink-soft); }
+.settings-chat-guide figcaption strong, .settings-chat-guide a { color: var(--site-red-dark); }
+#backup-restart-dialog { box-sizing: border-box; width: min(440px, calc(100% - 32px)); margin: auto; padding: 28px; border: 1px solid var(--site-line-strong); background: var(--site-paper); color: var(--site-ink); box-shadow: 0 16px 50px rgb(28 25 21 / 18%); }
+#backup-restart-dialog h2 { margin: 0 0 12px; font-family: var(--han-font-song, serif); font-size: 22px; }
+#backup-restart-dialog p { margin: 0; color: var(--site-ink-soft); font-size: 14px; line-height: 1.8; }
+@media (max-width: 620px) { .settings-chat-guide { padding: 14px; } .settings-chat-demo { padding: 12px; } .settings-chat-demo__actions { gap: 6px; } }
 .settings-view #local-model-scan { margin: -4px 0 22px; }
 .settings-view #local-generator-form > label:not(.field) { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.8; }
 .settings-view #local-model-auto { flex: 0 0 auto; width: 15px; height: 15px; margin: 4px 0 0; }

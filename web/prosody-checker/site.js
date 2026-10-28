@@ -2,8 +2,9 @@ import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation
 import { flattenMeter } from "./core.js?v=13";
 import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
 import { getDatasetJson } from "./dataset-cache.js?v=3";
-import { renderChatMarkdown } from "./chat-markdown.js?v=2";
+import { renderChatMarkdown } from "./chat-markdown.js?v=3";
 import { createStreamingText } from "./stream-text.js?v=2";
+import renderMathInElement from "./vendor/katex/auto-render.mjs";
 
 window.ShijuStartup?.mark("入口模块及静态依赖执行成功");
 
@@ -318,7 +319,6 @@ const chatAttachmentPreview = document.querySelector("#chat-attachment-preview")
 const chatPromptButton = document.querySelector("#chat-prompt-button");
 const chatThreadScroll = document.querySelector("#chat-thread-scroll");
 const chatThread = document.querySelector("#chat-thread");
-const chatWelcome = document.querySelector("#chat-welcome");
 const chatLayout = document.querySelector(".chat-layout");
 const conversationSearch = document.querySelector("#conversation-search");
 const conversationSearchInput = document.querySelector("#conversation-search-input");
@@ -378,9 +378,9 @@ function openChatPromptChooser() {
           <button type="submit" class="icon-button" aria-label="关闭">×</button>
         </header>
         <div class="chat-prompt-chooser__options">
-          <button type="button" data-prompt-mode="full"><strong>生成整首诗词</strong><span>写下创作要求，选择体裁和格律，生成完整作品。</span></button>
-          <button type="button" data-prompt-mode="partial"><strong>生成部分诗词</strong><span>补完残稿，或指定原诗中的句子进行改写。</span></button>
-          <button type="button" data-prompt-mode="rewrite"><strong>局部重写</strong><span>导入作品 ID，选择需要重写的句子，保留其余上下文。</span></button>
+          <button type="button" data-prompt-mode="full"><strong>完整生成</strong><span>写下创作要求，选择体裁和格律，生成完整作品。</span></button>
+          <button type="button" data-prompt-mode="partial"><strong>诗词补完</strong><span>补完残稿，或指定原诗中的句子进行改写。</span></button>
+          <button type="button" data-prompt-mode="rewrite"><strong>局部重写</strong><span>导入作品ID，选择需要重写的句子，保留其余上下文。</span></button>
         </div>
       </form>`;
     dialog.querySelectorAll("[data-prompt-mode]").forEach((button) => {
@@ -423,12 +423,13 @@ async function openDirectGenerationEditor(mode) {
       rhyme_mode: "auto",
       rhyme_parts: {},
       fixed_lines: {},
-      task_options: isRewrite ? { omit_original_target_from_prompt: true } : { allow_aojiu: true },
+      task_options: isRewrite ? { omit_original_target_from_prompt: true } : {},
       strict_polyphonic: false,
     },
   };
   if (isRewrite) prepared.proposal.rewrite_mode = true;
   const panel = appendProposalEditor(prepared);
+  if (panel) panel.open = true;
   panel?.scrollIntoView({ behavior: "smooth", block: "center" });
   panel?.querySelector("textarea")?.focus({ preventScroll: true });
 }
@@ -2338,7 +2339,7 @@ function setUserAvatar(element, user) {
   if (!element) return;
   element.replaceChildren();
   const url = user?.avatar_url;
-  if (url && /^\/media\/avatars\/[\w.-]+$/.test(url)) {
+  if (url && /^\/(?:media\/avatars|v1\/profile\/avatar-file)\/[\w.-]+$/.test(url)) {
     const img = document.createElement("img"); img.src = url; img.alt = ""; element.append(img);
   } else element.textContent = "客";
 }
@@ -2475,10 +2476,14 @@ document.querySelector("#backup-download")?.addEventListener("click", async (eve
     const response = await fetch("/v1/backup");
     if (!response.ok) throw new Error((await response.json()).detail || "备份失败");
     const blob = await response.blob();
+    if (!blob.size) throw new Error("备份文件为空，请重试并检查服务运行状态。");
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a"); link.href = url;
     link.download = `shiju-backup-${new Date().toISOString().slice(0, 10)}.zip`;
-    link.click(); URL.revokeObjectURL(url); status.textContent = "备份已下载。";
+    document.body.append(link);
+    link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    status.textContent = "已发起下载，请在浏览器下载列表中确认文件已保存。";
   } catch (error) { status.textContent = error.message; }
   finally { button.disabled = false; }
 });
@@ -2487,15 +2492,44 @@ document.querySelector("#backup-restore-file")?.addEventListener("change", async
   const file = event.target.files?.[0];
   const status = document.querySelector("#backup-status");
   if (!file) return;
+  if (!file.size) { status.textContent = "所选备份文件为空，请选择已完整下载的 ZIP 备份。"; event.target.value = ""; return; }
   if (!window.confirm("恢复备份会替换当前本机作品和数据。确定继续吗？")) { event.target.value = ""; return; }
   status.textContent = "正在校验并恢复……";
   try {
     const response = await fetch("/v1/backup/restore", { method: "POST", headers: { "Content-Type": "application/zip" }, body: file });
     const result = await response.json();
     if (!response.ok) throw new Error(result.detail || "恢复失败");
-    status.textContent = "恢复完成，请重启诗矩。";
+    status.textContent = "恢复完成，重启后生效。";
+    const dialog = document.querySelector("#backup-restart-dialog");
+    dialog.returnValue = "later";
+    dialog.showModal();
   } catch (error) { status.textContent = error.message; }
   finally { event.target.value = ""; }
+});
+
+document.querySelector("#backup-restart-dialog")?.addEventListener("close", async (event) => {
+  if (event.currentTarget.returnValue !== "restart") return;
+  const status = document.querySelector("#backup-status");
+  try {
+    const previous = await apiFetch("/health/live");
+    status.textContent = "正在重启诗矩……";
+    await apiFetch("/v1/local-runtime/restart", { method: "POST" });
+    const deadline = Date.now() + 60_000;
+    while (Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      try {
+        const response = await fetch("/health/live", { cache: "no-store" });
+        const health = await response.json();
+        if (response.ok && health.instance_id && health.instance_id !== previous.instance_id) {
+          window.location.reload();
+          return;
+        }
+      } catch { /* The service is temporarily unavailable during restart. */ }
+    }
+    status.textContent = "重启尚未完成，请稍后刷新页面，或在启动器中检查服务状态。";
+  } catch (error) {
+    status.textContent = `无法立即重启：${error.message}。请在启动器中重新启动诗矩。`;
+  }
 });
 
 document.addEventListener("visibilitychange", () => {
@@ -2538,10 +2572,9 @@ function appendMessage(text, role, state = "", meta = {}) {
   }
   const content = document.createElement("div");
   content.className = "message-content";
-  const paragraph = document.createElement(role === "assistant" ? "div" : "p");
+  const paragraph = document.createElement("div");
   paragraph.className = "message-text";
-  if (role === "assistant") paragraph.innerHTML = renderChatMarkdown(text);
-  else paragraph.textContent = text;
+  renderMessageContent(paragraph, text);
   content.append(paragraph);
   for (const image of meta.images || []) {
     if (!/^data:image\/(?:png|jpeg|webp);base64,/.test(image.data_url || "")) continue;
@@ -2605,12 +2638,27 @@ function appendMessage(text, role, state = "", meta = {}) {
   return article;
 }
 
+function renderMessageContent(element, text) {
+  element.innerHTML = renderChatMarkdown(text);
+  renderMathInElement(element, {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "\\[", right: "\\]", display: true },
+      { left: "\\(", right: "\\)", display: false },
+      { left: "$", right: "$", display: false },
+    ],
+    throwOnError: false,
+    trust: false,
+    maxExpand: 500,
+  });
+}
+
 function updateMessageVersionControls(article) {
   const versions = JSON.parse(article.dataset.messageVersions || "[]");
   const index = Number(article.dataset.versionIndex || 0);
   const version = versions[index];
   const paragraph = article.querySelector(".message-text");
-  if (version && paragraph) paragraph.textContent = version.content;
+  if (version && paragraph) renderMessageContent(paragraph, version.content);
   const counter = article.querySelector(".chat-message-version-count");
   if (counter) counter.textContent = `${index + 1} / ${versions.length}`;
   const previous = article.querySelector(".chat-message-version-prev");
@@ -2794,13 +2842,14 @@ function filterConversations() {
 }
 
 function hideChatWelcome() {
-  if (chatWelcome) chatWelcome.hidden = true;
+  const welcome = chatThread.querySelector("#chat-welcome");
+  if (welcome) welcome.hidden = true;
 }
 
 function replaceMessage(article, text, state = "") {
   const shouldFollow = isChatScrollPinnedToBottom();
   const content = article.querySelector(".message-text");
-  content.innerHTML = renderChatMarkdown(text);
+  renderMessageContent(content, text);
   article.dataset.messageText = String(text || "");
   content.hidden = Boolean(article._toolActivityItems?.size && article.dataset.executionPhase === "running") || !content.textContent.trim();
   article.classList.remove("chat-message--pending", "chat-message--error");
@@ -2853,6 +2902,7 @@ function openProposalHelpDialog() {
             <div><dt>多音字</dt><dd>严格判定会保守处理多音字；放行多音会允许模型结合语境判断。</dd></div>
             <div><dt>句数</dt><dd>仅排律需要填写，使用不少于 10 的偶数。</dd></div>
             <div><dt>允许拗救</dt><dd>唐诗或排律的格律选项，勾选后允许符合规则的拗救。</dd></div>
+            <div><dt>首句末尾多音字</dt><dd>唐诗和排律默认不允许在生成的首句末尾使用韵书中有多个平仄或韵部的字；勾选后取消此限制。此选项与多音字平仄判定模式独立，其他格律约束仍然生效。保留的首句不受此选项限制。</dd></div>
           </dl>
         </div>
         <footer class="proposal-help-dialog__footer"><button type="submit" class="quiet-button">知道了</button></footer>
@@ -2895,7 +2945,7 @@ function appendProposalEditor(prepared, anchor = null) {
   panel.dataset.proposalId = prepared.proposal_id;
   panel.dataset.conversationId = currentConversationId || "";
   if (prepared.submitted_job_id) panel.dataset.jobId = prepared.submitted_job_id;
-  panel.open = false;
+  panel.open = !prepared.direct && !prepared.submitted_job_id;
 
   const summary = document.createElement("summary");
   const isPartial = prepared.kind === "partial_generate" || prepared.kind === "rewrite";
@@ -3286,7 +3336,8 @@ function appendProposalEditor(prepared, anchor = null) {
     if (isLocalRewrite && !Object.hasOwn(cleaned, "omit_original_target_from_prompt")) {
       cleaned.omit_original_target_from_prompt = true;
     }
-    if (!["唐诗", "排律", "汉俳"].includes(meterType.value)) delete cleaned.allow_aojiu;
+    delete cleaned.allow_aojiu;
+    delete cleaned.allow_polyphonic_ending;
     return cleaned;
   };
   const cleanTaskOptionsText = () => {
@@ -3393,10 +3444,21 @@ function appendProposalEditor(prepared, anchor = null) {
 
   const allowAoJiu = document.createElement("input");
   allowAoJiu.type = "checkbox"; allowAoJiu.checked = proposal.task_options?.allow_aojiu !== false;
+  const checkOptions = document.createElement("div");
+  checkOptions.className = "proposal-editor__checks";
+  config.append(checkOptions);
   const aoJiuLabel = document.createElement("label");
   aoJiuLabel.className = "proposal-editor__check";
   const aoJiuText = document.createElement("span"); aoJiuText.textContent = "允许拗救";
-  aoJiuLabel.append(allowAoJiu, aoJiuText); config.append(aoJiuLabel);
+  aoJiuLabel.append(allowAoJiu, aoJiuText); checkOptions.append(aoJiuLabel);
+
+  const allowPolyphonicEnding = document.createElement("input");
+  allowPolyphonicEnding.type = "checkbox";
+  allowPolyphonicEnding.checked = proposal.task_options?.allow_polyphonic_ending === true;
+  const polyphonicEndingLabel = document.createElement("label");
+  polyphonicEndingLabel.className = "proposal-editor__check";
+  const polyphonicEndingText = document.createElement("span"); polyphonicEndingText.textContent = "首句末尾多音字";
+  polyphonicEndingLabel.append(allowPolyphonicEnding, polyphonicEndingText); checkOptions.append(polyphonicEndingLabel);
 
   const hanpaiRhyme = document.createElement("select");
   for (const [value, label] of [["AAA", "AAA（三句押韵）"], ["ABA", "ABA（一、三句押韵）"], ["BAA", "BAA（二、三句押韵）"], ["none", "不押韵"], ["random", "随机押韵"]]) {
@@ -3422,6 +3484,8 @@ function appendProposalEditor(prepared, anchor = null) {
      numLinesLabel.hidden = meterType.value !== "排律";
      if (meterType.value !== "排律") numLines.value = "";
      aoJiuLabel.hidden = !["唐诗", "排律", "汉俳"].includes(meterType.value);
+     polyphonicEndingLabel.hidden = !["唐诗", "排律"].includes(meterType.value);
+     checkOptions.hidden = aoJiuLabel.hidden && polyphonicEndingLabel.hidden;
      cleanTaskOptionsText();
      rhymePartLabel.hidden = rhymeMode.value !== "fixed";
    };
@@ -3486,7 +3550,7 @@ function appendProposalEditor(prepared, anchor = null) {
         if (draft[key] !== undefined) control.value = draft[key];
       }
       if (draft.taskType) songciTaskType.value = draft.taskType;
-      if (isLocalRewrite) cleanTaskOptionsText();
+      cleanTaskOptionsText();
       if (draft.variant && !isRevision) variant.value = draft.variant;
       if (isPartial && !isLocalRewrite && draft.sentenceInputs) {
         Object.assign(sentenceValues, draft.sentenceInputs);
@@ -3513,6 +3577,7 @@ function appendProposalEditor(prepared, anchor = null) {
         try { selectedRhymeParts = typeof draft.rhymeParts === "string" ? JSON.parse(draft.rhymeParts) : draft.rhymeParts; } catch (_) { /* ignore invalid draft */ }
       }
       if (draft.allowAoJiu !== undefined) allowAoJiu.checked = draft.allowAoJiu === true;
+      if (draft.allowPolyphonicEnding !== undefined) allowPolyphonicEnding.checked = draft.allowPolyphonicEnding === true;
       // 草稿恢复可能改变诗体、押韵策略或句数，必须重新计算条件字段可见性。
       updateFormOptions();
       updateConditionalFields();
@@ -3529,7 +3594,7 @@ function appendProposalEditor(prepared, anchor = null) {
     loadRhymeOptions();
   })();
   const readDraft = () => {
-    const draft = { prompt: prompt.value, count: count.value, meterType: meterType.value, formNameChoice: formName.value, variant: variant.value, rhymeBook: rhymeBook.value, rhymeMode: rhymeMode.value, rhymeParts: readRhymeParts(), taskOptions: taskOptions.value, taskType: songciTaskType.value, fixedLines: fixedLines.value, polyphonic: polyphonic.value, numLines: numLines.value, allowAoJiu: allowAoJiu.checked };
+    const draft = { prompt: prompt.value, count: count.value, meterType: meterType.value, formNameChoice: formName.value, variant: variant.value, rhymeBook: rhymeBook.value, rhymeMode: rhymeMode.value, rhymeParts: readRhymeParts(), taskOptions: taskOptions.value, taskType: songciTaskType.value, fixedLines: fixedLines.value, polyphonic: polyphonic.value, numLines: numLines.value, allowAoJiu: allowAoJiu.checked, allowPolyphonicEnding: allowPolyphonicEnding.checked };
     if (isPartial) {
       draft.sentenceInputs = { ...sentenceValues };
       draft.retainedLines = [...retainedLines];
@@ -3659,8 +3724,9 @@ function appendProposalEditor(prepared, anchor = null) {
          return;
        }
        if (meterType.value === "汉俳") selectedTaskOptions.rhyme_scheme = hanpaiRhyme.value;
+       selectedTaskOptions = cleanTaskOptions(selectedTaskOptions);
        if (["唐诗", "排律", "汉俳"].includes(meterType.value)) selectedTaskOptions.allow_aojiu = allowAoJiu.checked;
-       else selectedTaskOptions = cleanTaskOptions(selectedTaskOptions);
+       if (["唐诗", "排律"].includes(meterType.value)) selectedTaskOptions.allow_polyphonic_ending = allowPolyphonicEnding.checked;
        let selectedFixedLines = {};
        try {
          selectedFixedLines = isPartial ? Object.fromEntries(rewriteLines.filter((line) => retainedLines.has(line.number))
@@ -4060,12 +4126,26 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
   if (!list) {
     const heading = document.createElement("div");
     heading.className = "job-progress__results-heading";
-    const eyebrow = document.createElement("span"); eyebrow.textContent = "卷轴成稿";
-    const title = document.createElement("h3"); title.textContent = "生成诗稿";
-    heading.append(eyebrow, title); container.append(heading);
+    const title = document.createElement("h3"); title.textContent = "诗稿卷轴";
+    heading.append(title); container.append(heading);
     list = document.createElement("div");
     list.className = "job-progress__scrolls";
     container.append(list);
+    const navigation = document.createElement("nav");
+    navigation.className = "job-progress__scroll-nav";
+    navigation.setAttribute("aria-label", "切换诗稿卷轴");
+    const previous = document.createElement("button"); previous.type = "button"; previous.className = "quiet-button"; previous.textContent = "上一首";
+    const position = document.createElement("span"); position.className = "job-progress__scroll-position"; position.setAttribute("aria-live", "polite");
+    const next = document.createElement("button"); next.type = "button"; next.className = "quiet-button"; next.textContent = "下一首";
+    const change = (step) => {
+      const scrolls = [...list.children];
+      const current = scrolls.findIndex((scroll) => scroll.dataset.candidateOrdinal === container.dataset.selectedScroll);
+      const selected = scrolls[Math.max(0, Math.min(scrolls.length - 1, current + step))];
+      if (selected) { container.dataset.selectedScroll = selected.dataset.candidateOrdinal; updateScrollNavigation(container); }
+    };
+    previous.addEventListener("click", () => change(-1));
+    next.addEventListener("click", () => change(1));
+    navigation.append(previous, position, next); container.append(navigation);
   }
 
   works.forEach((work, index) => {
@@ -4096,6 +4176,22 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
     }
     if (autoEvaluate) ensureCandidateEvaluation(job, work, requestMeta, () => renderAvailableScrolls(container, job, requestMeta));
   });
+  updateScrollNavigation(container);
+}
+
+function updateScrollNavigation(container) {
+  const scrolls = [...container.querySelectorAll(".job-progress__scrolls > .poem-handscroll")];
+  if (!scrolls.length) return;
+  let selected = scrolls.findIndex((scroll) => scroll.dataset.candidateOrdinal === container.dataset.selectedScroll);
+  if (selected < 0) selected = 0;
+  container.dataset.selectedScroll = scrolls[selected].dataset.candidateOrdinal;
+  scrolls.forEach((scroll, index) => { scroll.hidden = index !== selected; });
+  const navigation = container.querySelector(".job-progress__scroll-nav");
+  navigation.hidden = scrolls.length < 2;
+  const [previous, next] = navigation.querySelectorAll("button");
+  previous.disabled = selected === 0; next.disabled = selected === scrolls.length - 1;
+  navigation.querySelector(".job-progress__scroll-position").textContent = `${selected + 1} / ${scrolls.length} · 候选 ${scrolls[selected].dataset.candidateOrdinal}`;
+  requestAnimationFrame(() => updatePoemLayout(scrolls[selected]));
 }
 
 function startJobProgress(jobId, initialJob = null, anchor = null, conversationId = currentConversationId) {
@@ -4123,6 +4219,7 @@ function startJobProgress(jobId, initialJob = null, anchor = null, conversationI
   let settled = false;
   const terminalAtStart = initialJob && !["queued", "running"].includes(initialJob.status);
   const archivedOrdinals = new Set();
+  let previousActiveCandidate = null;
   let requestMeta = initialJob?.request || {};
   const render = async (job) => {
     if (stopped || progressVersion !== conversationLoadVersion || currentConversationId !== conversationId || details.parentElement !== chatThread) return true;
@@ -4138,6 +4235,13 @@ function startJobProgress(jobId, initialJob = null, anchor = null, conversationI
     countNode.textContent = `${job.completed ?? job.result?.candidates?.length ?? 0} / ${job.total ?? job.request?.candidate_count ?? 0}`;
     if (Array.isArray(job.candidates)) {
       const openCandidates = new Set([...candidatesNode.querySelectorAll("details[open]")].map((item) => item.dataset.candidateOrdinal));
+      const activeCandidate = job.candidates.find((candidate) => ["running", "retrying"].includes(candidate.status));
+      const activeOrdinal = activeCandidate ? String(activeCandidate.ordinal) : null;
+      if (activeOrdinal && activeOrdinal !== previousActiveCandidate) {
+        if (previousActiveCandidate) openCandidates.delete(previousActiveCandidate);
+        openCandidates.add(activeOrdinal);
+      }
+      if (activeOrdinal) previousActiveCandidate = activeOrdinal;
       candidatesNode.replaceChildren(...job.candidates.map((candidate) => candidateDetail(candidate, openCandidates.has(String(candidate.ordinal)), job.kind)));
       const completedOrdinals = job.candidates.filter((candidate) => candidate.status === "succeeded").map((candidate) => candidate.ordinal);
       const hasNewCandidate = completedOrdinals.some((ordinal) => !archivedOrdinals.has(ordinal));
@@ -4210,14 +4314,15 @@ chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (chatBusy) return;
   if (!requireLocalProfile()) return;
-  await loadModelConfig();
-  if (!chatModel?.value) { announce("请先在模型设置中配置服务端点。"); window.location.hash = "settings"; return; }
   const attachmentFile = typeof chatAttachment !== "undefined" ? chatAttachment?.files?.[0] : null;
   const message = chatInput.value.trim() || (attachmentFile ? "请理解这张图片。" : "");
   if (!message) {
     chatInput.focus();
     return;
   }
+  hideChatWelcome();
+  await loadModelConfig();
+  if (!chatModel?.value) { announce("请先在模型设置中配置服务端点。"); window.location.hash = "settings"; return; }
   const editedMessageId = editingMessageId;
   const images = [];
   if (attachmentFile) {
@@ -4242,7 +4347,7 @@ chatForm.addEventListener("submit", async (event) => {
     setChatBusy(true);
     const editedArticle = chatThread.querySelector(`[data-message-id="${CSS.escape(editedMessageId)}"]`);
     try { editedVersions = JSON.parse(editedArticle?.dataset.messageVersions || "[]"); } catch { editedVersions = []; }
-    const editedText = editedArticle?.querySelector(".message-content p")?.textContent || "";
+    const editedText = editedArticle?.dataset.messageText || "";
     if (!editedVersions.length) editedVersions = [{ content: editedText, version_number: 1 }];
     try {
       await apiFetch(`/v1/conversations/${encodeURIComponent(currentConversationId)}/messages/${encodeURIComponent(editedMessageId)}/edit`, {
@@ -4499,7 +4604,7 @@ chatThread.addEventListener("click", (event) => {
     const article = copy.closest("[data-message-id]");
     const versions = JSON.parse(article?.dataset.messageVersions || "[]");
     const index = Number(article?.dataset.versionIndex || 0);
-    const text = versions[index]?.content || article?.querySelector(".message-content p")?.textContent || "";
+    const text = versions[index]?.content || article?.dataset.messageText || "";
     navigator.clipboard?.writeText(text).then(() => announce("消息已复制")).catch(() => announce("复制失败，请手动选择文本"));
     return;
   }
@@ -4750,7 +4855,7 @@ function renderWorkerStatus(data) {
   if (data.worker.plan) document.querySelector('#local-model-plan').textContent = `${data.worker.plan.label}。${data.worker.plan.note}`;
   document.querySelector('#local-worker-error').hidden = !data.worker.error;
   if (data.worker.error) enableDiagnosticCopy(document.querySelector('#local-worker-error'));
-  document.querySelector('#local-readiness').textContent = `${data.agent_ready ? '对话模型：已配置' : '对话模型：尚未配置，请先保存模型端点'}；诗词生成：${text}`;
+  document.querySelector('#local-readiness').textContent = `${data.agent_ready ? '对话模型：已配置' : '对话模型：未配置（可选，不影响手动打开创作面板）'}；诗词生成：${text}`;
   document.querySelector('#local-worker-start').disabled = ['ready', 'loading', 'released'].includes(data.worker.state);
   document.querySelector('#local-worker-stop').disabled = !['ready', 'loading', 'released'].includes(data.worker.state);
 }

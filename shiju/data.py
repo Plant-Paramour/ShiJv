@@ -19,6 +19,12 @@ class RhymeLookup(Protocol):
     def iter_rhyme_entries(self) -> Iterable[Tuple[str, str, str]]: ...
 
 
+def is_polyphonic_end(lexicon: RhymeLookup, char: str) -> bool:
+    """判断韵书中可区分的多个平仄或韵部。"""
+    tones = set(lexicon.get_pingze(char))
+    return len(tones) > 1 or len(set(lexicon.get_rhyme_part(char))) > 1
+
+
 class RhymeLexicon:
     """只负责韵书加载与查询，不感知格律模板。"""
 

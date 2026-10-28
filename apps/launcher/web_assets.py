@@ -42,6 +42,12 @@ def web_assets(entries):
             page.feed(text)
             refs = page.references
         elif name.endswith(('.js', '.mjs')):
+            # Ignore comments before looking for module specifiers. Preserve quoted
+            # strings so comment-like text inside a string is not stripped.
+            text = re.sub(
+                r'''("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|/\*[\s\S]*?\*/|//[^\r\n]*''',
+                lambda match: match.group(1) or ' ', text,
+            )
             refs = re.findall(r'''(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)["']([^"']+)["']''', text)
         elif name.endswith('.css'):
             refs = re.findall(r'''@import\s+(?:url\(\s*)?["']([^"']+)["']''', text)

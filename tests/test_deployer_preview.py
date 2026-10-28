@@ -6,6 +6,19 @@ import pytest
 from apps.launcher import deployer, resource_advice
 
 
+@pytest.mark.parametrize('field', ['model', 'target'])
+def test_preview_rejects_chinese_paths_before_any_deployment(tmp_path, monkeypatch, field):
+    report = tmp_path / 'report.json'
+    paths = {'model': str(tmp_path / 'model'), 'target': str(tmp_path / 'env')}
+    paths[field] = str(tmp_path / '中文目录')
+    monkeypatch.setattr(sys, 'argv', ['deployer', 'preview', '--data-dir', str(tmp_path),
+        '--report', str(report), '--model', paths['model'], '--target', paths['target'],
+        '--cache', str(tmp_path / 'cache'), '--plan', str(tmp_path / 'plan.json')])
+    monkeypatch.setattr(deployer, 'inspect_host', lambda *_: pytest.fail('中文路径应在检查硬件前拒绝'))
+    assert deployer.main() != 0
+    assert '不能包含中文' in deployer.read(report)['error']
+
+
 @pytest.mark.parametrize('name,expected', [
     ('Qwen3.5-2B', 'Qwen/Qwen3.5-2B'),
     ('my-Qwen3.5-4B-copy', 'Qwen/Qwen3.5-4B'),

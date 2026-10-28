@@ -46,7 +46,9 @@ async def restore_backup(request: Request):
     database_path = Path(request.app.state.settings.database_path)
     data_root = database_path.parent
     try:
-        with tempfile.TemporaryDirectory(prefix="shiju-restore-") as temporary:
+        data_root.mkdir(parents=True, exist_ok=True)
+        # Keep staging on the destination volume so Windows can atomically replace it.
+        with tempfile.TemporaryDirectory(prefix="shiju-restore-", dir=data_root) as temporary:
             temp_root = Path(temporary)
             archive_path = temp_root / "upload.zip"
             received = 0

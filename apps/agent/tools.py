@@ -998,7 +998,7 @@ def _generation_schema() -> dict[str, Any]:
             "rhyme_parts": {"type": "object", "additionalProperties": {"type": "string"}, "description": "按韵组编号指定韵部，如 {\"1\":\"一东\"}；值为 random 可对该组随机选韵"},
             "requirement": {
                 "type": "string",
-                "description": "细化后的创作提示，包含意象、情绪、章法和特殊要求",
+                "description": "细化后的创作提示，包含意象、情绪、章法和特殊要求；不同要点使用真实换行符分段，保留用户指定的换行",
             },
             "num_lines": {"type": "integer", "minimum": 10, "description": "排律必填，十句以上的偶数；十二句填数字 12。其他诗体不填"},
             "strict_polyphonic": {"type": "boolean"},

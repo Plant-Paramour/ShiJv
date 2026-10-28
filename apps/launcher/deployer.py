@@ -881,6 +881,10 @@ def main():
     try:
         operation.update('准备')
         advisory = None
+        if args.action in {'preview', 'download', 'verify-model', 'plan', 'import', 'inspect-target', 'install'}:
+            for label, path in (('模型位置', args.model), ('运行环境位置', args.target)):
+                if path and any('\u3400' <= char <= '\u9fff' or '\uf900' <= char <= '\ufaff' for char in path):
+                    raise ValueError(f'{label}不能包含中文，请选择或输入不含中文的完整路径。')
         if args.action == 'inspect':
             from .resource_advice import snapshot
             host = inspect_host(args.target or args.data_dir)

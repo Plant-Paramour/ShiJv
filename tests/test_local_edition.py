@@ -5,6 +5,7 @@ import json
 import mimetypes
 from pathlib import Path
 import sqlite3
+import subprocess
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import uuid
@@ -87,7 +88,7 @@ def test_entire_page_dependency_graph_over_http(local_app, monkeypatch):
             response = client.get('/' + name)
             assert response.status_code == 200, name
             assert hashlib.sha256(response.content).hexdigest() == digest, name
-            expected = {'.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html'}[Path(name).suffix]
+            expected = {'.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.html': 'text/html'}[Path(name).suffix]
             assert response.headers['content-type'].split(';')[0] == expected, name
         missing = client.get('/web/prosody-checker/missing.js')
         assert missing.status_code == 404
@@ -106,6 +107,19 @@ def test_build_dependency_validation_rejects_missing_and_case_mismatch():
     assert len(web_assets(entries)) == 3
     del entries['web/prosody-checker/app.js']
     with pytest.raises(ValueError, match='app.js'):
+        web_assets(entries)
+
+
+def test_web_assets_ignores_import_like_comments():
+    from apps.launcher.web_assets import web_assets
+    entries = {
+        'web/prosody-checker/index.html': b'<script type="module" src="./app.js"></script>',
+        'web/prosody-checker/app.js': b'''/* from "extension" */\n// import "missing.js"\nimport "./real.js";''',
+        'web/prosody-checker/real.js': b'export const x = 1;',
+    }
+    assert len(web_assets(entries)) == 3
+    del entries['web/prosody-checker/real.js']
+    with pytest.raises(ValueError, match='real.js'):
         web_assets(entries)
 
 
@@ -166,6 +180,81 @@ def test_backup_is_plain_and_contains_no_key_file(local_app):
         response = client.post('/v1/backup/restore', content=response.content, headers={'Content-Type': 'application/zip'})
         assert response.status_code == 200, response.text
         assert response.json()['restart_required']
+
+
+def test_uploaded_avatar_is_served_and_rendered_after_replacement(local_app):
+    from PIL import Image
+
+    def image_bytes(color):
+        output = io.BytesIO()
+        Image.new('RGB', (32, 32), color).save(output, format='JPEG')
+        return output.getvalue()
+
+    with TestClient(local_app) as client:
+        headers = {'Content-Type': 'image/jpeg'}
+        first = client.post('/v1/profile/me/avatar', content=image_bytes('red'), headers=headers)
+        assert first.status_code == 200, first.text
+        avatar_url = first.json()['avatar_url']
+        first_image = client.get(avatar_url)
+        assert first_image.status_code == 200
+        assert 'no-store' in first_image.headers['cache-control']
+        second = client.post('/v1/profile/me/avatar', content=image_bytes('blue'), headers=headers)
+        assert second.status_code == 200
+        assert client.get('/v1/profile/me').json()['avatar_url'] == avatar_url
+        assert client.get(avatar_url).content != first_image.content
+
+    script = (ROOT / 'web/prosody-checker/site.js').read_text(encoding='utf-8')
+    function = script.split('function setUserAvatar(element, user) {', 1)[1].split('\n}', 1)[0]
+    runner = '''
+const document = { createElement: () => ({}) };
+function setUserAvatar(element, user) { FUNCTION_BODY }
+for (const url of [process.argv[1], '/media/avatars/old.jpg']) {
+  const element = { replaceChildren() { this.children = []; }, append(child) { this.children.push(child); } };
+  setUserAvatar(element, {avatar_url: url});
+  if (element.children.length !== 1 || element.children[0].src !== url) throw new Error('avatar not rendered: ' + url);
+}
+const element = { replaceChildren() { this.children = []; }, append(child) { this.children.push(child); } };
+setUserAvatar(element, {avatar_url: 'https://example.com/avatar.jpg'});
+if (element.children.length || element.textContent !== '客') throw new Error('unexpected external avatar');
+'''.replace('FUNCTION_BODY', function)
+    subprocess.run(['node', '-e', runner, avatar_url], check=True)
+
+
+def test_backup_restore_stages_on_data_volume_and_restores_content(local_app, monkeypatch):
+    import apps.api.routes.backup as backup
+    data_root = local_app.state.settings.database_path.parent
+    original_replace = backup.os.replace
+
+    def same_volume_replace(source, target):
+        # Model Windows rejecting a move from the system temp drive to the data drive.
+        assert Path(source).is_relative_to(data_root)
+        assert Path(target).is_relative_to(data_root)
+        return original_replace(source, target)
+
+    with TestClient(local_app) as client:
+        client.patch('/v1/local-profile', json={'display_name': '备份时的名字'})
+        avatar = data_root / 'avatars' / 'fixture.png'
+        avatar.write_bytes(b'original-avatar')
+        archive = client.get('/v1/backup').content
+        client.patch('/v1/local-profile', json={'display_name': '修改后的名字'})
+        avatar.write_bytes(b'changed-avatar')
+        monkeypatch.setattr(backup.os, 'replace', same_volume_replace)
+        restored = client.post('/v1/backup/restore', content=archive,
+                               headers={'Content-Type': 'application/zip'})
+        assert restored.status_code == 200, restored.text
+        assert local_app.state.users.local_profile()['display_name'] == '备份时的名字'
+        assert avatar.read_bytes() == b'original-avatar'
+        assert not list(data_root.glob('shiju-restore-*'))
+
+
+def test_empty_backup_restore_leaves_data_unchanged(local_app):
+    with TestClient(local_app) as client:
+        client.patch('/v1/local-profile', json={'display_name': '保留数据'})
+        response = client.post('/v1/backup/restore', content=b'',
+                               headers={'Content-Type': 'application/zip'})
+        assert response.status_code == 400
+        assert '备份文件为空' in response.json()['detail']
+        assert local_app.state.users.local_profile()['display_name'] == '保留数据'
 
 
 def test_local_boundary_remains_loopback_and_same_origin(local_app):

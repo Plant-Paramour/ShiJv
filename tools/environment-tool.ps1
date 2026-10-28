@@ -154,6 +154,13 @@ $runtimeProfile.Add_SelectedIndexChanged({
 Label '第四步：创建 / 继续部署环境' 24 451 830 28
 Label '可选空文件夹；失败可原目录继续。运行资源与磁盘空间见右侧。' 24 479 570 28
 $target=TextBox (Join-Path $store 'environments\qwen35') 24 511 395
+foreach($pathInput in @($model,$target)) {
+    $pathInput.Add_KeyDown({ param($sender,$event)
+        if($event.Control -and $event.KeyCode -eq [Windows.Forms.Keys]::A) {
+            $sender.SelectAll(); $event.SuppressKeyPress=$true
+        }
+    })
+}
 $browseTarget=Button '选择新环境目录' 435 508 160
 $create=Button '创建 / 继续部署' 24 551 170; $create.Enabled=$false
 $cancel=Button '取消当前操作' 210 551 120; $cancel.Enabled=$false
@@ -282,21 +289,33 @@ function Restore-DeploymentSession($session) {
     $modelStatus.Text='已恢复：'+$p.model.model_id
     return $p
 }
+function Test-DeploymentPaths {
+    foreach($entry in @(@('模型位置',$model.Text),@('运行环境位置',$target.Text))) {
+        if($entry[1] -match '[\p{IsCJKUnifiedIdeographs}\p{IsCJKUnifiedIdeographsExtensionA}\p{IsCJKCompatibilityIdeographs}]') {
+            throw "$($entry[0])不能包含中文，请选择或输入不含中文的完整路径。"
+        }
+    }
+}
 function Show-FolderDialog($dialog) {
     return $dialog.ShowDialog($form)
 }
 function Pick-Folder($box,[string]$description='选择保存位置；不会覆盖用户已有环境') {
     $dialog=$null
     try {
-        $dialog=New-Object Windows.Forms.FolderBrowserDialog
-        $dialog.Description=$description
-        # Local-model fields start empty. Directory.Exists safely accepts empty,
-        # missing and malformed paths, unlike Test-Path -LiteralPath ''.
+        # OpenFileDialog uses the modern Windows shell dialog, including its
+        # editable address bar. A sentinel filename selects the current folder.
+        $dialog=New-Object Windows.Forms.OpenFileDialog
+        $dialog.Title=$description
+        $dialog.CheckFileExists=$false; $dialog.CheckPathExists=$true
+        $dialog.ValidateNames=$false; $dialog.FileName='选择当前文件夹'
+        $dialog.Filter='文件夹|*.shiju-folder-selection'
         if(-not [string]::IsNullOrWhiteSpace($box.Text) -and [IO.Directory]::Exists($box.Text)) {
-            $dialog.SelectedPath=$box.Text
+            $dialog.InitialDirectory=$box.Text
         }
-        if((Show-FolderDialog $dialog) -eq 'OK' -and -not [string]::IsNullOrWhiteSpace($dialog.SelectedPath)) {
-            $box.Text=$dialog.SelectedPath
+        if((Show-FolderDialog $dialog) -eq 'OK' -and -not [string]::IsNullOrWhiteSpace($dialog.FileName)) {
+            $selected=if([IO.Directory]::Exists($dialog.FileName)){$dialog.FileName}else{[IO.Path]::GetDirectoryName($dialog.FileName)}
+            if(-not [IO.Directory]::Exists($selected)) { throw '请选择已有目录，或先在窗口中新建目录。' }
+            $box.Text=$selected
         }
     } catch {
         $status.Text='无法打开目录选择窗口：'+$_.Exception.Message
@@ -306,6 +325,7 @@ function Pick-Folder($box,[string]$description='选择保存位置；不会覆�
 }
 function Begin-Action([string]$action) {
     if($script:job -or $script:download) { return }
+    if($action -in @('preview','download','verify-model','plan','import','inspect-target','install')) { Test-DeploymentPaths }
     New-Item -ItemType Directory -Force -Path $cache | Out-Null
     $script:action=$action
     $details.Text='正在执行：'+$action+'。本次进度与错误会显示在这里。'
@@ -718,7 +738,9 @@ $null=Wizard-Label $wizardPages[1] '运行环境位置（保存 Python 和运行
 Place-WizardControl $wizardPages[1] $target 8 213 390 28
 Place-WizardControl $wizardPages[1] $browseTarget 410 211 130 34
 $browseTarget.Text='更改位置'
-$null=Wizard-Label $wizardPages[1] '一般无需修改位置。模型与运行环境分开保存；下载缓存使用系统盘。' 8 252 535 48
+$pathWarning=Wizard-Label $wizardPages[1] '' 8 250 535 30
+$pathWarning.ForeColor=[Drawing.Color]::Firebrick
+$null=Wizard-Label $wizardPages[1] '模型与运行环境路径不能包含中文；下载缓存使用系统盘。' 8 280 535 36
 $wizardAdvancedButton=New-Object Windows.Forms.Button; $wizardAdvancedButton.Text='高级设置 / 离线工具'
 Place-WizardControl $wizardPages[1] $wizardAdvancedButton 8 318 220 34
 $wizardSummary=Wizard-Label $wizardPages[1] '确认模型和位置后，点击“检查安装方案”。' 575 8 320 344
@@ -796,6 +818,7 @@ function Update-Wizard {
     $route.Refresh()
     $pathCaption.SetBounds(8,102,535,28)
     $pathCaption.Text=if($deployRoute.Checked){'模型保存位置（已有完整文件会核验后复用）'}else{'已有模型目录（不移动原文件）'}
+    try { Test-DeploymentPaths; $pathWarning.Text='' } catch { $pathWarning.Text=$_.Exception.Message }
     if($script:wizardPreview) {
         $p=$script:wizardPreview
         $profileLabel=switch($p.profile){'cpu' {'CPU FP32'} 'cpu-bf16' {'CPU BF16'} 'cuda-fp16' {'GPU FP16'} 'cuda-bnb' {'GPU 4bit'} 'cuda-bnb8' {'GPU 8bit'} default {$p.profile}}

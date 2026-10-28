@@ -33,16 +33,28 @@ def main():
         try:
             import uvicorn
             from apps.api.main import create_app
-            app = create_app()
-            app.router.on_startup.append(lambda: write_report(snapshot, dict(record, state='running')))
-            server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port,
-                                                  timeout_graceful_shutdown=10))
-            app.state.launcher_shutdown = lambda: setattr(server, "should_exit", True)
-            instance_file = directory / "instance.json"
-            temporary = instance_file.with_suffix(".tmp")
-            temporary.write_text(json.dumps(record), encoding="utf-8")
-            temporary.replace(instance_file)
-            server.run()
+            while True:
+                app = create_app()
+                app.router.on_startup.append(lambda: write_report(snapshot, dict(record, state='running')))
+                server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port,
+                                                      timeout_graceful_shutdown=10))
+                restart = [False]
+                def stop_server(restart_requested=False):
+                    restart[0] = restart_requested
+                    server.should_exit = True
+                app.state.launcher_shutdown = stop_server
+                app.state.launcher_restart = lambda: stop_server(True)
+                instance_file = directory / "instance.json"
+                temporary = instance_file.with_suffix(".tmp")
+                temporary.write_text(json.dumps(record), encoding="utf-8")
+                temporary.replace(instance_file)
+                server.run()
+                if not restart[0]:
+                    break
+                instance_id = uuid.uuid4().hex
+                os.environ["SHIJU_INSTANCE_ID"] = instance_id
+                record.update(instance_id=instance_id, started_at=datetime.now().isoformat())
+                write_report(snapshot, dict(record, state='starting'))
             write_report(snapshot, dict(record, state='stopped'))
         except BaseException as exc:
             write_report(snapshot, dict(record, state='failed', error=str(exc)))

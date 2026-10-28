@@ -16,6 +16,20 @@ class SavedPoemJobs:
         return numbered_source(POEM, CONTEXT, ROOT, poem_id=poem_id)
 
 
+@pytest.mark.parametrize('tool,extra', [
+    ('prepare_generation', {}),
+    ('prepare_partial_generation', {'fixed_lines': {'1': '空山新雨后'}}),
+])
+def test_agent_proposal_preserves_multiline_requirement(tool, extra):
+    toolbox = AgentToolbox(ROOT, object(), allow_text_submission=False)
+    requirement = '创作目标：描写春山。\n\n结构安排：由远及近。\n用韵：自然协调。'
+    result = toolbox.execute(tool, {**CONTEXT, 'theme': '春山', 'requirement': requirement, **extra},
+                             ToolContext('写一首诗', 1))
+    assert result['editable_prompt'] == requirement
+    assert result['proposal']['requirement'] == requirement
+    assert toolbox.pending.payload['requirement'] == requirement
+
+
 def test_rewrite_tool_marks_checked_targets_and_preserves_other_sentences():
     from apps.agent.prompts import SYSTEM_PROMPT
 

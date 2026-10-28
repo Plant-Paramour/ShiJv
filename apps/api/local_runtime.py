@@ -8,7 +8,8 @@ import subprocess
 import sys
 import threading
 import time
-from .environment import inspect_environment, assess_model, python_process_env
+from .environment import (inspect_environment, assess_model, python_process_env,
+                          verified_start_environment, refresh_verified_environment)
 from apps.local_network import local_control_url
 
 from fastapi import HTTPException
@@ -103,9 +104,16 @@ class LocalRuntime:
         try:
             config = read_config(self.directory)
             validate_model(config["model_path"])
-            environment = inspect_environment(self.directory, refresh=True, cancel=self._cancel_event)
+            environment = verified_start_environment(self.directory, config['model_path'])
+            if environment is None:
+                environment = inspect_environment(self.directory, refresh=True, cancel=self._cancel_event)
+            elif diagnostic.root is not None:
+                snapshot = diagnostic.root / 'verified-environment.json'
+                snapshot.write_text(json.dumps(environment, ensure_ascii=False, indent=2), encoding='utf-8')
+                environment['diagnostics'] = {'report_path': str(snapshot)}
             diagnostic.event('environment_checked', diagnostics=environment.get('diagnostics'),
-                             python=environment.get('inference_python'), model=config['model_path'])
+                             python=environment.get('inference_python'), model=config['model_path'],
+                             reused_verification=environment.get('reused_verification', False))
             precision = None
             deployed = Path(environment['inference_python']).parent / 'shiju-install.json'
             if deployed.is_file():
@@ -124,6 +132,7 @@ class LocalRuntime:
                     plan.update(quantization=precision, label='采用当前环境—模型配对已验证的推理方式')
             if precision is None:
                 plan = assess_model(config['model_path'], environment, precision='bf16') if config.get('quantization') == 'bf16' else assess_model(config['model_path'], environment)
+            refresh_verified_environment(self.directory, config['model_path'], environment)
             plan['device'] = 'cuda' if environment.get('cuda') else 'cpu'
             with self.lock:
                 if generation != self._start_generation:

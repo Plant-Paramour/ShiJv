@@ -81,6 +81,7 @@ class PailvOptions:
     """排律的专用格律配置。"""
 
     allow_aojiu: bool = True
+    allow_polyphonic_ending: bool = False
 
 
 @dataclass(frozen=True)
@@ -88,6 +89,7 @@ class TangOptions:
     """绝句与律诗的专用格律配置。"""
 
     allow_aojiu: bool = True
+    allow_polyphonic_ending: bool = False
 
 
 @dataclass(frozen=True)
@@ -255,6 +257,7 @@ class RelationalTaskFactory:
                             "full",
                             allow_aojiu=request.tang.allow_aojiu,
                             strict_polyphonic=request.strict_polyphonic,
+                            allow_polyphonic_ending=request.tang.allow_polyphonic_ending,
                         ),
                         boundary,
                     ),
@@ -267,6 +270,7 @@ class RelationalTaskFactory:
                             "critical",
                             allow_aojiu=request.tang.allow_aojiu,
                             strict_polyphonic=request.strict_polyphonic,
+                            allow_polyphonic_ending=request.tang.allow_polyphonic_ending,
                         ),
                     ),
                 ),
@@ -385,6 +389,7 @@ class PailvTaskFactory:
                             allow_aojiu=request.pailv.allow_aojiu,
                             enforce_style=False,
                             strict_polyphonic=request.strict_polyphonic,
+                            allow_polyphonic_ending=request.pailv.allow_polyphonic_ending,
                         ),
                         RepetitionPenaltyPolicy(),
                         boundary,

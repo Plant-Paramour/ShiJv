@@ -225,6 +225,7 @@ class TangVerifierPolicy:
         enforce_style: bool = True,
         strict_polyphonic: bool = True,
         repetition_penalty_enabled: bool = True,
+        allow_polyphonic_ending: bool = False,
     ):
         if mode not in {"full", "critical"}:
             raise ValueError(f"未知唐诗校验模式: {mode}")
@@ -234,6 +235,7 @@ class TangVerifierPolicy:
         self._enforce_style = enforce_style
         self._strict_polyphonic = strict_polyphonic
         self._repetition_penalty_enabled = repetition_penalty_enabled
+        self._allow_polyphonic_ending = allow_polyphonic_ending
 
     def _candidate(self, token_id, context):
         key = ("tang-candidate", token_id)
@@ -270,6 +272,7 @@ class TangVerifierPolicy:
             enforce_style=self._enforce_style,
             strict_polyphonic=self._strict_polyphonic,
             repetition_penalty_enabled=False,
+            allow_polyphonic_ending=self._allow_polyphonic_ending,
         )
 
     def evaluate(self, token_id: int, context: CandidateContext) -> float | None:
@@ -449,6 +452,9 @@ class TangVerifierPolicy:
         return True
 
     def _check_rhyme(self, char: str, info: RelationalConstraintContext) -> bool:
+        from .data import is_polyphonic_end
+        if info.current_line == 0 and not self._allow_polyphonic_ending and is_polyphonic_end(self._lexicon, char):
+            return False
         expected = "平" if "平" in info.rhyme_type else "仄"
         is_rhyming = info.is_rhyming
         if info.current_line == 0:

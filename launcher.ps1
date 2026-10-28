@@ -314,7 +314,7 @@ $statusBox.Text = "尚未检查。`r`n依赖不足时会列出缺失项；不启
 $pairLabel = Add-Label '已记住的环境—模型配对（选择后直接启动）' 484 24
 $pairBox = New-Object Windows.Forms.ComboBox; $pairBox.DropDownStyle = 'DropDownList'; $pairBox.SetBounds(30, 512, 700, 30); $form.Controls.Add($pairBox)
 $script:rememberedPairs = @()
-$checkButton = New-Object Windows.Forms.Button; $checkButton.Text = '重新检测'; $checkButton.Location = New-Object Drawing.Point(30, 636); $checkButton.Size = New-Object Drawing.Size(130, 42)
+$checkButton = New-Object Windows.Forms.Button; $checkButton.Text = '重新检测配对'; $checkButton.Location = New-Object Drawing.Point(30, 636); $checkButton.Size = New-Object Drawing.Size(130, 42)
 $startButton = New-Object Windows.Forms.Button; $startButton.Text = '直接启动'; $startButton.Location = New-Object Drawing.Point(580, 636); $startButton.Size = New-Object Drawing.Size(150, 42)
 $stopButton = New-Object Windows.Forms.Button; $stopButton.Text = '停止软件服务'; $stopButton.Location = New-Object Drawing.Point(180, 636); $stopButton.Size = New-Object Drawing.Size(150, 42)
 $form.Controls.AddRange(@($checkButton, $startButton, $stopButton))
@@ -410,7 +410,18 @@ $run = {
     } catch { if (-not $form.IsDisposed) { $statusBox.Text = Write-LauncherFailure $_.Exception.Message } }
     finally { if (-not $form.IsDisposed) { $checkButton.Enabled = $true; $startButton.Enabled = $true; $stopButton.Enabled = $true; $openButton.Enabled = $true; $restartButton.Enabled = $true; Set-EnvironmentControls $true } }
 }
-$checkButton.Add_Click({ & $run $false }); $startButton.Add_Click({ & $run $true })
+$checkButton.Add_Click({
+    if (-not $localCheck.Checked) { & $run $false; return }
+    try {
+        $selectedPoetryModel = $script:selectedPoetryModel
+        $appBox.Text = Resolve-PythonPath $appBox.Text
+        $modelBox.Text = Resolve-PythonPath $modelBox.Text
+        $script:selectedPoetryModel = $selectedPoetryModel
+        if (-not $script:selectedPoetryModel) { throw '请先点击“选择本地模型 / 分项测试”选择模型，再重新检测配对。' }
+        $statusBox.Text = '正在重新检测所选环境与模型配对…'
+        Show-ModelSelection -Recheck
+    } catch { $statusBox.Text = Write-LauncherFailure $_.Exception.Message }
+}); $startButton.Add_Click({ & $run $true })
 $openButton.Add_Click({
     $health = Get-LauncherHealth $script:Port
     if (Test-OurInstance $health) { Start-Process "http://127.0.0.1:$script:Port/web/prosody-checker/#settings"; $statusBox.Text = "已打开正在运行的诗矩：http://127.0.0.1:$script:Port" }
@@ -435,7 +446,7 @@ $pairBox.Add_SelectedIndexChanged({
         $modelBox.Text = $pair.inference_python
         $script:selectedPoetryModel = $pair.model_path
         $poetryButton.Text = if ($pair.model_path) { $(if ($pair.valid) { '已验证模型：' } else { '未验证模型：' }) + (Split-Path $pair.model_path -Leaf) + '（点击可测试或更换）' } else { '选择本地模型 / 分项测试' }
-        $statusBox.Text = if ($pair.valid) { '已选择已验证配对，可以直接启动。需要主动复查时点击“重新检测”。' } else { '此配对已保存，但文件或环境已变化，请重新检测。' }
+        $statusBox.Text = if ($pair.valid) { '已选择已验证配对，可以直接启动。需要重新验收时点击“重新检测配对”。' } else { '此配对已保存，但文件或环境已变化，请点击“重新检测配对”。' }
     }
 })
 if (-not $EmptyEnvironments) { Update-RememberedPairs }

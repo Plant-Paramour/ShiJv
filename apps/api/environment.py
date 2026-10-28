@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import csv
+import io
 import os
 from pathlib import Path
 import subprocess
@@ -12,6 +14,80 @@ import time
 
 _cache = {}
 _lock = threading.Lock()
+
+
+def verified_start_environment(directory, model):
+    """复用仍有效的模型验收结果，只重新获取动态内存信息。"""
+    from apps.api.launcher_memory import environment_stamp
+    from apps.launcher.model_catalog import verified_report
+    selected = selected_environment(directory)
+    python = selected['inference_python']
+    if not selected['local_enabled'] or not Path(python).is_file():
+        return None
+    try:
+        report = verified_report(directory, model, python)
+        if (not report or not report.get('ok') or not report.get('environment', {}).get('ok')
+                or not report.get('inference_stamp')
+                or report['inference_stamp'] != environment_stamp(python)
+                or Path(report.get('python', '')).resolve() != Path(python).resolve()):
+            return None
+        check_managed_runtime(python)
+        environment = dict(report['environment'])
+        if environment.get('cuda'):
+            from apps.launcher.runtime_manager import _nvidia_smi
+            command = _nvidia_smi()
+            if not command:
+                return None
+            result = subprocess.run([command, '--query-gpu=index,uuid,name,memory.free,memory.total',
+                                     '--format=csv,noheader,nounits'], capture_output=True,
+                                    text=True, encoding='utf-8', errors='replace', timeout=10,
+                                    stdin=subprocess.DEVNULL,
+                                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+            if result.returncode:
+                return None
+            rows = list(csv.reader(io.StringIO(result.stdout), skipinitialspace=True))
+            visible = python_process_env(python).get('CUDA_VISIBLE_DEVICES', '').strip()
+            if visible:
+                choice = visible.split(',')[0].strip()
+                rows = [row for row in rows if len(row) == 5 and choice in (row[0].strip(), row[1].strip())]
+            if len(rows) != 1 or len(rows[0]) != 5:
+                return None
+            _, uuid, name, free, total = (value.strip() for value in rows[0])
+            old_gpu = environment.get('gpu') or {}
+            recorded_uuid = report.get('device_uuid') or ''
+            if name != old_gpu.get('name') or (recorded_uuid and recorded_uuid != uuid):
+                return None
+            environment['gpu'] = dict(old_gpu, free_bytes=int(free) * 1024**2,
+                                      total_bytes=int(total) * 1024**2)
+        else:
+            import psutil
+            environment['cpu_memory_available_bytes'] = psutil.virtual_memory().available
+        return selected | environment | {'reused_verification': True}
+    except (OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError, ImportError):
+        return None
+
+
+def refresh_verified_environment(directory, model, environment):
+    """完整重检成功后更新现有验收记录，供下一次启动复用。"""
+    from apps.api.launcher_memory import environment_stamp
+    from apps.launcher.model_catalog import report_path, verified_report
+    python = environment.get('inference_python')
+    if not python or not environment.get('ok') or environment.get('reused_verification'):
+        return
+    try:
+        report = verified_report(directory, model, python)
+        if (not report or not report.get('ok')
+                or Path(report.get('python', '')).resolve() != Path(python).resolve()):
+            return
+        report['environment'] = dict(environment)
+        report['inference_stamp'] = environment_stamp(python)
+        target = report_path(directory, model, python)
+        import uuid
+        temporary = target.with_suffix('.' + uuid.uuid4().hex + '.tmp')
+        temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+        temporary.replace(target)
+    except (OSError, ValueError, TypeError, KeyError):
+        return
 
 
 def python_process_env(python):

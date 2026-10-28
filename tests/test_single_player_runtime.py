@@ -43,6 +43,24 @@ def test_launcher_service_starts_and_shuts_down_with_workspace_identity(tmp_path
         saved_identity = json.loads((tmp_path / 'startup-diagnostics/service.json').read_text(encoding='utf-8'))
         assert saved_identity['state'] == 'running'
         assert saved_identity['build'] == health['build']
+        original_instance = health['instance_id']
+        request = urllib.request.Request(base + '/v1/local-runtime/restart', method='POST')
+        with opener.open(request, timeout=15) as response:
+            assert json.load(response)['status'] == 'restarting'
+        for _ in range(150):
+            try:
+                with opener.open(base + '/health/live', timeout=1) as response:
+                    restarted = json.load(response)
+                if restarted['instance_id'] != original_instance:
+                    break
+            except OSError:
+                pass
+            assert process.poll() is None
+            time.sleep(.1)
+        else:
+            raise AssertionError('service did not restart')
+        assert restarted['pid'] == process.pid
+        assert json.loads((tmp_path / 'instance.json').read_text(encoding='utf-8'))['instance_id'] == restarted['instance_id']
         request = urllib.request.Request(base + '/v1/local-runtime/shutdown', method='POST')
         with opener.open(request, timeout=15) as response:
             assert json.load(response)['status'] == 'stopping'

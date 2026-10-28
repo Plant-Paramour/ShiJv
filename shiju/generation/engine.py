@@ -130,6 +130,8 @@ class GenerationEngine:
                         self._validate_template_output(runtime, parsed.content, request.strict_polyphonic)
                     if use_constraints and request.meter_type == "汉俳":
                         self._validate_hanpai_output(runtime, parsed.content, request.strict_polyphonic)
+                    if use_constraints and request.meter_type in {"唐诗", "排律"}:
+                        self._validate_generated_endings(runtime, parsed.content, request.task_options)
                 except (GenerationProtocolError, PoemParseError, ContextConstraintError) as exc:
                     last_error = exc
                     if on_candidate_event: on_candidate_event("candidate.retry", {"ordinal": ordinal, "attempt": attempt, "error": str(exc)})
@@ -270,6 +272,9 @@ class GenerationEngine:
                     raw = self.runner.generate_partial(prompt, request.sampling, processor=processor, plan=plan, on_text=on_text)
                     parsed = parse_generation_protocol(raw)
                     plan.validate(parsed.content, request.strict_polyphonic)
+                    if request.meter_type in {"唐诗", "排律"}:
+                        self._validate_generated_endings(runtime, parsed.content, request.task_options,
+                                                         set(range(len(layout.lines))) - set(fixed))
                 except RuntimeError as exc:
                     emit("candidate.failed", error=str(exc))
                     raise
@@ -368,6 +373,14 @@ class GenerationEngine:
                 try:
                     protocol = parse_rewrite_protocol(raw)
                     replacements = plan.replacements_from_text(protocol.rewrite_text)
+                    if request.meter_type in {"唐诗", "排律"} and request.task_options.get("allow_polyphonic_ending") is not True:
+                        from ..data import is_polyphonic_end
+                        for number, replacement in replacements.items():
+                            if number != 1:
+                                continue
+                            ending = parse_poem(replacement).lines[0].text[-1]
+                            if is_polyphonic_end(runtime.profile.lexicon, ending):
+                                raise RewriteProtocolError(f"第 {number} 句句末字“{ending}”存在多个音类")
                     full_text = plan.apply(replacements)
                     original_lines = {line.number: line.text for line in parse_poem(request.original_text).lines}
                     if any(parse_poem(text).lines[0].text == original_lines[number] for number, text in replacements.items()):
@@ -417,6 +430,19 @@ class GenerationEngine:
         }
 
 
+    @staticmethod
+    def _validate_generated_endings(runtime, content, options, generated_indices=None):
+        from ..data import is_polyphonic_end
+        if options.get("allow_polyphonic_ending") is True:
+            return
+        for index, line in enumerate(parse_poem(content).lines):
+            if index != 0:
+                continue
+            if generated_indices is not None and index not in generated_indices:
+                continue
+            if is_polyphonic_end(runtime.profile.lexicon, line.text[-1]):
+                raise ContextConstraintError(f"第 {index + 1} 句句末字“{line.text[-1]}”存在多个音类")
+
     def _runtime_for(self, request: GeneratePoemRequest | RewritePoemRequest):
         lexicon, vocab = self._resources_for(request.rhyme_dict_name)
         options = dict(request.task_options)
@@ -441,12 +467,14 @@ class GenerationEngine:
             num_lines=request.num_lines,
             hanpai=HanpaiOptions(**options) if request.meter_type == "汉俳" else HanpaiOptions(),
             tang=(
-                TangOptions(allow_aojiu=bool(options.get("allow_aojiu", True)))
+                TangOptions(allow_aojiu=bool(options.get("allow_aojiu", True)),
+                            allow_polyphonic_ending=options.get("allow_polyphonic_ending") is True)
                 if request.meter_type == "唐诗"
                 else TangOptions()
             ),
             pailv=(
-                PailvOptions(allow_aojiu=bool(options.get("allow_aojiu", True)))
+                PailvOptions(allow_aojiu=bool(options.get("allow_aojiu", True)),
+                             allow_polyphonic_ending=options.get("allow_polyphonic_ending") is True)
                 if request.meter_type == "排律"
                 else PailvOptions()
             ),

@@ -16,7 +16,7 @@ TREES = {
     'shiju': {'.py', '.csv'},
     'Rhyme': {'.json'},
     'Songci_Meter': {'.json'},
-    'web/prosody-checker': {'.js', '.mjs', '.cjs', '.html', '.css', '.svg', '.json', '.md'},
+    'web/prosody-checker': {'.js', '.mjs', '.cjs', '.html', '.css', '.svg', '.json', '.md', '.woff2'},
 }
 FILES = {
     'README.md', '.gitignore', 'pyproject.toml', 'requirements-api.txt', 'requirements-gpu.txt',
