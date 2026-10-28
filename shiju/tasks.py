@@ -276,9 +276,9 @@ class RelationalTaskFactory:
                 ),
             ),
             processor_config=ProcessorConfig(
-                relax_rhyme_on_empty=True,
-                raw_on_no_candidates=True,
-                raw_after_policy_failure=True,
+                relax_rhyme_on_empty=False,
+                raw_on_no_candidates=False,
+                raw_after_policy_failure=False,
                 release_constraints_after_finish=True,
                 separator_empty_returns_raw=True,
                 strict_polyphonic=request.strict_polyphonic,

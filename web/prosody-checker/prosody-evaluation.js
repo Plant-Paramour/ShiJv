@@ -5,7 +5,7 @@ import {
   evaluatePailv,
   evaluateSongci,
   flattenMeter,
-} from "./core.js?v=13";
+} from "./core.js?v=22";
 import { getDatasetJson } from "./dataset-cache.js?v=3";
 
 export const RHYME_BOOKS = {
@@ -87,7 +87,7 @@ function finalEvaluation(best, candidates) {
   best.result.stats.comprehensiveScore = best.score;
   best.result.stats.autoMatched = true;
   return {
-    version: 1,
+    version: 8,
     evaluated_at: Date.now() / 1000,
     rhyme_book_id: best.rhymeBookId,
     rhyme_book_name: RHYME_BOOKS[best.rhymeBookId].name,
@@ -134,8 +134,8 @@ export async function evaluateBestTangAcrossBooks(text, options = {}, current = 
 
 export async function evaluateGeneratedPoem(text, request = {}, overrides = {}) {
   const options = {
-    strictPolyphonic: request.strict_polyphonic !== false,
-    polyphonicMode: request.strict_polyphonic === false ? "permissive" : "strict",
+    strictPolyphonic: false,
+    polyphonicMode: "automatic",
     allowAoJiu: request.task_options?.allow_aojiu !== false,
     linePattern: request.task_options?.line_pattern || "5-7-5",
     forbidIsolatedLevel: request.task_options?.forbid_isolated_level !== false,

@@ -132,6 +132,7 @@ class GenerationEngine:
                         self._validate_hanpai_output(runtime, parsed.content, request.strict_polyphonic)
                     if use_constraints and request.meter_type in {"唐诗", "排律"}:
                         self._validate_generated_endings(runtime, parsed.content, request.task_options)
+                        self._validate_generated_first_line(runtime, parse_poem(parsed.content).lines[0].text)
                 except (GenerationProtocolError, PoemParseError, ContextConstraintError) as exc:
                     last_error = exc
                     if on_candidate_event: on_candidate_event("candidate.retry", {"ordinal": ordinal, "attempt": attempt, "error": str(exc)})
@@ -275,6 +276,8 @@ class GenerationEngine:
                     if request.meter_type in {"唐诗", "排律"}:
                         self._validate_generated_endings(runtime, parsed.content, request.task_options,
                                                          set(range(len(layout.lines))) - set(fixed))
+                        if 0 not in fixed:
+                            self._validate_generated_first_line(runtime, parse_poem(parsed.content).lines[0].text)
                 except RuntimeError as exc:
                     emit("candidate.failed", error=str(exc))
                     raise
@@ -373,6 +376,11 @@ class GenerationEngine:
                 try:
                     protocol = parse_rewrite_protocol(raw)
                     replacements = plan.replacements_from_text(protocol.rewrite_text)
+                    if request.meter_type in {"唐诗", "排律"} and 1 in replacements:
+                        try:
+                            self._validate_generated_first_line(runtime, parse_poem(replacements[1]).lines[0].text)
+                        except ContextConstraintError as exc:
+                            raise RewriteProtocolError(str(exc)) from exc
                     if request.meter_type in {"唐诗", "排律"} and request.task_options.get("allow_polyphonic_ending") is not True:
                         from ..data import is_polyphonic_end
                         for number, replacement in replacements.items():
@@ -429,6 +437,17 @@ class GenerationEngine:
             "config": request.to_dict(),
         }
 
+
+    @staticmethod
+    def _validate_generated_first_line(runtime, text):
+        from ..candidates import has_viable_tang_completion
+        profile = runtime.profile
+        if not has_viable_tang_completion(
+            text, profile.line_length, 2, 2, profile.lexicon,
+            allow_aojiu=profile.allow_aojiu, strict_polyphonic=profile.strict_polyphonic,
+            is_first_line=True, rhyme_tone=0 if "平" in profile.rhyme_type else 1,
+        ) or len(text) != profile.line_length:
+            raise ContextConstraintError("生成的首句没有符合格律的末字读音")
 
     @staticmethod
     def _validate_generated_endings(runtime, content, options, generated_indices=None):

@@ -194,18 +194,21 @@ function buildAutomaticReadingDecisions(
       const isEven = (lineIndex + 1) % 2 === 0;
       const endEntry = lexicon.lookup(chars.at(-1));
       const isRhyming = isEven
-        || (lineIndex === 0 && endEntry.tones.has(context.rhymeTone));
+        || (lineIndex === 0 && (context.firstLineEndTone
+          ? context.firstLineEndTone === context.rhymeTone
+          : endEntry.tones.has(context.rhymeTone)));
       if (!isRhyming || context.rhymeTone !== TONE_PING) continue;
       const lineBase = expectedLineBase(context.globalBase, lineIndex);
       const isolatedIndex = lineBase === TONE_PING ? 1
         : context.charCount === 7 ? 3 : -1;
       if (isolatedIndex < 0) continue;
+      const windowStart = context.charCount === 7 && lineBase === TONE_ZE ? 2 : 0;
       for (let charIndex = 0; charIndex < chars.length - 1; charIndex += 1) {
         const entry = lexicon.lookup(chars[charIndex]);
         if (!entry.polyphonic || !entry.tones.has(TONE_PING)) continue;
         const pingWithoutCurrent = chars.slice(0, -1)
           .map((char, index) => ({ index, entry: lexicon.lookup(char) }))
-          .filter(({ index, entry: item }) => index > 0 && index !== charIndex
+          .filter(({ index, entry: item }) => index >= windowStart && index !== charIndex
             && item.tones.has(TONE_PING))
           .map(({ index }) => index);
         if (pingWithoutCurrent.length === 1 && pingWithoutCurrent[0] === isolatedIndex) {
@@ -575,10 +578,10 @@ export function scoreTangTones(lines, charCount, globalBase, rhymeTone, lexicon,
     total += chars.length;
     const lineBase = expectedLineBase(globalBase, lineIndex);
     const isEven = (lineIndex + 1) % 2 === 0;
-    const endTone = isEven ? rhymeTone : lineIndex === 0 ? null : opposite(rhymeTone);
+    const endTone = isEven ? rhymeTone : lineIndex === 0 ? (options.firstLineEndTone ?? null) : opposite(rhymeTone);
     const endEntry = lexicon.lookup(chars.at(-1));
     const isRhyming = endTone === rhymeTone
-      || (lineIndex === 0 && rescueHasTone(endEntry, rhymeTone, strictPolyphonic));
+      || (lineIndex === 0 && endTone === null && rescueHasTone(endEntry, rhymeTone, strictPolyphonic));
     const keyIndex = charCount - 2;
     const rescueIndex = keyIndex - 1;
     const checks = [[1, lineBase], [3, opposite(lineBase)]];
@@ -656,15 +659,18 @@ export function scoreTangTones(lines, charCount, globalBase, rhymeTone, lexicon,
     }
 
     const endingEntries = chars.slice(-3).map((char) => lexicon.lookup(char));
-    if (isRhyming && endingEntries.every(
-      (entry) => ruleCanUseTone(entry, rhymeTone, strictPolyphonic),
+    const endingTone = endTone ?? (isRhyming ? rhymeTone : null);
+    if ((isRhyming || (lineIndex === 0 && options.firstLineEndTone)) && endingTone && endingEntries.every(
+      (entry, index) => index === 2 && lineIndex === 0 && options.firstLineEndTone
+        ? options.firstLineEndTone === endingTone
+        : ruleCanUseTone(entry, endingTone, strictPolyphonic),
     )) {
       reject(
         lineIndex,
-        chars.length - 1,
-        rhymeTone === TONE_PING ? "三平尾" : "三仄尾",
-        "非三连" + rhymeTone,
-        chars.at(-1),
+        lineIndex === 0 && options.firstLineEndTone && !isRhyming ? chars.length - 3 : chars.length - 1,
+        endingTone === TONE_PING ? "三平尾" : "三仄尾",
+        lineIndex === 0 && options.firstLineEndTone && !isRhyming ? opposite(endingTone) + "声" : "非三连" + endingTone,
+        lineIndex === 0 && options.firstLineEndTone && !isRhyming ? chars.at(-3) : chars.at(-1),
       );
     }
 
@@ -679,22 +685,36 @@ export function scoreTangTones(lines, charCount, globalBase, rhymeTone, lexicon,
     }
 
     if (isRhyming && rhymeTone === TONE_PING) {
+      // 七言的孤平按末五字判断，开头两字不能抵消末五字中的孤平。
+      const windowStart = charCount === 7 && lineBase === TONE_ZE ? charCount - 5 : 0;
       const nonRhymePingPositions = chars
         .slice(0, -1)
         .map((char) => lexicon.lookup(char))
         .map((entry, charIndex) => ({ entry, charIndex }))
-        .filter(({ entry }) => rescueHasTone(entry, TONE_PING, strictPolyphonic))
+        .filter(({ entry, charIndex }) => charIndex >= windowStart
+          && rescueHasTone(entry, TONE_PING, strictPolyphonic))
         .map(({ charIndex }) => charIndex);
       if (lineBase === TONE_PING) {
         if (nonRhymePingPositions.length === 1
           && nonRhymePingPositions[0] === 1) {
-          reject(lineIndex, 1, "孤平", "第三字用平声自救", chars[1]);
+          reject(lineIndex, 1, "孤平", "第一字用平，或第三字用平自救", chars[1]);
         }
       } else if (charCount === 7) {
         if (nonRhymePingPositions.length === 1
           && nonRhymePingPositions[0] === 3) {
-          reject(lineIndex, 3, "孤平", "第五字用平声自救", chars[3]);
+          reject(lineIndex, 3, "孤平", "第三字用平，或第五字用平自救", chars[3]);
         }
+      }
+      const tailStart = charCount - 5;
+      const tailKeyTone = checks.find(([index]) => index === keyIndex)?.[1];
+      if (allowAoJiu && tailKeyTone === TONE_ZE
+          && ruleCanUseTone(lexicon.lookup(chars[tailStart]), TONE_ZE, strictPolyphonic)
+          && rescueHasTone(lexicon.lookup(chars[tailStart + 1]), TONE_PING, strictPolyphonic)
+          && rescueHasTone(lexicon.lookup(chars[tailStart + 2]), TONE_PING, strictPolyphonic)) {
+        recordAoJiu("孤平自救", "本句自救", [
+          { lineIndex, charIndex: tailStart, role: "ao" },
+          { lineIndex, charIndex: tailStart + 2, role: "rescue" },
+        ], `第 ${lineIndex + 1} 句第 ${tailStart + 1} 字“${chars[tailStart]}”用仄，第 ${tailStart + 3} 字“${chars[tailStart + 2]}”用平，符合孤平自救。`);
       }
     }
 
@@ -785,8 +805,142 @@ function selectGlobalBase(lines, charCount, rhymeTone, lexicon, options) {
   return best;
 }
 
+function firstLineToneRepairs(lines, lexicon, result, tone, options) {
+  const firstFaults = result.violations.filter((item) => item.lineIndex === 0);
+  if (!firstFaults.length || lines[0].length !== result.stats.charCount) return [];
+  const chars = [...lines[0]];
+  let plans = [[]];
+  for (let index = 0; index < chars.length - 1; index += 1) {
+    const entry = lexicon.lookup(chars[index]);
+    if (!entry.tones.size) continue;
+    const changes = [TONE_PING, TONE_ZE].filter((value) => !entry.tones.has(value));
+    plans = plans.flatMap((plan) => [plan, ...changes.map((value) => [...plan, { charIndex: index, tone: value }])]);
+  }
+  plans = plans.filter((plan) => plan.length).sort((a, b) => a.length - b.length);
+  const originalLaterErrors = new Set(result.violations.filter((item) => item.lineIndex > 0)
+    .map((item) => key(item.lineIndex, item.charIndex)));
+  const repairOptions = { ...options, firstLineEndTone: tone };
+  const rescueSignature = (detail) => JSON.stringify([detail.rule,
+    detail.positions.map(({ lineIndex, charIndex, role }) => [lineIndex, charIndex, role])]);
+  const originalRescues = new Set((options.allowAoJiu ? result.aoJiu.details
+    : scoreTangTones(lines, result.stats.charCount, result.stats.globalBase, result.stats.rhymeTone,
+      lexicon, { ...repairOptions, allowAoJiu: true }).aoJiuDetails).map(rescueSignature));
+  const accepted = [];
+  let minimum = Infinity;
+  let minimumNewRescues = Infinity;
+  for (const plan of plans) {
+    if (plan.length > minimum) break;
+    const changed = [...chars];
+    const entries = new Map();
+    for (const repair of plan) {
+      const placeholder = String.fromCharCode(0xe000 + repair.charIndex);
+      changed[repair.charIndex] = placeholder;
+      entries.set(placeholder, { ...lexicon.lookup(chars[repair.charIndex]), tones: new Set([repair.tone]) });
+    }
+    const changedLexicon = { lookup: (char) => entries.get(char) ?? lexicon.lookup(char) };
+    const checked = scoreTangTones([changed.join(''), ...lines.slice(1)], result.stats.charCount,
+      result.stats.globalBase, result.stats.rhymeTone, changedLexicon, repairOptions);
+    if (checked.violations.some((item) => item.lineIndex === 0
+        || !originalLaterErrors.has(key(item.lineIndex, item.charIndex)))) continue;
+    minimum = plan.length;
+    // 同等修改字数优先恢复常式、保留已有拗救，不把新增拗救当作并列的直接修复建议。
+    // 这只排序建议；原本已经合法的拗救句仍按原规则通过。
+    const rescues = options.allowAoJiu ? checked.aoJiuDetails
+      : scoreTangTones([changed.join(''), ...lines.slice(1)], result.stats.charCount,
+        result.stats.globalBase, result.stats.rhymeTone, changedLexicon,
+        { ...repairOptions, allowAoJiu: true }).aoJiuDetails;
+    const newRescues = rescues.filter((detail) => !originalRescues.has(rescueSignature(detail))).length;
+    if (newRescues < minimumNewRescues) {
+      minimumNewRescues = newRescues;
+      accepted.length = 0;
+    }
+    if (newRescues === minimumNewRescues) accepted.push(plan);
+  }
+  return accepted;
+}
+
+function mergePolyphonicFailures(result, position, branches, decision) {
+  const faults = branches.map(({ tone, result: branch }) => ({
+    tone,
+    violations: branch.violations.filter((item) => item.lineIndex === position.lineIndex),
+    rhymeViolations: branch.rhymeViolations.filter((item) => item.lineIndex === position.lineIndex),
+    repairs: branch.firstLineToneRepairs ?? [],
+  }));
+  if (!faults.every((branch) => branch.violations.length || branch.rhymeViolations.length)) return;
+
+  // 分支中的规则位置只属于该读法，不能作为无条件错误再次输出。
+  // 原始分支与扣分保留；对外只暴露这一条共享的条件冲突。
+  const conflict = { ...decision, rule: '多音字条件冲突', readingConditions: faults };
+  result.violations = result.violations.filter((item) => item.lineIndex !== position.lineIndex);
+  result.rhymeViolations = result.rhymeViolations.filter((item) => item.lineIndex !== position.lineIndex);
+  if (faults.some((branch) => branch.violations.length)) result.violations.push(conflict);
+  else result.rhymeViolations.push(conflict);
+  result.polyphonicDecisions = result.polyphonicDecisions.map((item) =>
+    item.lineIndex === position.lineIndex && item.charIndex === position.charIndex ? conflict : item);
+  result.conditionalConflicts = [conflict];
+  for (const error of result.errors) {
+    if (error.startsWith(`${position.lineIndex}:`)) result.errors.delete(error);
+  }
+  result.errors.add(key(position.lineIndex, position.charIndex));
+  const affected = new Set(faults.flatMap((branch) => branch.repairs.flatMap((plan) => plan.map((item) => item.charIndex))));
+  result.lines[position.lineIndex].characters = result.lines[position.lineIndex].characters.map((character, charIndex) => ({
+    ...character,
+    error: charIndex === position.charIndex,
+    ...(charIndex === position.charIndex ? { conditionalError: 'polyphonic' }
+      : affected.has(charIndex) ? { conditionalError: 'affected' } : {}),
+  }));
+}
+
 function evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind, options = {}) {
   const lines = parsePoem(text);
+  const firstEnd = lines[0] ? lexicon.lookup([...lines[0]].at(-1)) : null;
+  if (!options.firstLineEndTone && firstEnd?.tones.size === 1) {
+    options = { ...options, firstLineEndTone: [...firstEnd.tones][0] };
+  }
+  if (!options.firstLineEndTone && !isStrictPolyphonic(options)
+      && firstEnd?.tones.has(TONE_PING) && firstEnd.tones.has(TONE_ZE)) {
+    const branches = [TONE_PING, TONE_ZE].map((tone) => ({
+      tone,
+      result: evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind,
+        { ...options, firstLineEndTone: tone }),
+    }));
+    const firstLinePasses = ({ result }) => ![...result.violations, ...result.rhymeViolations]
+      .some((item) => item.lineIndex === 0);
+    branches.sort((a, b) => Number(firstLinePasses(b)) - Number(firstLinePasses(a))
+      || comprehensiveScore(b.result) - comprehensiveScore(a.result));
+    const chosen = { ...branches[0].result, errors: new Set(branches[0].result.errors),
+      stats: { ...branches[0].result.stats },
+      lines: branches[0].result.lines.map((line) => ({ ...line, characters: line.characters.map((character) => ({ ...character })) })) };
+    let decision;
+    if (polyphonicMode(options) === POLYPHONIC_AUTO) {
+      const char = [...lines[0]].at(-1);
+      const descriptions = [...branches].sort((a, b) => a.tone === TONE_ZE ? -1 : b.tone === TONE_ZE ? 1 : 0).map(({ tone, result }) => {
+        const firstErrors = result.violations.filter((item) => item.lineIndex === 0);
+        const rhymeErrors = result.rhymeViolations.filter((item) => item.lineIndex === 0);
+        const repairs = firstLineToneRepairs(lines, lexicon, result, tone, options);
+        result.firstLineToneRepairs = repairs;
+        const faults = firstErrors.map((item) => `第 ${item.charIndex + 1} 字“${item.char}”${item.rule}，要求${item.required}`);
+        const rhymeFaults = rhymeErrors.map((item) => `第 ${item.charIndex + 1} 字应属${item.required}`);
+        const toneCondition = repairs.length
+          ? repairs.map((plan) => plan.map((repair) => `第 ${repair.charIndex + 1} 字应${repair.tone}`).join('、')).join('，或')
+          : faults.join('；');
+        const conditions = [toneCondition, ...rhymeFaults].filter(Boolean);
+        return `若为${tone}声，${conditions.length ? conditions.join('；') : '符合首句格律'}`;
+      });
+      for (const branch of branches) {
+        branch.result.polyphonicDecisions = branch.result.polyphonicDecisions.filter((item) => !(item.lineIndex === 0 && item.charIndex === charCount - 1));
+        branch.result.polyphonicDecisions.unshift({ lineIndex: 0, charIndex: charCount - 1, char,
+          tone: branch.tone, message: `第 1 句第 ${charCount} 字“${char}”：${descriptions.join('；')}。` });
+      }
+      decision = branches[0].result.polyphonicDecisions[0];
+      chosen.polyphonicDecisions = [...branches[0].result.polyphonicDecisions];
+    }
+    for (const branch of branches) branch.result.stats.firstLineEndTone = branch.tone;
+    chosen.stats.firstLineEndTone = branches[0].tone;
+    chosen.firstLineAlternatives = branches.map(({ tone, result }) => ({ tone, result: { ...result } }));
+    if (decision) mergePolyphonicFailures(chosen, { lineIndex: decision.lineIndex, charIndex: decision.charIndex }, branches, decision);
+    return chosen;
+  }
   const issues = [];
   let structureMismatches = 0;
   for (let index = 0; index < lines.length; index += 1) {
@@ -824,7 +978,7 @@ function evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind, opt
   for (let index = 1; index < lines.length; index += 2) rhymePositions.push(index);
   if (lines[0]) {
     const firstEnd = lexicon.lookup([...lines[0]].at(-1));
-    if (firstEnd.tones.has(rhymeTone)) rhymePositions.unshift(0);
+    if (options.firstLineEndTone ? options.firstLineEndTone === rhymeTone : firstEnd.tones.has(rhymeTone)) rhymePositions.unshift(0);
   }
   const rhyme = scoreRhymeGroups(
     lines,
@@ -845,6 +999,7 @@ function evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind, opt
       rhymeTone,
       globalBase: selected?.tone,
       charCount,
+      firstLineEndTone: options.firstLineEndTone,
       aoJiuDetails: tonal.aoJiuDetails,
     },
   );
@@ -878,6 +1033,7 @@ function evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind, opt
       globalBase: selected?.tone ?? null,
       rhymeTone,
       charCount,
+      firstLineEndTone: options.firstLineEndTone ?? null,
     },
   };
 }

@@ -2627,6 +2627,10 @@ input:focus {
   background: transparent;
 }
 
+.prosody-view mark.conditional-polyphonic { color: #a9272c; background: #f8dada; border-radius: 3px; }
+.prosody-view mark.conditional-affected { color: #555; background: #e1e1e1; border-radius: 3px; }
+.conditional-sample { color: #555; background: #e1e1e1; border-radius: 3px; }
+
 .issues {
   max-height: 70px;
   margin-bottom: 8px;
@@ -3953,6 +3957,7 @@ body.has-open-drawer { overflow: hidden; }
 .poem-score dt { color: var(--site-ink-soft); }
 .poem-score dd { color: var(--site-ink); font-variant-numeric: tabular-nums; }
 .poem-handscroll__line .prosody-error { color: #a9272c; font-weight: 800; text-decoration: underline; text-decoration-color: color-mix(in srgb, #a9272c 65%, transparent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.poem-handscroll__line .prosody-conditional-affected, .prosody-inspector__line-text .is-conditional-affected { color: #777; font-weight: 800; text-decoration: underline; text-decoration-color: #999; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .poem-score--pending { align-content: center; text-align: right; }
 .poem-handscroll__roller {
   position: absolute;

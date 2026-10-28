@@ -162,6 +162,19 @@ def has_viable_tang_completion(
     )
 
 
+def first_line_reading_is_viable(text, target_length, line_tone, rhyme_tone,
+                                 lexicon, ending_tone, *, allow_aojiu=False,
+                                 strict_polyphonic=True):
+    """检查指定末字读音与整句平仄能否同时成立。"""
+    if len(text) != target_length or ending_tone not in lexicon.get_pingze(text[-1]):
+        return False
+    options = tuple(tuple(dict.fromkeys(lexicon.get_pingze(char))) for char in text[:-1]) + ((ending_tone,),)
+    if any(not tones for tones in options):
+        return False
+    return _has_viable_tang_tones(options, target_length, line_tone, 2,
+                                  allow_aojiu, strict_polyphonic, True, rhyme_tone, False)
+
+
 def has_viable_tang_completion_from_options(
     tone_options: tuple[tuple[str, ...], ...],
     target_length: int,
@@ -220,8 +233,7 @@ def _valid_tang_patterns(
     patterns = []
     for tones in product(("平", "仄"), repeat=target_length):
         rhyme_value = "平" if rhyme_tone == 0 else "仄"
-        # When the first-line ending is still unconstrained (end_tone=2),
-        # the original prefix algorithm treats an ambiguous ending as non-rhyming.
+        # Each concrete first-line reading determines its own rhyme status.
         first_line_rhymes = (
             False if end_tone == 2 else tones[-1] == rhyme_value
         ) if is_first_line else None
@@ -341,14 +353,7 @@ def _tang_tones_are_valid(
         return False
 
     rhyme_value = "平" if rhyme_tone == 0 else "仄"
-    is_rhyming = end_tone == rhyme_tone or (
-        is_first_line
-        and (
-            first_line_rhymes
-            if first_line_rhymes is not None
-            else tones[-1] == rhyme_value
-        )
-    )
+    is_rhyming = tones[-1] == rhyme_value if is_first_line else end_tone == rhyme_tone
     key_position = target_length - 2
     rescue_position = key_position - 1
 
@@ -377,6 +382,13 @@ def _tang_tones_are_valid(
     if require_cross_rescue and tones[rescue_position] != "平":
         return False
 
+    # 首句多音韵脚的每种读法对应各自句式，不能将入韵状态共享给另一读法。
+    if is_first_line and rhyme_tone == 0:
+        if is_rhyming and target_length == 7 and line_tone == 1 and tones[2] != "平":
+            return False
+        if not is_rhyming and tones[-3:] == ("仄", "仄", "仄"):
+            return False
+
     if is_rhyming:
         if tones[-3:] == (rhyme_value, rhyme_value, rhyme_value):
             return False
@@ -403,8 +415,7 @@ def _tang_suffix_masks(target_length, line_tone, end_tone, allow_aojiu,
     """For each concrete prefix, bits identify the SAME possible suffixes.
 
     Intersecting these masks preserves exists-suffix/forall-readings semantics.
-    The first-line rhyme decision depends on the original options, so retain
-    separate tables for None/False/True rather than inferring it per reading.
+    First-line rhyme is determined separately for each concrete reading.
     """
     tables = {}
     for first_rhymes in (None, False, True):

@@ -5,10 +5,10 @@ import {
   evaluateTang,
   evaluateBestTangForm,
   formatMeterTemplate,
-} from "./core.js?v=13";
+} from "./core.js?v=22";
 import {
   getLexicon,
-} from "./prosody-evaluation.js?v=10";
+} from "./prosody-evaluation.js?v=17";
 import { getDatasetJson } from "./dataset-cache.js?v=3";
 
 let METER_FILES = [];
@@ -457,12 +457,13 @@ function appendCharacterRow(container, characters, property) {
   const row = document.createElement("div");
   row.className = property === "char" ? "poem-line" : "tone-line";
   for (const item of characters) {
-    const span = document.createElement("span");
+    const span = document.createElement(item.conditionalError ? "mark" : "span");
     span.className = property;
     if (item.polyphonic) span.classList.add("polyphonic");
     if (item.roles?.includes("ao")) span.classList.add("ao");
     if (item.roles?.includes("rescue")) span.classList.add("rescue");
-    if (item.error) span.classList.add("error");
+    if (item.error && item.conditionalError !== "affected") span.classList.add("error");
+    if (item.conditionalError) span.classList.add("conditional-" + item.conditionalError);
     if (property === "tone" && item.tone.includes("/")) span.classList.add("multi-label");
     span.textContent = property === "char" ? item.char : (item.polyphonic ? "多" : item.tone);
     const hints = [];
@@ -513,7 +514,7 @@ function renderDetectionSummary(result) {
       + " 字“" + item.char + "”：“" + item.rule + "”，应" + item.required + "。"
   );
   elements.detectionSummary.replaceChildren();
-  const rhymeViolations = (result.rhymeViolations ?? []).map((item) =>
+  const rhymeViolations = (result.rhymeViolations ?? []).map((item) => item.message ||
     "第 " + (item.lineIndex + 1) + " 句第 " + (item.charIndex + 1)
       + " 字“" + item.char + "”：未与本组主韵部“" + item.required + "”相合。"
   );
@@ -593,8 +594,9 @@ function resultMeta(result, type, variant) {
   }
   if (type === "tang") {
     const form = elements.tangForm.value === "jueju" ? "绝句" : "律诗";
+    const firstRhyme = result.stats.firstLineEndTone === result.stats.rhymeTone ? "首句押韵" : "";
     return charCountLabel(result.stats.charCount) + "言" + form + " · "
-      + (result.stats.globalBase ?? "未定") + "起 · "
+      + (result.stats.globalBase ?? "未定") + "起" + firstRhyme + " · "
       + result.stats.rhymeTone + "韵 · " + rhymeBookName + smartMeta;
   }
   if (type === "pailv") {
@@ -633,7 +635,7 @@ function renderResult(result, type, variant) {
     row.className = "result-line";
     appendCharacterRow(row, line.characters.map((character, charIndex) => ({
       ...character,
-      error: errorPositions.has(`${lineIndex}:${charIndex}`),
+      error: character.error || errorPositions.has(`${lineIndex}:${charIndex}`),
     })), "char");
     appendCharacterRow(row, line.characters, "tone");
     makeEditable(row, lineIndex);

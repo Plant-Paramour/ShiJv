@@ -1,5 +1,5 @@
-import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=10";
-import { flattenMeter } from "./core.js?v=13";
+import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=17";
+import { flattenMeter } from "./core.js?v=22";
 import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
 import { getDatasetJson } from "./dataset-cache.js?v=3";
 import { renderChatMarkdown } from "./chat-markdown.js?v=3";
@@ -1659,13 +1659,14 @@ function rhymeViolationMessages(result = {}) {
   const explicit = result.rhymeViolations || [];
   const inferred = explicit.length ? [] : (result.rhymeGroups || []).flatMap((group) =>
     (group.endings || []).filter((ending) => group.dominantPart
-      && !(ending.parts || []).includes(group.dominantPart)).map((ending) => ({
+      && !(ending.parts || []).includes(group.dominantPart)
+      && !(result.conditionalConflicts || []).some((conflict) => conflict.lineIndex === ending.lineIndex)).map((ending) => ({
       lineIndex: ending.lineIndex,
       charIndex: (result.lines?.[ending.lineIndex]?.characters || []).length - 1,
       char: ending.char,
       required: `${group.dominantPart}韵部`,
     })));
-  return [...explicit, ...inferred].map((item) =>
+  return [...explicit, ...inferred].map((item) => item.message ||
     `第 ${Number(item.lineIndex) + 1} 句第 ${Number(item.charIndex) + 1} 字“${item.char}”：未与本组主韵部“${item.required}”相合。`);
 }
 
@@ -1674,8 +1675,11 @@ function scoreDeductionMessages(evaluation = {}) {
   const result = evaluation.result || {};
   const tonal = violationMessages(result);
   const rhyme = rhymeViolationMessages(result);
-  if (Number(evaluation.tonal_score) < 100 && !tonal.length) tonal.push("平仄分未满，请核对逐字声调和句式要求。");
-  if (Number(evaluation.rhyme_score) < 100 && !rhyme.length) rhyme.push("押韵分未满，请核对各韵脚与本组主韵部。");
+  const conflicts = result.conditionalConflicts || [];
+  const explainsTone = conflicts.some((item) => item.readingConditions.some((branch) => branch.violations.length));
+  const explainsRhyme = conflicts.some((item) => item.readingConditions.some((branch) => branch.rhymeViolations.length));
+  if (Number(evaluation.tonal_score) < 100 && !tonal.length && !explainsTone) tonal.push("平仄分未满，请核对逐字声调和句式要求。");
+  if (Number(evaluation.rhyme_score) < 100 && !rhyme.length && !explainsRhyme) rhyme.push("押韵分未满，请核对各韵脚与本组主韵部。");
   return [...tonal, ...rhyme];
 }
 
@@ -1701,6 +1705,7 @@ function appendMarkedPoemText(container, content, result, cursor) {
   const annotations = result.lines.flatMap((line, lineIndex) => (line.characters || []).map((character, charIndex) => ({
     char: character.char,
     error: positions.has(`${lineIndex}:${charIndex}`),
+    conditionalError: character.conditionalError,
   })));
   let plainText = "";
   for (const char of [...content]) {
@@ -1709,7 +1714,8 @@ function appendMarkedPoemText(container, content, result, cursor) {
     const annotation = annotations[cursor.index++];
     const span = document.createElement("span");
     span.textContent = char;
-    if (annotation?.error) span.className = "prosody-error";
+    if (annotation?.conditionalError === "affected") span.className = "prosody-conditional-affected";
+    else if (annotation?.error) span.className = "prosody-error";
     container.append(span);
   }
   if (plainText) container.append(document.createTextNode(plainText));
@@ -1810,7 +1816,8 @@ function openProsodyInspector(evaluation, title = "评分详情") {
       (line.characters || []).forEach((character, charIndex) => {
         const span = document.createElement("span");
         span.textContent = character.char;
-        if (errors.has(charIndex)) span.className = "is-error";
+        if (character.conditionalError === "affected") span.className = "is-conditional-affected";
+        else if (errors.has(charIndex)) span.className = "is-error";
         text.append(span);
       });
       const tones = document.createElement("p"); tones.className = "prosody-inspector__tones";
@@ -4009,7 +4016,7 @@ function candidateDetail(candidate, wasOpen = false, jobKind = "") {
 }
 
 async function ensureCandidateEvaluation(job, candidate, requestMeta, onComplete) {
-  if (candidate.evaluation || candidate.status !== "succeeded" || !candidate.content) return null;
+  if (candidate.evaluation?.version >= 8 || candidate.status !== "succeeded" || !candidate.content) return null;
   const key = `${job.job_id}:${candidate.ordinal}`;
   if (completedEvaluations.has(key)) {
     candidate.evaluation = completedEvaluations.get(key);
@@ -4159,7 +4166,7 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
       content: work.content || work.text || work.full_text || work.display_text || "",
     };
     const key = `${job.job_id}:${ordinal}`;
-    value.evaluation = value.evaluation || completedEvaluations.get(key);
+    value.evaluation = (value.evaluation?.version >= 8 ? value.evaluation : null) || completedEvaluations.get(key);
     const evaluationState = value.evaluation?.evaluated_at || (activeEvaluations.has(key) ? "pending" : failedEvaluations.has(key) ? "failed" : "none");
     const existing = list.querySelector(`[data-candidate-ordinal="${ordinal}"]`);
     if (!existing || existing.dataset.evaluationState !== String(evaluationState)) {
@@ -4174,7 +4181,7 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
       if (existing) existing.replaceWith(scroll);
       else list.append(scroll);
     }
-    if (autoEvaluate) ensureCandidateEvaluation(job, work, requestMeta, () => renderAvailableScrolls(container, job, requestMeta));
+    if (autoEvaluate || (work.evaluation && !(work.evaluation.version >= 8))) ensureCandidateEvaluation(job, work, requestMeta, () => renderAvailableScrolls(container, job, requestMeta, { autoEvaluate }));
   });
   updateScrollNavigation(container);
 }

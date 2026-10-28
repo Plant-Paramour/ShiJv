@@ -6,7 +6,7 @@ import random
 from typing import Mapping, Protocol, Sequence
 
 from .data import MeterTemplate, RhymeLookup
-from .candidates import has_viable_tang_completion, tang_line_requires_cross_rescue
+from .candidates import has_viable_tang_completion, tang_line_requires_cross_rescue, first_line_reading_is_viable
 from .domain import (
     AllowedPattern,
     GenerationLayout,
@@ -737,6 +737,24 @@ class RelationalConstraintSession(BaseConstraintSession):
                 else expected in tones
             )
             if line0_rhymes:
+                parts = set(self._lexicon.get_rhyme_part_by_tone(last_char, expected))
+                line0_rhymes = bool(parts) and (not self._locked_rhyme_parts or bool(parts & self._locked_rhyme_parts))
+                if line0_rhymes and len(tones) > 1:
+                    rhyme_tone = 0 if expected == "平" else 1
+                    rhyme_viable = first_line_reading_is_viable(
+                        simulated, self._line_length, self._current_base_tone,
+                        rhyme_tone, self._lexicon, expected,
+                        allow_aojiu=self._allow_aojiu, strict_polyphonic=self._strict_polyphonic,
+                    )
+                    opposite = "仄" if expected == "平" else "平"
+                    other_viable = first_line_reading_is_viable(
+                        simulated, self._line_length, self._current_base_tone,
+                        rhyme_tone, self._lexicon, opposite,
+                        allow_aojiu=self._allow_aojiu, strict_polyphonic=self._strict_polyphonic,
+                    )
+                    if not rhyme_viable and other_viable:
+                        line0_rhymes = False
+            if line0_rhymes:
                 self._line0_rhymes = True
                 parts = self._lexicon.get_rhyme_part_by_tone(last_char, expected)
                 if parts:
@@ -792,12 +810,30 @@ class RelationalConstraintSession(BaseConstraintSession):
                 )
 
         expected_rhyme_tone = "平" if "平" in self._rhyme_type else "仄"
-        if 0 in fixed_lines:
-            self._line0_rhymes = _tone_matches(
-                self._lexicon.get_pingze(fixed_lines[0][-1]),
-                {expected_rhyme_tone},
-                strict_polyphonic,
+        def first_line_rhymes(text):
+            tones = self._lexicon.get_pingze(text[-1])
+            if not _tone_matches(tones, {expected_rhyme_tone}, strict_polyphonic):
+                return False
+            if len(set(tones)) < 2:
+                return True
+            rhyme_tone = 0 if expected_rhyme_tone == "平" else 1
+            base = self._infer_base_tone(text)
+            rhyme_ok = first_line_reading_is_viable(
+                text, self._line_length, base, rhyme_tone, self._lexicon,
+                expected_rhyme_tone, allow_aojiu=self._allow_aojiu,
+                strict_polyphonic=strict_polyphonic,
             )
+            parts = set(self._lexicon.get_rhyme_part_by_tone(text[-1], expected_rhyme_tone))
+            rhyme_ok = rhyme_ok and bool(parts) and (not self._locked_rhyme_parts or bool(parts & self._locked_rhyme_parts))
+            if rhyme_ok:
+                return True
+            opposite = "仄" if expected_rhyme_tone == "平" else "平"
+            return not first_line_reading_is_viable(
+                text, self._line_length, base, rhyme_tone, self._lexicon, opposite,
+                allow_aojiu=self._allow_aojiu, strict_polyphonic=strict_polyphonic,
+            )
+        if 0 in fixed_lines:
+            self._line0_rhymes = first_line_rhymes(fixed_lines[0])
 
         possible_bases = []
         for global_base in (0, 1):
@@ -841,9 +877,7 @@ class RelationalConstraintSession(BaseConstraintSession):
             end_tones = self._lexicon.get_pingze(text[-1])
             is_rhyming = index > 0 and (index + 1) % 2 == 0
             if index == 0:
-                self._line0_rhymes = _tone_matches(
-                    end_tones, {expected_rhyme_tone}, strict_polyphonic
-                )
+                self._line0_rhymes = first_line_rhymes(text)
                 is_rhyming = self._line0_rhymes
             elif not is_rhyming and not _tone_matches(
                 end_tones, {opposite}, strict_polyphonic

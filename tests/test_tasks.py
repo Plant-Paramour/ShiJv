@@ -32,6 +32,9 @@ def test_tang_task_does_not_read_meter_source(tmp_path):
 
     assert len(runtime.profile.layout.lines) == 8
     assert not missing_source.exists()
+    assert not runtime.processor_config.raw_on_no_candidates
+    assert not runtime.processor_config.raw_after_policy_failure
+    assert not runtime.processor_config.relax_rhyme_on_empty
 
 
 def test_tang_task_propagates_aojiu_option_to_profile_policy_and_prompt(tmp_path):

@@ -12,6 +12,7 @@ import {
   flattenMeter,
   formatMeterTemplate,
   parsePoem,
+  scoreTangTones,
 } from "../core.js";
 
 const lexicon = buildLexicon({
@@ -27,6 +28,123 @@ const pinshuiLexicon = buildLexicon(JSON.parse(readFileSync(
   new URL("../../../Rhyme/Pinshui.json", import.meta.url),
   "utf8",
 )));
+
+test("首句多音韵脚按韵书显示两种读音的条件", () => {
+  const text = "圆腹短翘戏石横，\n顽痴自乐拾微轻。\n扑腾滑跌声含涩，\n憨拙方知趣未平。";
+  const result = evaluateTang(text, { charCount: 7, form: "jueju", polyphonicMode: "automatic", allowAoJiu: true }, pinshuiLexicon);
+  const decision = result.polyphonicDecisions.find((item) => item.lineIndex === 0 && item.char === "横");
+  assert.ok(decision);
+  assert.equal(decision.message, "第 1 句第 7 字“横”：若为仄声，第 5 字应平；若为平声，第 3 字应平。");
+  const levelBranch = result.firstLineAlternatives.find((branch) => branch.tone === "平").result;
+  const obliqueBranch = result.firstLineAlternatives.find((branch) => branch.tone === "仄").result;
+  assert.equal(levelBranch.stats.globalBase, "仄");
+  assert.equal(obliqueBranch.stats.globalBase, "仄");
+  assert.deepEqual(levelBranch.violations.map(({ lineIndex, charIndex, char, rule }) => [lineIndex, charIndex, char, rule]), [[0, 3, "翘", "孤平"]]);
+  assert.deepEqual(obliqueBranch.violations.map(({ lineIndex, charIndex, char }) => [lineIndex, charIndex, char]), [[0, 4, "戏"]]);
+  assert.deepEqual(levelBranch.rhymeViolations, []);
+  assert.deepEqual(obliqueBranch.rhymeViolations, []);
+  assert.equal(levelBranch.tonalScore, 96.43);
+  assert.equal(obliqueBranch.tonalScore, 96.43);
+  assert.equal(result.tonalScore, 96.43);
+  assert.equal(result.rhymeScore, 100);
+  assert.equal(result.violations[0], result.polyphonicDecisions[0]);
+  assert.equal(result.violations[0].message, decision.message);
+  assert.equal(result.violations.length, 1);
+  assert.deepEqual(result.lines[0].characters.filter((item) => item.error).map((item) => item.char), ["横"]);
+  assert.deepEqual(result.lines[0].characters.filter((item) => item.conditionalError).map((item) => [item.char, item.conditionalError]),
+    [["短", "affected"], ["戏", "affected"], ["横", "polyphonic"]]);
+  const suffix = "，顽痴自乐拾微轻。扑腾滑跌声含涩，憨拙方知趣未平。";
+  const options = { charCount: 7, form: "jueju", polyphonicMode: "automatic", allowAoJiu: true };
+  const level = evaluateTang("圆腹春翘戏石横" + suffix, options, pinshuiLexicon);
+  const oblique = evaluateTang("圆腹短翘风石横" + suffix, options, pinshuiLexicon);
+  assert.equal(level.tonalScore, 100);
+  assert.ok(level.lines[0].characters.every((item) => !item.conditionalError));
+  assert.equal(level.stats.firstLineEndTone, "平");
+  assert.equal(oblique.tonalScore, 100);
+  assert.ok(oblique.lines[0].characters.every((item) => !item.conditionalError));
+  assert.ok(oblique.firstLineAlternatives.every((branch) => branch.result.violations.length === 0));
+  assert.ok(oblique.firstLineAlternatives.find((branch) => branch.tone === '平').result.aoJiu.details.some((item) => item.rule === '孤平自救'));
+  assert.deepEqual(oblique.firstLineAlternatives.find((branch) => branch.tone === '仄').result.rhymeGroups[0].positions, [1, 3]);
+  const xinyun = buildLexicon(JSON.parse(readFileSync(new URL("../../../Rhyme/Xinyun.json", import.meta.url), "utf8")));
+  const xinyunResult = evaluateTang(text, options, xinyun);
+  assert.equal(xinyunResult.polyphonicDecisions[0].message,
+    "第 1 句第 7 字“横”：若为仄声，第 4 字应平；若为平声，第 4 字应平。");
+});
+
+test("多音提示的修改条件来自重新校验，适用于五七言、平仄起和不同末字", () => {
+  const book = buildLexicon({ 一: { 平声: ['山', '春', '行', '重'], 仄声: ['雨', '夜', '行', '重'] } });
+  let checked = 0;
+  let multipleFailures = 0;
+  for (const length of [5, 7]) {
+    for (const base of ['平', '仄']) {
+      for (const ending of ['行', '重']) {
+        for (let mask = 0; mask < (1 << (length - 2)); mask += 1) {
+          const chars = Array.from({ length: length - 1 }, (_, index) => (mask >> index) & 1 ? '山' : '雨');
+          chars[1] = base === '平' ? '山' : '雨';
+          const lines = [chars.join('') + ending, '山'.repeat(length)];
+          const result = evaluateTang(lines.join('，'), { charCount: length, form: 'jueju', polyphonicMode: 'automatic', allowAoJiu: true }, book);
+          const firstFaults = result.firstLineAlternatives.map(({ result: branch }) =>
+            [...branch.violations, ...branch.rhymeViolations].filter((item) => item.lineIndex === 0));
+          const allFailed = firstFaults.every((faults) => faults.length > 0);
+          assert.equal(result.conditionalConflicts?.length ?? 0, Number(allFailed));
+          const visibleFirstFaults = [...result.violations, ...result.rhymeViolations].filter((item) => item.lineIndex === 0);
+          if (allFailed) {
+            if (firstFaults.some((faults) => faults.length > 1)) multipleFailures += 1;
+            assert.equal(visibleFirstFaults.length, 1);
+            assert.equal(visibleFirstFaults[0], result.polyphonicDecisions[0]);
+            assert.equal(visibleFirstFaults[0].char, ending);
+            assert.equal(visibleFirstFaults[0].charIndex, length - 1);
+            assert.deepEqual(result.lines[0].characters.filter((item) => item.error).map((item) => item.char), [ending]);
+          } else {
+            assert.deepEqual(visibleFirstFaults, []);
+            assert.ok(result.lines[0].characters.every((item) => !item.error));
+          }
+          for (const branch of result.firstLineAlternatives) {
+            const resolved = evaluateTang(lines[0].slice(0, -1) + (branch.tone === '平' ? '春' : '夜') + '，' + lines[1],
+              { charCount: length, form: 'jueju', polyphonicMode: 'automatic', allowAoJiu: true }, book);
+            assert.deepEqual(branch.result.violations.map((item) => [item.lineIndex, item.charIndex, item.required]),
+              resolved.violations.map((item) => [item.lineIndex, item.charIndex, item.required]));
+            for (const plan of branch.result.firstLineToneRepairs) {
+              const changed = [...lines[0]];
+              for (const repair of plan) {
+                assert.ok(!book.lookup(changed[repair.charIndex]).tones.has(repair.tone));
+                changed[repair.charIndex] = repair.tone === '平' ? '山' : '雨';
+              }
+              const rescored = scoreTangTones([changed.join(''), ...lines.slice(1)], length,
+                branch.result.stats.globalBase, branch.result.stats.rhymeTone, book,
+                { polyphonicMode: 'automatic', allowAoJiu: true, firstLineEndTone: branch.tone });
+              assert.ok(rescored.violations.every((item) => item.lineIndex !== 0));
+              checked += 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  assert.ok(checked > 50);
+  assert.ok(multipleFailures > 0);
+});
+
+test("同等字数的修复建议优先恢复常式，不并列推荐新增拗救", () => {
+  const book = buildLexicon({ 一: { 平声: ['山', '春', '行', '重'], 仄声: ['雨', '夜', '行', '重'] } });
+  for (const [first, position] of [['雨山雨雨重', 0], ['山雨雨山雨雨行', 2]]) {
+    for (const allowAoJiu of [false, true]) {
+      const options = { charCount: first.length, form: 'jueju', polyphonicMode: 'automatic', allowAoJiu };
+      const suffix = '，' + '山'.repeat(first.length);
+      const result = evaluateTang(first + suffix, options, book);
+      const level = result.firstLineAlternatives.find((branch) => branch.tone === '平').result;
+      assert.deepEqual(level.firstLineToneRepairs, [[{ charIndex: position, tone: '平' }]]);
+      // 另一位置用平仍可形成合法自救，但不应混入恢复常式的直接建议。
+      const selfRescued = [...first];
+      selfRescued[position + 2] = '山';
+      const accepted = evaluateTang(selfRescued.join('') + suffix, { ...options, allowAoJiu: true }, book);
+      const acceptedLevel = accepted.firstLineAlternatives.find((branch) => branch.tone === '平').result;
+      assert.ok(!acceptedLevel.violations.some((item) => item.lineIndex === 0));
+      assert.ok(acceptedLevel.aoJiu.details.some((item) => item.rule === '孤平自救'));
+      assert.deepEqual(acceptedLevel.firstLineToneRepairs, []);
+    }
+  }
+});
 
 test("parsePoem accepts punctuation, newlines, and generated output markers", () => {
   assert.deepEqual(
@@ -428,7 +546,7 @@ test("江南春 marks 十 and 烟 as a cross-line rescue pair", () => {
   assert.deepEqual(result.lines[3].characters[4].roles, ["rescue"]);
 });
 
-test("夜泊水村 marks cross-line rescue and the 泊船 self rescue", () => {
+test("夜泊水村 marks 无 as both isolated-level and cross-line rescue", () => {
   const result = evaluateTang(
     "腰间羽箭久凋零，太息燕然未勒铭。老子犹堪绝大漠，诸君何至泣新亭。"
       + "一身报国有万死，双鬓向人无再青。记取江湖泊船处，卧闻新雁落寒汀。",
@@ -438,15 +556,15 @@ test("夜泊水村 marks cross-line rescue and the 泊船 self rescue", () => {
 
   assert.equal(result.violations.length, 0);
   assert.equal(
-    result.aoJiu.details.some((item) => item.rule === "对句相救"
+    result.aoJiu.details.some((item) => item.rule === "一字两救"
       && item.message.includes("“万”") && item.message.includes("“无”")),
     true,
   );
   assert.equal(
     result.aoJiu.details.some((item) => item.rule === "一字两救"),
-    false,
+    true,
   );
-  assert.deepEqual(result.lines[5].characters[2].roles, []);
+  assert.deepEqual(result.lines[5].characters[2].roles, ["ao"]);
   assert.equal(
     result.aoJiu.details.some((item) => item.rule === "特拗交换"
       && item.message.includes("“泊船”")),
@@ -456,6 +574,31 @@ test("夜泊水村 marks cross-line rescue and the 泊船 self rescue", () => {
   assert.deepEqual(result.lines[5].characters[4].roles, ["rescue"]);
   assert.deepEqual(result.lines[6].characters[4].roles, ["ao"]);
   assert.deepEqual(result.lines[6].characters[5].roles, ["rescue"]);
+});
+
+test("孤平检查末五字并允许本句自救，不强制入韵句的某个字用平", () => {
+  const book = buildLexicon({ 一: { 平声: ['山'], 仄声: ['雨'] } });
+  const cases = [
+    { length: 5, base: '平', broken: 'ZPZZP', restored: 'PPZZP', rescued: 'ZPPZP' },
+    { length: 7, base: '仄', broken: 'PZZPZZP', restored: 'PZPPZZP', rescued: 'PZZPPZP' },
+  ];
+  for (const item of cases) {
+    const score = (pattern) => scoreTangTones([pattern.replaceAll('P', '山').replaceAll('Z', '雨')],
+      item.length, item.base, '平', book, { allowAoJiu: true, firstLineEndTone: '平' });
+    assert.deepEqual(score(item.broken).violations.map((fault) => fault.rule), ['孤平']);
+    assert.deepEqual(score(item.restored).violations, []);
+    const rescued = score(item.rescued);
+    assert.deepEqual(rescued.violations, []);
+    assert.equal(rescued.aoJiuDetails[0].rule, '孤平自救');
+    assert.deepEqual(rescued.aoJiuDetails[0].positions.map((position) => position.charIndex),
+      [item.length - 5, item.length - 3]);
+  }
+  // 两种起式的入韵句，都存在第三字用仄而合法的情况。
+  for (const [pattern, length, base] of [['ZZZPP', 5, '仄'], ['PPZZZPP', 7, '平']]) {
+    const result = scoreTangTones([pattern.replaceAll('P', '山').replaceAll('Z', '雨')],
+      length, base, '平', book, { allowAoJiu: true, firstLineEndTone: '平' });
+    assert.deepEqual(result.violations, []);
+  }
 });
 
 test("登高按多音字读法判断长字造成的孤平", () => {

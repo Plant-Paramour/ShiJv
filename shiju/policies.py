@@ -314,7 +314,7 @@ class TangVerifierPolicy:
                 simulated[-1], state, target_length
             ):
                 return None
-            if not self._check_rhyme(simulated[-1], info):
+            if not self._check_rhyme(simulated[-1], info, simulated):
                 return None
 
         penalty = 0.0
@@ -391,7 +391,7 @@ class TangVerifierPolicy:
         if not self._has_viable_completion(simulated, state, info, context):
             return None
         if len(simulated) == info.target_length:
-            if not self._check_rhyme(simulated[-1], info):
+            if not self._check_rhyme(simulated[-1], info, simulated):
                 return None
         return 0.0
 
@@ -451,7 +451,7 @@ class TangVerifierPolicy:
                 return False
         return True
 
-    def _check_rhyme(self, char: str, info: RelationalConstraintContext) -> bool:
+    def _check_rhyme(self, char: str, info: RelationalConstraintContext, line_text: str | None = None) -> bool:
         from .data import is_polyphonic_end
         if info.current_line == 0 and not self._allow_polyphonic_ending and is_polyphonic_end(self._lexicon, char):
             return False
@@ -464,16 +464,39 @@ class TangVerifierPolicy:
                 if self._strict_polyphonic
                 else expected in tones
             )
+            if line_text is not None and is_rhyming:
+                from .candidates import first_line_reading_is_viable
+                is_rhyming = first_line_reading_is_viable(
+                    line_text, info.target_length, info.base_tone,
+                    0 if expected == "平" else 1, self._lexicon, expected,
+                    allow_aojiu=self._allow_aojiu, strict_polyphonic=self._strict_polyphonic,
+                )
         if not is_rhyming:
             return True
         parts = set(self._lexicon.get_rhyme_part_by_tone(char, expected))
         if not parts or (self._strict_polyphonic and len(parts) != 1):
+            if not self._strict_polyphonic and info.current_line == 0 and line_text is not None:
+                from .candidates import first_line_reading_is_viable
+                opposite = "仄" if expected == "平" else "平"
+                return first_line_reading_is_viable(
+                    line_text, info.target_length, info.base_tone,
+                    0 if expected == "平" else 1, self._lexicon, opposite,
+                    allow_aojiu=self._allow_aojiu, strict_polyphonic=False,
+                )
             return False
         if info.locked_rhyme_parts:
             if self._strict_polyphonic:
                 if not parts.issubset(info.locked_rhyme_parts):
                     return False
             elif not info.locked_rhyme_parts.intersection(parts):
+                if info.current_line == 0 and line_text is not None:
+                    from .candidates import first_line_reading_is_viable
+                    opposite = "仄" if expected == "平" else "平"
+                    return first_line_reading_is_viable(
+                        line_text, info.target_length, info.base_tone,
+                        0 if expected == "平" else 1, self._lexicon, opposite,
+                        allow_aojiu=self._allow_aojiu, strict_polyphonic=False,
+                    )
                 return False
         return True
 
