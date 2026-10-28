@@ -11,6 +11,61 @@ import sys
 import traceback
 
 
+def loaded_module_paths():
+    """Use the Unicode loader API, not mapped-section names retained after rename."""
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    psapi = ctypes.WinDLL('psapi', use_last_error=True)
+    kernel.GetCurrentProcess.restype = wintypes.HANDLE
+    psapi.EnumProcessModules.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.HMODULE),
+                                        wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
+    psapi.EnumProcessModules.restype = wintypes.BOOL
+    kernel.GetModuleFileNameW.argtypes = [wintypes.HMODULE, wintypes.LPWSTR, wintypes.DWORD]
+    kernel.GetModuleFileNameW.restype = wintypes.DWORD
+    capacity = 256
+    while True:
+        modules = (wintypes.HMODULE * capacity)()
+        needed = wintypes.DWORD()
+        if not psapi.EnumProcessModules(kernel.GetCurrentProcess(), modules,
+                                        ctypes.sizeof(modules), ctypes.byref(needed)):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if needed.value <= ctypes.sizeof(modules):
+            break
+        capacity = needed.value // ctypes.sizeof(wintypes.HMODULE) + 64
+    paths = set()
+    for module in modules[:needed.value // ctypes.sizeof(wintypes.HMODULE)]:
+        buffer = ctypes.create_unicode_buffer(32768)
+        length = kernel.GetModuleFileNameW(module, buffer, len(buffer))
+        if not length or length >= len(buffer):
+            raise OSError('Cannot obtain complete Unicode module path')
+        paths.add(buffer.value)
+    return sorted(paths)
+
+
+def classify_modules(paths, root, base_prefix, windows, cache, defender, windowsapps, programdata):
+    allowed = tuple(Path(p).resolve() for p in (root, base_prefix, windows, cache))
+    defender, windowsapps, programdata = (Path(p).resolve() for p in (defender, windowsapps, programdata))
+    result = dict(additional_os_modules=[], injected_modules=[], external_loaded_modules=[])
+    for path in paths:
+        p = Path(path).resolve()
+        if not Path(path).is_absolute():
+            result['external_loaded_modules'].append(path)
+        elif any(p.is_relative_to(base) for base in allowed):
+            continue
+        elif ((p.name.casefold() == 'mpoav.dll' and p.is_relative_to(defender)) or
+              (p.suffix.casefold() == '.mui' and p.is_relative_to(windowsapps) and
+               p.relative_to(windowsapps).parts[0].startswith('Microsoft.LanguageExperiencePack'))):
+            result['additional_os_modules'].append(path)
+        elif (p.name.casefold() == 'audiodevprops2.dll' and
+              p.is_relative_to(programdata / 'A-Volute/A-Volute.Nahimic/Modules/Scheduled')):
+            result['injected_modules'].append(path)
+        else:
+            result['external_loaded_modules'].append(path)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
@@ -81,27 +136,27 @@ def main():
             if model_main() != 0:
                 raise RuntimeError("Actual model acceptance failed")
         import psutil
-        report["loaded_modules"] = sorted({m.path for m in psutil.Process().memory_maps() if m.path})
+        # Section names are diagnostics only: Windows can retain an old directory
+        # name for a mapped image after its directory has been renamed.
+        try:
+            report["mapped_files"] = sorted({m.path for m in psutil.Process().memory_maps() if m.path})
+        except OSError as exc:
+            report["mapped_files_error"] = str(exc)
+        report["loaded_modules"] = loaded_module_paths()
+        report["module_path_source"] = "GetModuleFileNameW"
         windows = Path(os.environ.get("SystemRoot", r"C:\Windows")).resolve()
         # Windows loads Defender inspection and language resource modules from
         # outside SystemRoot. Record these narrowly identified OS components.
         defender = Path(os.environ.get("ProgramData", r"C:\ProgramData")) / "Microsoft/Windows Defender/Platform"
         windowsapps = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "WindowsApps"
-        def os_component(path):
-            p = Path(path).resolve()
-            if p.name.casefold() == "mpoav.dll" and p.is_relative_to(defender):
-                return True
-            if p.suffix.casefold() == ".mui" and p.is_relative_to(windowsapps):
-                return p.relative_to(windowsapps).parts[0].startswith("Microsoft.LanguageExperiencePack")
-            return False
-        report["additional_os_modules"] = [p for p in report["loaded_modules"] if os_component(p)]
-        report["external_loaded_modules"] = [p for p in report["loaded_modules"]
-            if Path(p).is_absolute() and not any(Path(p).resolve().is_relative_to(base) for base in (root, Path(sys.base_prefix).resolve()))
-            and not Path(p).resolve().is_relative_to(windows)
-            and not Path(p).resolve().is_relative_to(Path(os.environ["TRITON_CACHE_DIR"]).resolve().parent)
-            and not os_component(p)]
+        report.update(classify_modules(report["loaded_modules"], root, sys.base_prefix, windows,
+            Path(os.environ["TRITON_CACHE_DIR"]).resolve().parent, defender, windowsapps,
+            os.environ.get("ProgramData", r"C:\ProgramData")))
+        if report["injected_modules"]:
+            report["module_warnings"] = ["检测到 Nahimic 音效注入组件，已记录，不影响模型验收"]
         if report["external_loaded_modules"]:
-            raise RuntimeError("Unexpected loaded modules outside runtime/Windows/cache")
+            raise RuntimeError("模块来源检查失败：以下加载器路径位于环境、Windows 和缓存目录之外：\n" +
+                               "\n".join(report["external_loaded_modules"]))
         report["ok"] = True
     except Exception:
         report["error"] = traceback.format_exc()

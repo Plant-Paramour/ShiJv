@@ -45,5 +45,5 @@ function Update-RememberedPairs {
             }
             $pairBox.SelectedIndex = $index
         }
-    } catch { $statusBox.Text = $_.Exception.Message }
+    } catch { $statusBox.Text = Write-LauncherFailure $_.Exception.Message }
 }

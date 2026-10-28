@@ -45,6 +45,8 @@ class LocalRuntime:
         self.start_error = ""
         self._starting = False
         self._start_generation = 0
+        self.diagnostics = None
+        self._cancel_event = threading.Event()
 
     def status(self):
         with self.lock:
@@ -70,7 +72,7 @@ class LocalRuntime:
             return {"state": state, "ready": state == "ready", "error": error,
                     "checks": phase.get("checks", []), "phase": phase.get("phase") if running or self._starting else None, "message": self.start_error or phase.get("message", ""),
                     "plan": self.plan,
-                    "external_worker": external}
+                    "external_worker": external, "diagnostics": self.diagnostics}
 
     def start(self, control_url=None, *, for_submission=False, background=False):
         with self.lock:
@@ -81,6 +83,7 @@ class LocalRuntime:
             self._start_generation += 1
             generation = self._start_generation
             self._starting = True
+            self._cancel_event = threading.Event()
             self.start_error = ""
         if background:
             def prepare():
@@ -94,11 +97,17 @@ class LocalRuntime:
         return self._prepare_start(control_url, for_submission, generation)
 
     def _prepare_start(self, control_url, for_submission, generation):
+        from apps.launcher.diagnostics import OperationDiagnostic
+        diagnostic = OperationDiagnostic(self.directory, 'generator')
+        self.diagnostics = diagnostic.metadata
         try:
             config = read_config(self.directory)
             validate_model(config["model_path"])
-            environment = inspect_environment(self.directory, refresh=True)
+            environment = inspect_environment(self.directory, refresh=True, cancel=self._cancel_event)
+            diagnostic.event('environment_checked', diagnostics=environment.get('diagnostics'),
+                             python=environment.get('inference_python'), model=config['model_path'])
             plan = assess_model(config["model_path"], environment)
+            plan['device'] = 'cuda' if environment.get('cuda') else 'cpu'
             deployed = Path(environment['inference_python']).parent / 'shiju-install.json'
             if deployed.is_file():
                 selected = json.loads(deployed.read_text(encoding='utf-8'))
@@ -110,29 +119,82 @@ class LocalRuntime:
                 if precision is not None:
                     if precision not in environment.get('quantization', []):
                         raise ValueError('已验证配对的推理方式未通过当前环境检测，请重新测试此模型')
+                    if precision == 'none' and plan['quantization'] != 'none':
+                        raise ValueError('当前可用显存不足以采用已验证的 FP16 方案，请释放显存或重新验收其他精度')
                     plan.update(quantization=precision, label='采用当前环境—模型配对已验证的推理方式')
             with self.lock:
                 if generation != self._start_generation:
+                    diagnostic.event('cancelled')
+                    diagnostic.save(dict(completed=True, ok=False, error='操作已取消', diagnostics=diagnostic.metadata))
+                    diagnostic.close()
                     return self.status()
                 self.plan = plan
                 python = environment['inference_python']
                 self.ready.unlink(missing_ok=True)
                 self.phase_file.unlink(missing_ok=True)
                 env = python_process_env(python)
-                env.update(SHIJU_ALLOW_UNVERIFIED='1' if config.get('allow_unverified') or for_submission else '0',
+                env.update(SHIJU_DIAGNOSTIC_ID=diagnostic.id, SHIJU_DATA_DIR=str(self.directory))
+                if environment.get('diagnostics', {}).get('report_path'):
+                    env['SHIJU_ENVIRONMENT_REPORT'] = environment['diagnostics']['report_path']
+                env.update(SHIJU_ALLOW_UNVERIFIED='1' if config.get('allow_unverified') else '0',
                            SHIJU_APPLICATION_PYTHON=sys.executable, SHIJU_RUNTIME_CONFIG=str(self.directory / 'runtime.json'),
                            SHIJU_MODEL_PATH=config['model_path'], SHIJU_QUANTIZATION=plan['quantization'],
                            SHIJU_CONTROL_URL=control_url, SHIJU_READY_FILE=str(self.ready),
                            SHIJU_WORKER_STATUS_FILE=str(self.phase_file), PYTHONIOENCODING='utf-8', SHIJU_ENV='development')
-                with self.log.open('wb') as output:
-                    self.process = subprocess.Popen([python, str(self.root / 'apps/launcher/python_entry.py'), '-m', 'apps.gpu_worker.local_main'],
-                        cwd=self.root, env=env, stdout=output, stderr=subprocess.STDOUT,
+                if diagnostic.metadata['log_path']:
+                    self.log = Path(diagnostic.metadata['log_path'])
+                self.process = subprocess.Popen([python, '-I', str(self.root / 'apps/launcher/python_entry.py'), '-m', 'apps.gpu_worker.local_main'],
+                        cwd=self.root, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                         creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+                process = self.process
+            def capture():
+                try:
+                    for line in iter(process.stdout.readline, b''):
+                        diagnostic.logger.info(line.decode('utf-8', errors='replace').rstrip())
+                finally:
+                    process.stdout.close()
+            reader = threading.Thread(target=capture, daemon=True)
+            reader.start()
+            def supervise():
+                deadline = time.monotonic() + (1800 if environment.get('cuda') else 7200)
+                loaded = False
+                try:
+                    while process.poll() is None and generation == self._start_generation:
+                        if not loaded and self.ready.exists():
+                            loaded = True
+                            diagnostic.event('model_ready', plan=plan)
+                        if not loaded and time.monotonic() > deadline:
+                            process.kill()
+                            self.start_error = diagnostic.fail(TimeoutError('模型加载超时'), 'MODEL_LOAD_TIMEOUT')
+                            self.diagnostics = diagnostic.metadata
+                            break
+                        time.sleep(.2)
+                    process.wait(timeout=30)
+                    reader.join(timeout=5)
+                    exit_code = process.poll()
+                    if generation == self._start_generation and not self.start_error:
+                        diagnostic.error_code = 'LOCAL_WORKER_EXITED'
+                        self.start_error = diagnostic.describe(f'生成进程已退出，退出码 {exit_code}')
+                        if diagnostic.metadata['log_path']:
+                            with Path(diagnostic.metadata['log_path']).open('rb') as stream:
+                                size = stream.seek(0, 2)
+                                stream.seek(max(0, size - 6000))
+                                self.start_error += '\n' + stream.read().decode('utf-8', errors='replace')[-3000:]
+                        self.diagnostics = diagnostic.metadata
+                    diagnostic.event('process_exit', exit_code=exit_code)
+                    diagnostic.save(dict(completed=True, ok=exit_code == 0, diagnostics=diagnostic.metadata))
+                finally:
+                    diagnostic.close()
+            threading.Thread(target=supervise, daemon=True).start()
         except Exception as exc:
+            message = diagnostic.fail(exc, 'LOCAL_WORKER_START_FAILED')
+            self.diagnostics = diagnostic.metadata
+            diagnostic.save(dict(completed=True, ok=False, error=str(exc), diagnostics=diagnostic.metadata))
+            diagnostic.close()
             with self.lock:
                 if generation == self._start_generation:
-                    self.start_error = str(exc)
-            raise
+                    self.start_error = message
+            raise ValueError(message) from exc
         finally:
             with self.lock:
                 if generation == self._start_generation:
@@ -142,6 +204,7 @@ class LocalRuntime:
     def stop(self):
         with self.lock:
             self._start_generation += 1
+            self._cancel_event.set()
             self._starting = False
             if self.process and self.process.poll() is None:
                 self.process.terminate()
@@ -165,7 +228,7 @@ class LocalRuntime:
             if not read_config(self.directory)['model_path']:
                 raise HTTPException(409, '尚未配置本地诗词生成模型，请在个人中心选择模型目录并保存；提交时会自动启动')
             try:
-                self.start(for_submission=True)
+                self.start(for_submission=True, background=True)
             except (ValueError, OSError) as exc:
                 raise HTTPException(409, f'本地生成器自动启动失败：{exc}') from exc
 
@@ -204,7 +267,7 @@ class LocalRuntime:
                             self.jobs.fail_pending(job_id, 'LOCAL_WORKER_START_FAILED', message)
                         return
                     if job.status == 'queued' and time.monotonic() >= deadline:
-                        self.jobs.fail_pending(job_id, 'LOCAL_WORKER_START_TIMEOUT', '本地生成器超过 15 分钟未领取任务，请检查生成器日志后重试')
+                        self.jobs.fail_pending(job_id, 'LOCAL_WORKER_START_TIMEOUT', f'本地生成器超过 15 分钟未领取任务。日志：{self.log}')
                         return
                     time.sleep(0.5)
             finally:

@@ -1,5 +1,7 @@
 import json
 import time
+import threading
+import io
 from pathlib import Path
 
 import pytest
@@ -82,6 +84,7 @@ def test_owned_worker_readiness_stop_and_no_stale_heartbeat(runtime_client, monk
     class Process:
         code = None
         def __init__(self, args, **kwargs):
+            self.stdout = io.BytesIO()
             launched.update(args=args, **kwargs)
         def poll(self):
             return self.code
@@ -93,6 +96,9 @@ def test_owned_worker_readiness_stop_and_no_stale_heartbeat(runtime_client, monk
     monkeypatch.setattr(local_runtime.subprocess, "Popen", Process)
     response = client.post("/v1/local-runtime/start")
     assert response.status_code == 200 and response.json()["state"] == "loading"
+    deadline = time.monotonic() + 5
+    while 'env' not in launched and time.monotonic() < deadline:
+        time.sleep(.01)
     assert launched["env"]["SHIJU_CONTROL_URL"] == "http://127.0.0.1:18763"
     assert launched["env"]["SHIJU_MODEL_PATH"] == str(model)
     app.state.local_runtime.ready.touch()
@@ -139,7 +145,9 @@ def test_managed_environment_can_start_a_different_verified_model(runtime_client
     launched = {}
     class Process:
         code = None
-        def __init__(self, args, **kw): launched.update(args=args, **kw)
+        def __init__(self, args, **kw):
+            self.stdout = io.BytesIO()
+            launched.update(args=args, **kw)
         def poll(self): return self.code
         def terminate(self): self.code = 0
         def wait(self, timeout): return self.code
@@ -147,8 +155,12 @@ def test_managed_environment_can_start_a_different_verified_model(runtime_client
     assert client.put('/v1/local-runtime', json=dict(model_path=str(model))).status_code == 200
     response = client.post('/v1/local-runtime/start')
     assert response.status_code == 200, response.text
+    deadline = time.monotonic() + 5
+    while 'args' not in launched and time.monotonic() < deadline:
+        time.sleep(.01)
     assert launched['args'][0] == str(python)
-    assert Path(launched['args'][1]).name == 'python_entry.py'
+    assert launched['args'][1] == '-I'
+    assert Path(launched['args'][2]).name == 'python_entry.py'
     assert launched['env']['SHIJU_MODEL_PATH'] == str(model)
     assert launched['env']['SHIJU_QUANTIZATION'] == 'none'
 

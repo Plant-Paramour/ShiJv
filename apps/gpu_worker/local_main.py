@@ -2,6 +2,7 @@
 import logging
 import os
 import json
+import uuid
 from pathlib import Path
 
 
@@ -9,7 +10,7 @@ def prepare_model(runner, engine, directory, model, checks, report, check_report
     from apps.launcher.model_catalog import verified_report
     from apps.launcher.model_probe import check_runner
     saved = verified_report(directory, model)
-    if saved and saved.get('ok'):
+    if saved and saved.get('ok') and saved.get('plan', {}).get('quantization') == os.environ.get('SHIJU_QUANTIZATION'):
         checks[:] = saved.get('checks', [])
         report('loading', '已读取环境—模型验收记录，正在加载权重；无需重复生成测试诗词')
         runner.load()
@@ -36,6 +37,7 @@ def main():
     status = Path(os.environ["SHIJU_WORKER_STATUS_FILE"])
     checks = []
     def report(phase, message):
+        logging.getLogger(__name__).info('生成器阶段：%s', phase)
         temporary = status.with_suffix(".tmp")
         temporary.write_text(json.dumps({"phase": phase, "message": message, "checks": checks}, ensure_ascii=False), encoding="utf-8")
         temporary.replace(status)
@@ -55,7 +57,17 @@ def main():
         target = report_path(ready.parent, os.environ["SHIJU_MODEL_PATH"])
         target.parent.mkdir(parents=True, exist_ok=True)
         if not any(c.get('state') == 'pending' for c in checks):
-            target.write_text(json.dumps({"ok": True, "model": os.environ["SHIJU_MODEL_PATH"], "checks": checks}, ensure_ascii=False), encoding="utf-8")
+            from apps.launcher.model_catalog import verified_report
+            previous = verified_report(ready.parent, os.environ['SHIJU_MODEL_PATH']) or {}
+            snapshot = os.getenv('SHIJU_ENVIRONMENT_REPORT')
+            if snapshot and Path(snapshot).is_file():
+                previous['environment'] = json.loads(Path(snapshot).read_text(encoding='utf-8'))
+            previous.update(ok=True, model=os.environ['SHIJU_MODEL_PATH'], checks=checks,
+                            python=os.sys.executable,
+                            plan=(previous.get('plan') or {}) | dict(quantization=os.environ['SHIJU_QUANTIZATION']))
+            temporary = target.with_suffix('.' + uuid.uuid4().hex + '.tmp')
+            temporary.write_text(json.dumps(previous, ensure_ascii=False), encoding='utf-8')
+            temporary.replace(target)
     except Exception as exc:
         for item in checks:
             if item['state'] == 'running':

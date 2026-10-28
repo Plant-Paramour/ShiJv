@@ -23,6 +23,9 @@ class ApplicationStaticFiles(StaticFiles):
         # A cached response from the old server may have an incorrect MIME type.
         # Give the corrected representation a distinct validator as well.
         response.headers['etag'] = response.headers['etag'].removesuffix('"') + '-mime1"'
-        if self.is_not_modified(response.headers, Headers(scope=scope)):
+        # Last-Modified alone cannot distinguish an old MIME representation.
+        request_headers = Headers(scope=scope)
+        validators = Headers({'if-none-match': request_headers.get('if-none-match', '')})
+        if 'if-none-match' in request_headers and self.is_not_modified(response.headers, validators):
             return NotModifiedResponse(response.headers)
         return response

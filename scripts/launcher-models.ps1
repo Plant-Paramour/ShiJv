@@ -65,7 +65,7 @@
                 if ($result.ok) { $state.testedPath = $selected; $use.Enabled = $true; $details.AppendText("`r`n全部通过。测试权重已释放，可应用此模型。") }
                 else { $details.AppendText("`r`n未通过：$($result.error)`r`n请更换推理环境或模型后重试。") }
             }
-        } catch { if (-not $dialog.IsDisposed) { $details.Text = $_.Exception.Message } }
+        } catch { if (-not $dialog.IsDisposed) { $details.Text = Write-LauncherFailure $_.Exception.Message } }
         finally {
             $state.process = $null
             if (-not $dialog.IsDisposed) { $choice.Enabled = $true; $browse.Enabled = $true; $scan.Enabled = $true; $test.Enabled = $true; $untested.Enabled = $true }

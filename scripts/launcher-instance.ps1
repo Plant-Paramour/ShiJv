@@ -1,12 +1,28 @@
 ﻿# Port and process ownership helpers. Never terminate an unidentified listener.
 function Get-LauncherBuildFingerprint([string]$Workspace) {
-    $names = @('apps/api/main.py','apps/api/static_files.py','apps/api/startup_diagnostics.py','web/prosody-checker/index.html','web/prosody-checker/site.js')
+    $manifest = Join-Path $Workspace 'RELEASE-MANIFEST.json'
+    if (Test-Path -LiteralPath $manifest) {
+        $value = Get-Content -LiteralPath $manifest -Raw -Encoding UTF8 | ConvertFrom-Json
+        [string[]]$names = @($value.files.PSObject.Properties.Name)
+    } else {
+        $all = @()
+        foreach ($folder in @('apps','shiju','Rhyme','Songci_Meter','web','scripts','tools','deploy')) {
+            $base = Join-Path $Workspace $folder
+            if (Test-Path -LiteralPath $base) {
+                $all += @(Get-ChildItem -LiteralPath $base -Recurse -File | Where-Object { $_.Extension -cin @('.py','.ps1','.cs','.js','.mjs','.cjs','.html','.css','.json','.sql','.toml','.csv') -and $_.FullName -notmatch '[\\/](__pycache__|node_modules|\.git)[\\/]' } | ForEach-Object { $_.FullName.Substring($Workspace.TrimEnd('\','/').Length + 1).Replace('\','/') })
+            }
+        }
+        foreach ($name in @('launcher.ps1','start-single-player.ps1','pyproject.toml')) { if (Test-Path -LiteralPath (Join-Path $Workspace $name)) { $all += $name } }
+        [string[]]$names = @($all)
+    }
+    [Array]::Sort($names, [StringComparer]::Ordinal)
     $hashes = foreach ($name in $names) {
+        if ([IO.Path]::IsPathRooted($name) -or $name.Split('/') -contains '..') { throw '发布清单包含非法路径' }
         $path = Join-Path $Workspace $name
         if (Test-Path -LiteralPath $path -PathType Leaf) {
             $fileSha = [Security.Cryptography.SHA256]::Create()
-            try { ([BitConverter]::ToString($fileSha.ComputeHash([IO.File]::ReadAllBytes($path)))).Replace('-','').ToLowerInvariant() } finally { $fileSha.Dispose() }
-        } else { 'missing' }
+            try { $name + ':' + ([BitConverter]::ToString($fileSha.ComputeHash([IO.File]::ReadAllBytes($path)))).Replace('-','').ToLowerInvariant() } finally { $fileSha.Dispose() }
+        } else { $name + ':missing' }
     }
     $sha = [Security.Cryptography.SHA256]::Create()
     try { return ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($hashes -join '|'))))).Replace('-','').ToLowerInvariant() } finally { $sha.Dispose() }

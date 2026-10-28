@@ -15,23 +15,8 @@ _lock = threading.Lock()
 
 
 def python_process_env(python):
-    env = os.environ.copy()
-    executable = Path(python)
-    prefix = executable.parent.parent if executable.parent.name.lower() == 'scripts' else executable.parent
-    env["PATH"] = os.pathsep.join(map(str, [prefix, prefix / "Library" / "bin", prefix / "Scripts"])) + os.pathsep + env.get("PATH", "")
-    env.pop("PYTHONHOME", None)
-    env.pop("PYTHONPATH", None)
-    env["PYTHONIOENCODING"] = "utf-8"
-    deployment = prefix / 'shiju-install.json'
-    if deployment.is_file():
-        state = json.loads(deployment.read_text(encoding='utf-8'))
-        if state.get('state') == 'verified' and state.get('ok'):
-            env['CUDA_VISIBLE_DEVICES'] = state.get('gpu_uuid') or '-1'
-            backend = prefix / 'Lib/site-packages/triton/backends/nvidia'
-            env['CC'] = str(prefix / 'Lib/site-packages/triton/runtime/tcc/tcc.exe')
-            env['CUDA_PATH'] = str(backend)
-            env['TRITON_PTXAS_PATH'] = str(backend / 'bin/ptxas.exe')
-    return env
+    from apps.launcher.process_environment import python_environment
+    return python_environment(python)
 
 
 def selected_environment(directory):
@@ -90,28 +75,56 @@ def check_managed_runtime(python):
             raise ValueError('部署环境文件缺失或已变化：' + str(path) + '。请通过部署工具修复；本次模型验收未通过。')
 
 
-def inspect_environment(directory, *, refresh=False):
+def inspect_environment(directory, *, refresh=False, cancel=None):
     selected = selected_environment(directory)
+    def rejected(message):
+        from apps.launcher.diagnostics import OperationDiagnostic
+        diagnostic = OperationDiagnostic(directory, 'environment-selection')
+        diagnostic.error_code = 'ENVIRONMENT_SELECTION_INVALID'
+        diagnostic.event('failed', error=message, inference_python=selected['inference_python'])
+        result = selected | dict(ok=False, errors=[diagnostic.describe(message)], quantization=[], diagnostics=diagnostic.metadata)
+        diagnostic.save(dict(completed=True, **result))
+        diagnostic.close()
+        return result
     if not selected["local_enabled"]:
-        return selected | {"ok": False, "errors": ["请在启动器中勾选本地诗词生成，并选择推理环境后重新启动软件"], "quantization": []}
+        return rejected('请在启动器中勾选本地诗词生成，并选择推理环境后重新启动软件')
     python = Path(selected["inference_python"])
     if not python.is_absolute() or not python.is_file() or python.name.lower() not in {"python.exe", "python"}:
-        return selected | {"ok": False, "errors": [f"所选推理环境的 Python 路径无效：{python}。请在启动器中重新选择该环境实际存在的 python.exe"], "quantization": []}
+        return rejected(f'所选推理环境的 Python 路径无效：{python}。请在启动器中重新选择该环境实际存在的 python.exe')
     key = (str(python), python.stat().st_mtime_ns)
     with _lock:
         if not refresh and key in _cache and time.monotonic() - _cache[key][0] < 60:
             return selected | _cache[key][1]
         script = Path(__file__).resolve().parents[1] / "launcher" / "environment_probe.py"
         try:
-            check_managed_runtime(python)
-            with tempfile.TemporaryDirectory(prefix="shiju-probe-") as temp:
-                output = Path(temp) / "result.json"
-                result = subprocess.run([str(python), str(script), "--mode", "inference", "--output", str(output)],
-                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600,
-                    env=python_process_env(python),
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
-                report = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {
-                    "ok": False, "errors": [f"环境检查进程退出，退出码 {result.returncode}，请检查 Python 或 DLL 依赖"]}
+            from apps.launcher.diagnostics import OperationDiagnostic
+            diagnostic = OperationDiagnostic(directory, 'environment-check')
+            try:
+                check_managed_runtime(python)
+                if diagnostic.root is None:
+                    raise OSError(diagnostic.describe('无法创建检查报告'))
+                output = diagnostic.root / 'probe-result.json'
+                env = python_process_env(python)
+                env['SHIJU_DIAGNOSTIC_ID'] = diagnostic.id
+                env['SHIJU_DATA_DIR'] = str(directory)
+                code = diagnostic.run([str(python), '-I', str(script), '--mode', 'inference', '--output', str(output)],
+                                      env=env, timeout=600, cancel=cancel)
+                report = json.loads(output.read_text(encoding='utf-8')) if output.exists() else {
+                    'ok': False, 'errors': [f'环境检查未生成报告（退出码 {code}）']}
+                if code and report.get('ok'):
+                    report.update(ok=False, errors=[f'环境检查异常退出（退出码 {code}）'])
+                if not report.get('ok'):
+                    diagnostic.error_code = 'ENVIRONMENT_CHECK_FAILED'
+                    report['errors'] = [diagnostic.describe(error) for error in report.get('errors', ['环境检查失败'])]
+                diagnostic.event('completed', ok=report.get('ok'), exit_code=code)
+            except Exception as exc:
+                code = ('ENVIRONMENT_CHECK_TIMEOUT' if isinstance(exc, subprocess.TimeoutExpired) else
+                        'CANCELLED' if cancel is not None and cancel.is_set() else 'ENVIRONMENT_CHECK_FAILED')
+                report = dict(ok=False, errors=[diagnostic.fail(exc, code)])
+            finally:
+                report['diagnostics'] = diagnostic.metadata
+                diagnostic.save(dict(completed=True, **report))
+                diagnostic.close()
         except subprocess.TimeoutExpired:
             report = {"ok": False, "errors": ["环境检查超过 10 分钟，已停止检查。请确认所选环境可以正常运行后重试"]}
         except (OSError, ValueError) as exc:

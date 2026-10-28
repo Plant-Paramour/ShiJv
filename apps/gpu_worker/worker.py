@@ -204,13 +204,16 @@ class GpuWorker:
             self.client.acknowledge_cancel(job_id, self.worker_id)
             LOGGER.info("任务已取消: job_id=%s", job_id)
         except Exception as exc:
-            LOGGER.exception("任务执行失败", extra={"job_id": job_id})
+            LOGGER.exception("任务执行失败 job_id=%s diagnostic_id=%s", job_id, os.getenv('SHIJU_DIAGNOSTIC_ID', ''))
             code = str(getattr(exc, "code", "WORKER_EXECUTION_ERROR"))
+            message = str(exc)
+            if os.getenv('SHIJU_DIAGNOSTIC_LOG'):
+                message += '\n阶段：任务生成\n日志：' + os.environ['SHIJU_DIAGNOSTIC_LOG'] + '\n诊断编号：' + os.getenv('SHIJU_DIAGNOSTIC_ID', '')
             self.client.fail(
                 job_id,
                 self.worker_id,
                 code,
-                str(exc),
+                message,
                 retryable=code in {"CUDA_RUNTIME_ERROR", "CONTROL_PLANE_UNAVAILABLE"},
             )
         finally:

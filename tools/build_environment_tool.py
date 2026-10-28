@@ -29,6 +29,10 @@ def build(output):
         if findings:
             raise ValueError('发布检查未通过：' + json.dumps(findings, ensure_ascii=False))
         entries[name] = content
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from apps.launcher.web_assets import web_assets
+    web_assets(entries)
     output.mkdir(parents=True)
     for name, content in entries.items():
         dest = output / name
@@ -42,6 +46,15 @@ def build(output):
                     '/reference:System.Windows.Forms.dll', '/out:' + str(output / '诗矩环境部署.exe'),
                     str(ROOT / 'tools/EnvironmentDeployer.cs')], check=True)
     shutil.copy2(ROOT / 'docs/environment-tool-user.md', output / '使用说明.md')
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from apps.launcher.build_info import runtime_files, build_info
+    import hashlib
+    names = runtime_files(output)
+    manifest = dict(schema_version=1, files={name: hashlib.sha256((output / name).read_bytes()).hexdigest() for name in names})
+    (output / 'RELEASE-MANIFEST.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+    manifest['build'] = build_info(output)
+    (output / 'RELEASE-MANIFEST.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     archive = output.with_suffix('.zip')
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as stream:
         for path in sorted(output.rglob('*')):

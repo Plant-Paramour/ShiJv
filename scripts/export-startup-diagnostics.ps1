@@ -15,46 +15,15 @@ function Protect-DiagnosticText([string]$Value) {
     $Value=[regex]::Replace($Value,'(?i)((?:api[_-]?key|authorization|access[_-]?token|password|secret)["\s]*[:=]["\s]*)[^\s,";}]+','$1[redacted]')
     return [regex]::Replace($Value,'(https?://[^\s?"<>]+)\?[^\s"<>]+','$1?[redacted]')
 }
-function Read-Probe([string]$Path) {
-    $request=[Net.HttpWebRequest]::Create("http://127.0.0.1:$Port$Path")
-    $request.Proxy=$null; $request.Timeout=4000; $request.ReadWriteTimeout=4000
-    $request.Headers['Cache-Control']='no-cache'
-    $response=$null
-    try { $response=$request.GetResponse() } catch {
-        $response=$_.Exception.Response
-        if (-not $response) { return @{path=$Path; error=$_.Exception.Message} }
-    }
+$record=@{schema=2; time=(Get-Date).ToString('o'); workspace=$Workspace; data_root=$DataDirectory; port=$Port; package_fingerprint=(Get-LauncherBuildFingerprint $Workspace); source='persisted-files'; service_record=$null}
+$serviceFile=Join-Path $DataDirectory 'startup-diagnostics\service.json'
+if (Test-Path -LiteralPath $serviceFile -PathType Leaf) {
     try {
-        $stream=$response.GetResponseStream(); $reader=New-Object IO.StreamReader($stream)
-        try { $buffer=New-Object char[] 262144; $length=$reader.ReadBlock($buffer,0,$buffer.Length); $body=New-Object string($buffer,0,$length) } finally { $reader.Dispose() }
-        return @{path=$Path; status=[int]$response.StatusCode; content_type=$response.ContentType; cache_control=$response.Headers['Cache-Control']; etag=$response.Headers['ETag']; body=$body}
-    } finally { $response.Dispose() }
-}
-$record=@{schema=1; time=(Get-Date).ToString('o'); workspace=$Workspace; data_root=$DataDirectory; port=$Port; package_fingerprint=(Get-LauncherBuildFingerprint $Workspace); probes=@()}
-$health=Read-Probe '/health/live'
-$record.health=$health
-try {
-    if ($health.status -eq 200) {
-        $service=ConvertFrom-Json $health.body
-        if ($service.application -eq 'ShiJu' -and $service.workspace -and [IO.Directory]::Exists($service.workspace)) {
-            $record.service_disk_fingerprint=Get-LauncherBuildFingerprint $service.workspace
-            $record.running_build=$service.build
-            $record.version_matches=($service.build -and $service.build.fingerprint -eq $record.package_fingerprint)
-        }
-    }
-} catch { $record.version_check_error=$_.Exception.Message }
-$html=Read-Probe '/web/prosody-checker/?startup-diagnostic=1'
-$moduleUrls=@('/web/prosody-checker/site.js','/web/prosody-checker/app.js','/web/prosody-checker/sentence-search.js')
-if ($html.body) {
-    $record.html_module_urls=@([regex]::Matches($html.body,'<script[^>]+src="([^"]+\.js[^" ]*)"') | ForEach-Object { $_.Groups[1].Value })
-    $record.html_release=@([regex]::Matches($html.body,'name="shiju-release" content="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
-}
-$html.Remove('body'); $record.probes+=,$html
-foreach ($url in $moduleUrls) {
-    $probe=Read-Probe ($url+'?startup-diagnostic=1')
-    if ($probe.status -ne 200 -and $probe.body) { $probe.error_body=$probe.body.Substring(0,[Math]::Min(400,$probe.body.Length)) }
-    $probe.Remove('body'); $record.probes+=,$probe
-}
+        $service=Get-Content -LiteralPath $serviceFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $record.service_record=$service
+        $record.version_matches=($service.build -and $service.build.fingerprint -eq $record.package_fingerprint)
+    } catch { $record.service_record_error=$_.Exception.Message }
+} else { $record.service_record_error='服务未留下启动身份记录；请查看启动器及进程日志。' }
 $stream=[IO.File]::Open($OutputPath,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
 $archive=New-Object IO.Compression.ZipArchive($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
 function Protect-DiagnosticObject($Value) {
@@ -73,14 +42,17 @@ function Write-Entry([string]$Name,[string]$Content) {
     $entry=$archive.CreateEntry($Name)
     $writer=New-Object IO.StreamWriter($entry.Open(),(New-Object Text.UTF8Encoding($false)))
     try {
-        if ($Name.EndsWith('.json')) { $Content=(Protect-DiagnosticObject (ConvertFrom-Json $Content)) | ConvertTo-Json -Depth 30 }
+        if ($Name.EndsWith('.json')) {
+            try { $Content=(Protect-DiagnosticObject (ConvertFrom-Json $Content)) | ConvertTo-Json -Depth 30 }
+            catch { $Content=Protect-DiagnosticText $Content }
+        }
         else { $Content=Protect-DiagnosticText $Content }
         $writer.Write($Content)
     } finally { $writer.Dispose() }
 }
 try {
     Write-Entry 'launcher.json' ($record | ConvertTo-Json -Depth 12)
-    foreach ($name in @('api-startup.log','api-bootstrap.stderr.log','api-bootstrap.stdout.log','startup-diagnostics\latest-browser.json')) {
+    foreach ($name in @('api-startup.log','api-bootstrap.stderr.log','api-bootstrap.stdout.log','startup-diagnostics\latest-browser.json','startup-diagnostics\service.json')) {
         $path=Join-Path $DataDirectory $name
         if (Test-Path -LiteralPath $path -PathType Leaf) {
             $file=[IO.File]::Open($path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
@@ -92,6 +64,29 @@ try {
             } finally { $file.Dispose() }
         }
     }
-    Write-Entry '说明.txt' '包含应用版本、启动日志和资源响应；未读取数据库、对话或模型密钥配置。日志最多保留各文件末尾 256 KiB。网页独立导出的 JSON 如未同步，可一起发送。'
+    $exportIndex = @()
+    $budget = 32MB
+    foreach ($base in @((Join-Path $DataDirectory 'diagnostics'), (Join-Path $env:LOCALAPPDATA 'ShiJu\deployment\reports'), (Join-Path ([IO.Path]::GetTempPath()) 'ShiJu\diagnostics'))) {
+        if (Test-Path -LiteralPath $base -PathType Container) {
+            foreach ($item in @(Get-ChildItem -LiteralPath $base -Recurse -File | Where-Object { $_.Extension -in @('.json','.log','.1','.2','.3') -and -not ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) } | Sort-Object LastWriteTime -Descending | Select-Object -First 600)) {
+                if ($budget -le 0) { break }
+                $take = [Math]::Min([Math]::Min($item.Length,262144),$budget)
+                $file = [IO.File]::Open($item.FullName,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+                try {
+                    $null = $file.Seek([Math]::Max(0,$file.Length-$take),[IO.SeekOrigin]::Begin)
+                    $reader = New-Object IO.StreamReader($file)
+                    try { $content=$reader.ReadToEnd() } finally { $reader.Dispose() }
+                } finally { $file.Dispose() }
+                $entryName = 'operations/' + [IO.Path]::GetFileName($base) + '/' + $item.FullName.Substring($base.TrimEnd('\').Length+1).Replace('\','/')
+                # A truncated JSON tail is text, not a standalone JSON document.
+                if ($item.Length -gt $take) { $entryName += '.tail.txt' }
+                Write-Entry $entryName $content
+                $exportIndex += @{name=$entryName; path=$item.FullName; truncated=($item.Length -gt $take)}
+                $budget -= $take
+            }
+        }
+    }
+    Write-Entry 'diagnostic-export-index.json' (@{files=$exportIndex; byte_limit=33554432} | ConvertTo-Json -Depth 10)
+    Write-Entry '说明.txt' '包含版本、启动、环境检查、生成器及部署日志；未读取数据库、对话或模型密钥配置。单文件保留末尾 256 KiB，截断信息见 diagnostic-export-index.json。'
 } finally { $archive.Dispose(); $stream.Dispose() }
 Write-Output $OutputPath

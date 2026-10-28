@@ -188,6 +188,13 @@ def _submit(request: Request, kind: str, payload: dict, idempotency_key: str | N
     if conversation_id and user_id:
         request.app.state.users.touch_conversation(conversation_id, user_id)
     request.app.state.gpu_provider.ensure_running(job.id)
+    from apps.launcher.diagnostics import OperationDiagnostic
+    diagnostic = OperationDiagnostic(request.app.state.local_runtime.directory, 'submission')
+    diagnostic.event('submitted', request_id=getattr(request.state, 'request_id', ''), job_id=job.id,
+                     worker_diagnostics=request.app.state.local_runtime.diagnostics)
+    diagnostic.save(dict(completed=True, ok=True, job_id=job.id, request_id=getattr(request.state, 'request_id', ''), diagnostics=diagnostic.metadata))
+    request.state.diagnostics = diagnostic.metadata
+    diagnostic.close()
     return {'job_id': job.id, 'status': job.status, 'waiting_for_worker': not repository.has_live_worker()}
 
 def _job_response(request: Request, job) -> dict:

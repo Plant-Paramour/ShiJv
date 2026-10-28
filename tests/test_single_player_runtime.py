@@ -40,10 +40,14 @@ def test_launcher_service_starts_and_shuts_down_with_workspace_identity(tmp_path
             raise AssertionError('service did not become ready')
         assert health['pid'] == process.pid
         assert health['workspace'] == str(tmp_path / 'launcher-workspace')
+        saved_identity = json.loads((tmp_path / 'startup-diagnostics/service.json').read_text(encoding='utf-8'))
+        assert saved_identity['state'] == 'running'
+        assert saved_identity['build'] == health['build']
         request = urllib.request.Request(base + '/v1/local-runtime/shutdown', method='POST')
         with opener.open(request, timeout=15) as response:
             assert json.load(response)['status'] == 'stopping'
         assert process.wait(timeout=20) == 0
+        assert json.loads((tmp_path / 'startup-diagnostics/service.json').read_text(encoding='utf-8'))['state'] == 'stopped'
         with socket.socket() as check:
             assert check.connect_ex(('127.0.0.1', port)) != 0
     finally:
@@ -230,6 +234,7 @@ def test_local_start_profile_model_and_persisted_stream(tmp_path, monkeypatch):
     """Exercise the actual Agent queue and plain SQLite message storage."""
     monkeypatch.setenv("SHIJU_DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SHIJU_ENV", "development")
+    (tmp_path / 'launcher.json').write_text(json.dumps(dict(local_enabled=False)))
     for name in ("DATABASE_URL", "SHIJU_DATABASE_PATH"):
         monkeypatch.delenv(name, raising=False)
 

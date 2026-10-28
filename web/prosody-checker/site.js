@@ -2295,6 +2295,7 @@ async function requestApi(url, options = {}) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(responseError(payload, response.status));
+    if (payload?.diagnostics?.log_path) error.message += `\n阶段：${payload.diagnostics.stage}\n日志：${payload.diagnostics.log_path}\n诊断编号：${payload.diagnostics.diagnostic_id}`;
     error.status = response.status;
     if (["/v1/local-profile", "/v1/model-config", "/v1/local-runtime"].includes(path)) {
       window.ShijuStartup?.fail(new Error(`${path}：HTTP ${response.status}；${error.message}`));
@@ -4726,6 +4727,17 @@ loadCurrentUser();
 
 let localRuntimeConfig = {};
 let runtimeModels = [];
+function enableDiagnosticCopy(target) {
+  if (!target || target.nextElementSibling?.dataset.diagnosticCopy) return;
+  const button = document.createElement('button');
+  button.type = 'button'; button.dataset.diagnosticCopy = '1';
+  button.textContent = '复制错误与日志位置';
+  button.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(target.textContent); button.textContent = '已复制'; }
+    catch { button.textContent = '请选中文字复制'; }
+  });
+  target.after(button);
+}
 let runtimeRequestActive = false;
 function renderWorkerStatus(data) {
   const labels = { released: '权重已释放；提交新任务时自动重新加载', stopped: '生成器未启动；保存模型目录后，提交任务会自动启动', loading: '正在加载模型；可提交任务排队，加载完成后自动生成', ready: '本地生成器已就绪，可以提交诗词生成', failed: '模型加载或运行失败，请查看下方错误并检查依赖、模型和显存' };
@@ -4733,9 +4745,11 @@ function renderWorkerStatus(data) {
   const text = data.worker.ready ? (pendingVerification ? '模型已加载；配对未验证，实际生成成功后自动记住' : labels.ready) : data.worker.state === 'loading' ? (data.worker.message || labels.loading) : data.worker.external_worker ? '已连接独立运行的诗词生成器' : labels[data.worker.state];
   document.querySelector('#local-worker-status').textContent = text;
   document.querySelector('#local-model-check-results').replaceChildren(...(data.worker.checks || []).map(c => { const li = document.createElement('li'); li.textContent = `${c.name}：${({passed:'通过',running:'进行中',failed:'失败',pending:'待实际生成验证'})[c.state] || '未测试'} · ${c.detail}`; return li; }));
-  document.querySelector('#local-worker-error').textContent = [data.worker.state === 'failed' ? data.worker.message : '', data.worker.error].filter(Boolean).join('\n\n');
+  const diagnosticText = data.worker.diagnostics?.log_path ? `日志：${data.worker.diagnostics.log_path}\n诊断编号：${data.worker.diagnostics.diagnostic_id}` : '';
+  document.querySelector('#local-worker-error').textContent = [data.worker.state === 'failed' ? data.worker.message : '', data.worker.error, data.worker.state === 'failed' ? diagnosticText : ''].filter(Boolean).join('\n\n');
   if (data.worker.plan) document.querySelector('#local-model-plan').textContent = `${data.worker.plan.label}。${data.worker.plan.note}`;
   document.querySelector('#local-worker-error').hidden = !data.worker.error;
+  if (data.worker.error) enableDiagnosticCopy(document.querySelector('#local-worker-error'));
   document.querySelector('#local-readiness').textContent = `${data.agent_ready ? '对话模型：已配置' : '对话模型：尚未配置，请先保存模型端点'}；诗词生成：${text}`;
   document.querySelector('#local-worker-start').disabled = ['ready', 'loading', 'released'].includes(data.worker.state);
   document.querySelector('#local-worker-stop').disabled = !['ready', 'loading', 'released'].includes(data.worker.state);
@@ -4781,7 +4795,9 @@ async function checkLocalEnvironment() {
   try {
     const data = await apiFetch('/v1/local-runtime/check', {method: 'POST'});
     const environment = data.environment;
-    status.textContent = environment.ok ? `环境检查通过：${environment.gpu.name}。模型仍需通过实际加载、有效输出及约束生成。` : (environment.errors || []).join('；');
+    status.textContent = environment.ok ? `环境检查通过：${environment.gpu?.name || 'CPU'}。模型仍需通过实际加载、有效输出及约束生成。` : (environment.errors || []).join('；');
+    if (environment.diagnostics?.log_path) status.textContent += `\n日志：${environment.diagnostics.log_path}\n诊断编号：${environment.diagnostics.diagnostic_id}`;
+    if (!environment.ok) enableDiagnosticCopy(status);
     document.querySelector('#local-model-plan').textContent = data.error || (data.plan ? `${data.plan.label}。${data.plan.note}` : '选择模型后自动确定运行方式，完整验收通过后才会就绪。');
   } catch (error) { status.textContent = error.message; }
   finally { button.disabled = false; }

@@ -1,5 +1,6 @@
 """Promote a pair only after its real generation was accepted by the API."""
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -26,7 +27,10 @@ class GenerationVerification:
                 or environment_stamp(self.inference) != self.inference_stamp):
             return False
         report = dict(ok=True, source='successful_generation', model=self.model, python=self.inference,
-                      job_id=job['job_id'], verified_at=time.time(), checks=[dict(id='actual_generation',
+                      job_id=job['job_id'], verified_at=time.time(),
+                      plan=dict(quantization=os.environ.get('SHIJU_QUANTIZATION', 'none')),
+                      application_stamp=self.app_stamp, inference_stamp=self.inference_stamp,
+                      checks=[dict(id='actual_generation',
                       name='网页实际生成', state='passed', detail='已成功生成非空正文，且任务完成结果已由软件接收')])
         previous = verified_report(self.directory, self.model, self.inference)
         if not (previous and previous.get('ok')):

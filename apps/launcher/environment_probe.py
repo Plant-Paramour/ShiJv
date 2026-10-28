@@ -11,10 +11,22 @@ import sys
 import traceback
 
 
+def exception_chain(exc):
+    messages, seen = [], set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        messages.append(f'{type(exc).__name__}: {exc}')
+        exc = exc.__cause__ or (None if exc.__suppress_context__ else exc.__context__)
+    return '\n原因：'.join(messages)
+
+
 def probe(mode="core"):
     result = {"python": sys.executable, "version": platform.python_version(), "mode": mode,
               "ok": False, "errors": [], "packages": {}, "cuda": False, "gpu": None,
-              "quantization": [], "supported_model_types": [], "model_errors": {}}
+              "quantization": [], "supported_model_types": [], "model_errors": {},
+              "model_error_tracebacks": {}, "sys_path": list(sys.path), "package_paths": {},
+              "prefix": sys.prefix, "base_prefix": sys.base_prefix,
+              "cwd": str(Path.cwd()), "model_class_paths": {}}
     if sys.version_info < (3, 10):
         result["errors"].append("需要 Python 3.10 或以上版本")
         return result
@@ -27,10 +39,11 @@ def probe(mode="core"):
         modules["tomli"] = "tomli"
     for name, distribution in modules.items():
         try:
-            importlib.import_module(name)
+            module = importlib.import_module(name)
+            result["package_paths"][distribution] = getattr(module, '__file__', None)
             result["packages"][distribution] = importlib.metadata.version(distribution)
         except Exception as exc:
-            result["errors"].append(f"{distribution} 无法使用：{type(exc).__name__}: {exc}")
+            result["errors"].append(f"{distribution} 无法使用：{exception_chain(exc)}")
     if mode == "core" and not result["errors"]:
         try:
             from pydantic import BaseModel
@@ -102,14 +115,17 @@ def probe(mode="core"):
                     if kind not in CONFIG_MAPPING_NAMES:
                         raise RuntimeError("当前 Transformers 未注册此架构")
                     configuration = AutoConfig.for_model(kind)
-                    factory._model_mapping[type(configuration)]
+                    model_class = factory._model_mapping[type(configuration)]
+                    import inspect
+                    result['model_class_paths'][kind] = inspect.getfile(model_class)
                     result["supported_model_types"].append(kind)
                 except Exception as exc:
-                    result["model_errors"][kind] = f"{type(exc).__name__}: {exc}"
+                    result["model_errors"][kind] = exception_chain(exc)
+                    result["model_error_tracebacks"][kind] = traceback.format_exc()
             if not result["supported_model_types"]:
                 result["errors"].append("所选环境无法加载程序已实现的 Qwen3 / Qwen3.5 架构：" + str(result["model_errors"]))
         except Exception as exc:
-            result["errors"].append(f"推理后端检查失败：{type(exc).__name__}: {exc}")
+            result["errors"].append(f"推理后端检查失败：{exception_chain(exc)}")
     result["ok"] = not result["errors"]
     return result
 
@@ -119,11 +135,22 @@ def main():
     parser.add_argument("--mode", choices=["core", "inference"], default="core")
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from apps.launcher.diagnostics import OperationDiagnostic
+    import os
+    diagnostic = OperationDiagnostic(os.getenv('SHIJU_DATA_DIR') or Path(args.output).parent, 'dependency-probe', os.getenv('SHIJU_DIAGNOSTIC_ID'))
     try:
         result = probe(args.mode)
     except Exception:
         result = {"ok": False, "errors": [traceback.format_exc()]}
+    result['diagnostics'] = diagnostic.metadata
+    if not result.get('ok'):
+        result['errors'] = [diagnostic.describe(error) for error in result.get('errors', [])]
+        diagnostic.event('failed', errors=result['errors'], tracebacks=result.get('model_error_tracebacks'))
+    diagnostic.event('completed', ok=result.get('ok'))
+    diagnostic.save(dict(completed=True, **result))
     Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    diagnostic.close()
     return 0 if result["ok"] else 1
 
 

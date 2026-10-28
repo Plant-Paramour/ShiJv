@@ -4,42 +4,73 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <base href="/web/prosody-checker/">
-  <meta name="shiju-release" content="20261027-startup-diagnostics-1">
+  <meta name="shiju-release" content="20261027-file-diagnostics-3">
   <script id="shiju-startup-recorder">
 (function () {
   "use strict";
-  var report = {schema: 1, release: "20261027-startup-diagnostics-1", page: location.origin + location.pathname + location.hash.split("?")[0], browser: navigator.userAgent, started_at: new Date().toISOString(), events: [], resources: [], health: null};
-  var failed = false, ready = false, panel, details, status, saveTimer;
+  var prefix = "shiju:browser-report:", timer, inFlight = false, delay = 500, acknowledged = 0;
+  var session = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID().replace(/-/g, "") : Date.now().toString(16) + Math.random().toString(16).slice(2);
+  var report = {schema: 2, session_id: session, revision: 0, release: "20261027-file-diagnostics-3", page: location.origin + location.pathname, browser: navigator.userAgent, started_at: new Date().toISOString(), events: [], closed: false};
   function clean(value) {
     return String(value == null ? "" : value).replace(/(Bearer\s+)[\w.\-]+/gi, "$1[redacted]").replace(/\bsk-[A-Za-z0-9_-]+/g, "[redacted]").replace(/((?:api[_-]?key|authorization|access[_-]?token|password|secret)["\s]*[:=]["\s]*)[^\s,";}]+/gi, "$1[redacted]").replace(/(https?:\/\/[^\s?"<>]+)\?[^\s"<>]+/g, "$1?[redacted]").slice(0, 4000);
   }
-  function text() { return JSON.stringify(report, null, 2); }
-  function xhr(url, method, body, callback, blob) {
+  function pending() {
+    var values = [], found = false;
     try {
-      var request = new XMLHttpRequest(); request.open(method, url, true); request.timeout = 5000;
-      if (blob) request.responseType = "blob";
-      if (body) request.setRequestHeader("Content-Type", "application/json");
-      request.onload = function () { callback(request, null); };
-      request.onerror = request.ontimeout = function () { callback(request, "连接失败或超时"); };
-      request.send(body || null);
-    } catch (error) { callback(null, clean(error.message)); }
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf(prefix) === 0) {
+          try { var item = JSON.parse(localStorage.getItem(key)); if (item && item.session_id && item.events) { values.push(item); if (item.session_id === session) found = true; } } catch (_) {}
+        }
+      }
+    } catch (_) {}
+    if (!found && acknowledged < report.revision) values.push(report);
+    values.sort(function (a, b) { return String(a.started_at).localeCompare(String(b.started_at)); });
+    return values;
   }
+  function schedule(wait) { clearTimeout(timer); timer = setTimeout(flush, wait); }
   function persist() {
-    while (new Blob([text()]).size > 44000 && report.events.length > 1) { report.events.shift(); report.truncated = true; }
-    try { localStorage.setItem("shiju:startup-diagnostics", text()); } catch (_) {}
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(function () { xhr("/v1/startup-diagnostics/browser", "POST", text(), function () {}); }, 400);
-    if (details) details.textContent = text();
+    while (new Blob([JSON.stringify(report)]).size > 44000 && report.events.length > 1) { report.events.shift(); report.truncated = true; }
+    try { localStorage.setItem(prefix + session, JSON.stringify(report)); } catch (_) {}
+    schedule(400);
+  }
+  function flush() {
+    if (inFlight) return;
+    var items = pending();
+    if (!items.length) return;
+    var item = items[0], revision = item.revision, request;
+    inFlight = true;
+    function finish(saved) {
+      inFlight = false;
+      if (saved) {
+        try {
+          var current = JSON.parse(localStorage.getItem(prefix + item.session_id));
+          if (current && current.revision === revision) localStorage.removeItem(prefix + item.session_id);
+        } catch (_) {}
+        if (item.session_id === session && report.revision === revision) acknowledged = revision;
+        delay = 500;
+      } else { delay = Math.min(delay * 2, 30000); }
+      if (pending().length) schedule(saved ? 0 : delay);
+    }
+    try {
+      request = new XMLHttpRequest(); request.open("POST", "/v1/startup-diagnostics/browser", true); request.timeout = 5000;
+      request.setRequestHeader("Content-Type", "application/json");
+      request.onload = function () {
+        var receipt;
+        try { receipt = JSON.parse(request.responseText); } catch (_) {}
+        finish(request.status === 200 && receipt && receipt.saved === true && receipt.session_id === item.session_id && receipt.revision === revision);
+      };
+      request.onerror = request.ontimeout = function () { finish(false); };
+      request.send(JSON.stringify(item));
+    } catch (_) { finish(false); }
   }
   function record(kind, message, stack) {
-    report.events.push({time: new Date().toISOString(), kind: kind, message: clean(message), stack: clean(stack)});
-    if (report.events.length > 40) report.events.shift();
-    if (window.console) (kind === "error" ? console.error : console.info).call(console, "[ShiJu 启动诊断]", report.events[report.events.length - 1]);
-    if (kind === "error") { failed = true; if (panel) panel.open = true; }
-    if (status) status.textContent = failed ? "启动异常：请导出诊断文件发送给开发者" : (ready ? "启动完成 · 导出诊断" : "启动检查中 · 导出诊断");
+    report.revision += 1;
+    report.events.push({sequence: report.revision, time: new Date().toISOString(), kind: kind, message: clean(message), stack: clean(stack)});
+    if (report.events.length > 40) { report.events.shift(); report.truncated = true; }
     persist();
   }
-  window.ShijuStartup = {mark: function (stage) { record("stage", stage); }, fail: function (error) { record("error", error && error.message || error, error && error.stack); }, ready: function () { ready = true; record("stage", "初始化完成"); }, report: function () { return JSON.parse(text()); }};
+  window.ShijuStartup = {mark: function (stage) { record("stage", stage); }, fail: function (error) { record("error", error && error.message || error, error && error.stack); }, ready: function () { record("stage", "初始化完成"); }, report: function () { return JSON.parse(JSON.stringify(report)); }};
   window.addEventListener("error", function (event) {
     if (event.target && event.target !== window) {
       var resource = event.target.src || event.target.href;
@@ -51,61 +82,12 @@
     }
   }, true);
   window.addEventListener("unhandledrejection", function (event) { record("error", event.reason && event.reason.message || event.reason, event.reason && event.reason.stack); });
-  function download(blob, name) {
-    var url = URL.createObjectURL(blob), link = document.createElement("a");
-    link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
-  }
-  function exportReport() {
-    record("stage", "用户导出启动诊断");
-    xhr("/v1/startup-diagnostics/browser", "POST", text(), function (saved, error) {
-      if (error || !saved || saved.status !== 200) { download(new Blob([text()], {type: "application/json"}), "shiju-browser-diagnostics.json"); return; }
-      xhr("/v1/startup-diagnostics/export", "GET", null, function (result, failure) {
-        if (!failure && result && result.status === 200 && /application\/zip/i.test(result.getResponseHeader("Content-Type") || "")) download(result.response, "shiju-startup-diagnostics.zip");
-        else download(new Blob([text()], {type: "application/json"}), "shiju-browser-diagnostics.json");
-      }, true);
-    });
-  }
-  function inspect(url, health) {
-    xhr(url, "GET", null, function (response, error) {
-      if (health) {
-        if (error || !response || response.status !== 200) { record("error", "健康检查失败：" + (error || response.status)); return; }
-        try {
-          var data = JSON.parse(response.responseText);
-          report.health = {application:data.application, pid:data.pid, python:clean(data.python), workspace:clean(data.workspace), data_root:clean(data.data_root), instance_id:data.instance_id, build:data.build || null};
-          if (!data.build || data.build.release !== report.release) record("error", "前端与服务版本不一致，或正在运行不含诊断版本信息的旧服务");
-          persist();
-        } catch (failure) { record("error", "健康检查响应格式错误", failure.stack); }
-        return;
-      }
-      var type = response && response.getResponseHeader("Content-Type") || "";
-      var item = {url:url, status:response && response.status, content_type:type, cache_control:response && response.getResponseHeader("Cache-Control"), etag:response && response.getResponseHeader("ETag"), error:error};
-      var okay = !error && response && response.status === 200 && /^(text|application)\/(javascript|ecmascript)(;|$)/i.test(type);
-      if (!okay && response) item.error_body = clean(response.responseText.slice(0, 400));
-      report.resources.push(item);
-      if (!okay) record("error", "脚本响应异常：" + url + "；HTTP " + item.status + "；Content-Type=" + type + "；" + (error || ""));
-      else persist();
-    });
-  }
-  document.addEventListener("DOMContentLoaded", function () {
-    panel = document.createElement("details"); panel.id = "shiju-startup-diagnostics";
-    panel.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;max-width:calc(100vw - 24px);width:440px;box-sizing:border-box;background:#fffaf0;color:#29251f;border:1px solid #a99477;padding:12px;font:13px/1.6 sans-serif;box-shadow:0 4px 20px #0003";
-    status = document.createElement("summary"); status.textContent = "启动诊断 · 导出诊断"; panel.appendChild(status);
-    var explanation = document.createElement("p"); explanation.textContent = "包含启动错误、版本、资源响应及本机路径；不读取对话、数据库或模型密钥配置。展开下方可检查内容。"; panel.appendChild(explanation);
-    var button = document.createElement("button"); button.type = "button"; button.textContent = "导出诊断"; button.onclick = exportReport; panel.appendChild(button);
-    var copy = document.createElement("button"); copy.type = "button"; copy.textContent = "复制诊断"; copy.style.marginLeft = "10px";
-    copy.onclick = function () { if (navigator.clipboard) navigator.clipboard.writeText(text()).catch(function () { details.focus(); details.select(); }); else { details.focus(); details.select(); } }; panel.appendChild(copy);
-    details = document.createElement("textarea"); details.readOnly = true; details.style.cssText = "display:block;width:100%;height:220px;box-sizing:border-box;margin-top:10px;font:12px monospace"; panel.appendChild(details);
-    document.body.appendChild(panel); panel.open = failed;
-    record("stage", "HTML 诊断就绪（独立于模块）");
-    var modules = document.querySelectorAll('script[type="module"][src]');
-    for (var i = 0; i < modules.length; i++) inspect(modules[i].getAttribute("src"), false);
-    inspect("./core.js?startup-check=1", false);
-    inspect("./prosody-evaluation.js?startup-check=1", false);
-    inspect("/health/live", true);
-    setTimeout(function () { if (!ready) record("error", "启动 15 秒后尚未完成；查看最后成功阶段及资源响应"); }, 15000);
+  window.addEventListener("online", function () { schedule(0); });
+  window.addEventListener("pagehide", function () {
+    report.closed = true; record("stage", "页面退出");
+    try { if (navigator.sendBeacon) navigator.sendBeacon("/v1/startup-diagnostics/browser", new Blob([JSON.stringify(report)], {type: "application/json"})); } catch (_) {}
   });
-  record("stage", "HTML 启动记录器已执行");
+  record("stage", "HTML 错误记录器已执行");
 }());
   </script>
 

@@ -44,6 +44,7 @@ def check_runtime(request: Request):
     require_profile(request)
     runtime = request.app.state.local_runtime
     environment = inspect_environment(runtime.directory, refresh=True)
+    request.state.diagnostics = environment.get('diagnostics')
     result = {"environment": environment, "plan": None, "error": ""}
     model = read_config(runtime.directory)["model_path"]
     if model:
@@ -145,7 +146,7 @@ def verified_models(request: Request):
 def start_worker(request: Request):
     require_profile(request)
     try:
-        return request.app.state.local_runtime.start(f"http://127.0.0.1:{request.url.port or 18763}")
+        return request.app.state.local_runtime.start(f"http://127.0.0.1:{request.url.port or 18763}", background=True)
     except (ValueError, OSError) as exc:
         raise HTTPException(422, str(exc)) from exc
 

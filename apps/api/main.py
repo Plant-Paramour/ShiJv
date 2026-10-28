@@ -50,6 +50,18 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     app.state.turn_controller = TurnController()
     project_root = Path(__file__).resolve().parents[2]
     app.state.project_root = project_root
+    from apps.launcher.web_assets import check_web_assets
+    try:
+        import hashlib
+        app.state.web_assets = {'state': 'ready', 'files': {name: hashlib.sha256((project_root / name).read_bytes()).hexdigest()
+                                 for name in check_web_assets(project_root)}}
+    except Exception as exc:
+        from apps.launcher.diagnostics import OperationDiagnostic
+        diagnostic = OperationDiagnostic(active.database_path.parent, 'web_assets')
+        message = diagnostic.fail(exc, 'WEB_ASSETS_INVALID')
+        app.state.web_assets = {'state': 'failed', 'error': message, 'diagnostics': diagnostic.metadata}
+        diagnostic.save(dict(completed=True, ok=False, **app.state.web_assets))
+        diagnostic.close()
     configured_meter_dir = getattr(active, 'meter_source', None)
     meter_dir = Path(configured_meter_dir) if configured_meter_dir else project_root / 'Songci_Meter'
     if not meter_dir.is_absolute():
@@ -70,6 +82,38 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
             except Exception:
                 logging.getLogger(__name__).exception('本地生成器自动启动失败')
     app.router.on_startup.append(auto_start_local_worker)
+    from starlette.exceptions import HTTPException as StarletteHTTPException
+    from fastapi.exceptions import RequestValidationError
+    @app.exception_handler(RequestValidationError)
+    async def diagnostic_validation_error(request, exc):
+        from fastapi.exception_handlers import request_validation_exception_handler
+        from apps.launcher.diagnostics import OperationDiagnostic
+        import json
+        diagnostic = OperationDiagnostic(active.database_path.parent, 'request-validation')
+        diagnostic.error_code = 'REQUEST_VALIDATION_FAILED'
+        diagnostic.event('failed', request_id=getattr(request.state, 'request_id', ''), path=request.url.path,
+                         errors=[dict(type=e['type'], loc=e['loc']) for e in exc.errors()])
+        metadata = diagnostic.metadata
+        diagnostic.save(dict(completed=True, ok=False, diagnostics=metadata))
+        diagnostic.close()
+        response = await request_validation_exception_handler(request, exc)
+        payload = json.loads(response.body)
+        payload['diagnostics'] = metadata
+        request.state.diagnostics = metadata
+        return JSONResponse(status_code=422, content=payload, headers={'X-ShiJu-Diagnostic-Id': metadata['diagnostic_id']})
+    @app.exception_handler(StarletteHTTPException)
+    async def diagnostic_http_error(request, exc):
+        from apps.launcher.diagnostics import OperationDiagnostic
+        diagnostic = OperationDiagnostic(active.database_path.parent, 'http-error')
+        diagnostic.event('request', request_id=getattr(request.state, 'request_id', ''), method=request.method, path=request.url.path)
+        message = diagnostic.fail(exc, f'HTTP_{exc.status_code}')
+        metadata = diagnostic.metadata
+        diagnostic.save(dict(completed=True, ok=False, diagnostics=metadata))
+        diagnostic.close()
+        request.state.diagnostics = metadata
+        return JSONResponse(status_code=exc.status_code,
+            content={'detail': exc.detail, 'diagnostics': metadata},
+            headers={**(exc.headers or {}), 'X-ShiJu-Diagnostic-Id': metadata['diagnostic_id']})
     app.state.meter_version = meter_version(meter_dir)
     app.state.rhyme_directory = project_root / 'Rhyme'
     app.state.rhyme_version = rhyme_version(app.state.rhyme_directory)
@@ -79,6 +123,7 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     async def observe_requests(request: Request, call_next):
         app.state.local_runtime.control_url = f'http://127.0.0.1:{request.url.port or 18763}'
         request_id = request.headers.get('x-request-id') or str(uuid.uuid4())
+        request.state.request_id = request_id
         source = request.headers.get('x-request-source')
         if source not in {'page_init', 'user_action', 'poll', 'background'}:
             source = 'poll' if request.url.path.endswith(('/state', '/events')) else 'user_action'
@@ -86,19 +131,33 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
         token = begin()
         try:
             response = await call_next(request)
-        except Exception:
+        except Exception as exc:
             logger.exception('request_failed request_id=%s method=%s path=%s source=%s', request_id, request.method, request.url.path, source)
+            from apps.launcher.diagnostics import OperationDiagnostic
+            diagnostic = OperationDiagnostic(active.database_path.parent, 'http-error')
+            diagnostic.event('request', request_id=request_id, method=request.method, path=request.url.path)
+            message = diagnostic.fail(exc, 'HTTP_INTERNAL_ERROR')
+            metadata = diagnostic.metadata
+            diagnostic.save(dict(completed=True, ok=False, diagnostics=metadata))
+            diagnostic.close()
             end(token)
-            raise
+            return JSONResponse(status_code=500, content={'detail': message, 'diagnostics': metadata},
+                headers={'X-Request-ID': request_id, 'X-ShiJu-Diagnostic-Id': metadata['diagnostic_id']},
+                media_type='application/json; charset=utf-8')
         duration_ms = (time.perf_counter() - started) * 1000
         stats = end(token)
         response.headers['X-Request-ID'] = request_id
+        if response.headers.get('content-type', '').lower() == 'application/json':
+            response.headers['content-type'] = 'application/json; charset=utf-8'
+        diagnostics = getattr(request.state, 'diagnostics', None) or getattr(app.state.local_runtime, 'diagnostics', None)
+        if diagnostics:
+            response.headers['X-ShiJu-Diagnostic-Id'] = diagnostics.get('diagnostic_id', '')
         if request.url.path.startswith(('/v1/poetry/jobs/', '/v1/conversations/')):
             response.headers['Cache-Control'] = 'private, no-store'
         elif request.url.path.startswith(('/Rhyme/', '/Songci_Meter/')):
             response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
             response.headers.setdefault('ETag', '"' + str(response.headers.get('content-length', 'dataset')) + '"')
-        logger.info('request request_id=%s method=%s path=%s source=%s status=%s duration_ms=%.2f db_duration_ms=%.2f db_query_count=%s pool_wait_ms=%.2f', request_id, request.method, request.url.path, source, response.status_code, duration_ms, stats.db_duration_ms if stats else 0, stats.db_query_count if stats else 0, stats.pool_wait_ms if stats else 0)
+        logger.info('request request_id=%s method=%s path=%s source=%s status=%s content_type=%s duration_ms=%.2f db_duration_ms=%.2f db_query_count=%s pool_wait_ms=%.2f', request_id, request.method, request.url.path, source, response.status_code, response.headers.get('content-type', ''), duration_ms, stats.db_duration_ms if stats else 0, stats.db_query_count if stats else 0, stats.pool_wait_ms if stats else 0)
         return response
     app.state.agent_service = agent_service
 
@@ -152,10 +211,19 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
             database.check()
         except Exception:
             database_status = 'error'
-        payload = {'status': 'ok' if database_status == 'ok' else 'degraded', 'database': database_status, 'gpu_provider': app.state.gpu_provider.status(), 'worker_online': app.state.jobs.has_live_worker()}
-        if database_status != 'ok':
+        from .environment import selected_environment
+        worker = app.state.local_runtime.status()
+        enabled = selected_environment(active.database_path.parent)['local_enabled']
+        generation_ready = (not enabled or worker['state'] in {'ready', 'released'}) and app.state.web_assets['state'] == 'ready'
+        payload = {'status': 'ok' if database_status == 'ok' and generation_ready else 'degraded', 'database': database_status,
+                   'service': 'ready' if database_status == 'ok' and app.state.web_assets['state'] == 'ready' else 'failed', 'generator': worker, 'web_assets': app.state.web_assets,
+                   'local_enabled': enabled, 'gpu_provider': app.state.gpu_provider.status(), 'worker_online': app.state.jobs.has_live_worker()}
+        if database_status != 'ok' or not generation_ready:
             return JSONResponse(status_code=503, content=payload)
         return payload
+    @app.get('/health/web', tags=['health'])
+    def web_health():
+        return app.state.web_assets
     app.include_router(public_router)
     app.include_router(worker_router)
     app.include_router(agent_router)

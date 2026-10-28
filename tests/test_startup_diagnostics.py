@@ -34,11 +34,87 @@ def test_startup_diagnostics_export_is_bounded_and_redacted(client, tmp_path):
         assert 'secret-value' not in browser and 'sensitive-token' not in browser and 'sk-abcdef' not in browser and 'DO-NOT-COLLECT' not in browser
         assert 'private-value' not in z.read('api-startup.log').decode()
         assert len(z.read('api-startup.log')) <= 262144
-        assert json.loads(z.read('service.json'))['build'] == build_info()
+        assert json.loads(z.read('service.json'))['record_missing'] is True
     assert client.post('/v1/startup-diagnostics/browser', content='x' * 50000).status_code == 413
     assert client.post('/v1/startup-diagnostics/browser', json=[]).status_code == 400
     assert client.post('/v1/startup-diagnostics/browser', json={}, headers={'Origin':'https://other.example'}).status_code == 403
     assert client.get('/health/live').json()['build'] == build_info()
+
+
+def test_browser_errors_are_files_per_session_and_retry_does_not_erase_history(client):
+    session = 'a' * 32
+    report = dict(schema=2, session_id=session, revision=1,
+                  events=[dict(sequence=1, kind='error', message='first frontend failure', stack='traceback one')])
+    receipt = client.post('/v1/startup-diagnostics/browser', json=report).json()
+    assert receipt['saved'] and receipt['session_id'] == session and receipt['revision'] == 1
+    path, log = Path(receipt['report_path']), Path(receipt['log_path'])
+    assert path.is_file() and 'traceback one' in log.read_text(encoding='utf-8')
+    client.post('/v1/startup-diagnostics/browser', json=report)
+    assert log.read_text(encoding='utf-8').count('"message": "first frontend failure"') == 1
+    report['revision'] = 2
+    report['events'] = [dict(sequence=2, kind='error', message='second runtime failure')]
+    client.post('/v1/startup-diagnostics/browser', json=report)
+    stale = dict(schema=2, session_id=session, revision=1, events=[])
+    client.post('/v1/startup-diagnostics/browser', json=stale)
+    persisted = json.loads(path.read_text(encoding='utf-8'))
+    assert persisted['revision'] == 2
+    assert [e['sequence'] for e in persisted['events']] == [1, 2]
+    other = client.post('/v1/startup-diagnostics/browser', json=dict(schema=2, session_id='b'*32, revision=1,
+        events=[dict(sequence=1, kind='error', message='another page failed')])).json()
+    assert other['report_path'] != str(path)
+    assert 'second runtime failure' in path.read_text(encoding='utf-8')
+
+
+def test_browser_report_is_not_acknowledged_when_file_write_fails(client, monkeypatch):
+    from apps.api import startup_diagnostics
+    def fail(*args):
+        raise OSError('fixture: disk write failed')
+    monkeypatch.setattr(startup_diagnostics, 'write_report', fail)
+    response = client.post('/v1/startup-diagnostics/browser', json=dict(schema=2, session_id='c'*32, revision=1,
+        events=[dict(sequence=1, kind='error', message='browser failed')]))
+    assert response.status_code == 500
+    assert response.json().get('saved') is not True
+    assert response.json()['diagnostics']['log_path']
+
+
+def test_browser_report_rejects_path_traversal(client):
+    assert client.post('/v1/startup-diagnostics/browser', json=dict(session_id='../outside', events=[])).status_code == 400
+
+
+def test_launcher_export_reads_recorded_files_without_http_requests(tmp_path):
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    requests = []
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            requests.append(self.path)
+            self.send_response(503)
+            self.end_headers()
+        def log_message(self, *args):
+            pass
+    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    directory = tmp_path / 'startup-diagnostics'
+    directory.mkdir()
+    saved = dict(state='failed', error='saved startup import failure', build=dict(fingerprint='recorded-build'))
+    (directory / 'service.json').write_text(json.dumps(saved))
+    output = tmp_path / 'offline.zip'
+    try:
+        result = subprocess.run(['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+            str(ROOT / 'scripts/export-startup-diagnostics.ps1'), '-Workspace', str(ROOT),
+            '-DataDirectory', str(tmp_path), '-Port', str(server.server_port), '-OutputPath', str(output)], capture_output=True)
+        assert result.returncode == 0, result.stderr
+        assert not requests
+        with zipfile.ZipFile(output) as archive:
+            record = json.loads(archive.read('launcher.json').decode('utf-8-sig'))
+            assert record['source'] == 'persisted-files'
+            assert record['service_record'] == saved
+            assert json.loads(archive.read('service.json')) == saved
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
 
 
 def test_powershell_and_python_build_fingerprint_agree():
@@ -57,7 +133,8 @@ def test_launcher_export_works_without_server(tmp_path):
     assert result.returncode == 0, result.stderr
     with zipfile.ZipFile(output) as z:
         report = json.loads(z.read('launcher.json').decode('utf-8-sig'))
-        assert report['health']['error']
+        assert report['source'] == 'persisted-files'
+        assert report['service_record_error']
         assert report['package_fingerprint'] == build_info()['fingerprint']
         browser = json.loads(z.read('latest-browser.json'))
         assert 'sensitive-value' not in browser['events'][0]['message']
@@ -86,25 +163,33 @@ exit 0
     result=subprocess.run(['powershell','-NoProfile','-Command',command],capture_output=True,text=True)
     assert result.returncode == 0, result.stdout + result.stderr
 
-def test_inline_recorder_survives_missing_modules_and_old_backend():
-    script = r'''
+def test_inline_recorder_is_silent_retries_and_replays_across_reload():
+    script = r"""
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync(process.argv[1],'utf8');
 const code=html.match(/<script id="shiju-startup-recorder">([\s\S]*?)<\/script>/)[1];
-const listeners={},domListeners={},downloads=[];
-function element(tag){return {tag,children:[],style:{},appendChild(child){this.children.push(child);},click(){},remove(){},focus(){},select(){}};}
-const body=element('body');
-function XHR(){this.status=404;this.responseText='Not Found';this.open=function(){};this.setRequestHeader=function(){};this.getResponseHeader=function(){return 'text/plain';};this.send=function(){this.onload();};}
-const window={console:{info(){},error(){}},addEventListener(type,fn){listeners[type]=fn;}};
-const context={window,console:window.console,document:{body,createElement:element,addEventListener(type,fn){domListeners[type]=fn;},querySelectorAll(){return [];}},location:{origin:'http://127.0.0.1:1',pathname:'/web/prosody-checker/',hash:'#chat'},navigator:{userAgent:'test-browser'},localStorage:{setItem(){}},Date,JSON,String,Blob,XMLHttpRequest:XHR,setTimeout(){return 1;},clearTimeout(){},URL:{createObjectURL(blob){downloads.push(blob);return 'blob:test';},revokeObjectURL(){}}};
-vm.runInNewContext(code,context);
-listeners.error({target:window,filename:'http://127.0.0.1:1/site.js',message:'module blocked',lineno:1,colno:1,error:{stack:'fixture stack'}});
-domListeners.DOMContentLoaded();
-assert(window.ShijuStartup.report().events.some(item=>item.message.includes('module blocked')));
-const panel=body.children[0];assert(panel.open);
-panel.children.find(item=>item.textContent==='导出诊断').onclick();
-assert.equal(downloads.length,1);assert.equal(downloads[0].type,'application/json');
-downloads[0].text().then(value=>{const report=JSON.parse(value);assert(report.events.some(item=>item.stack==='fixture stack'));console.log('Independent recorder and old-backend JSON fallback passed');});
-'''
+const saved=new Map(),requests=[];let online=false;
+const storage={get length(){return saved.size;},key(i){return [...saved.keys()][i];},getItem(k){return saved.get(k)||null;},setItem(k,v){saved.set(k,v);},removeItem(k){saved.delete(k);}};
+function page(id){
+  const listeners={},timers=new Map();let next=0;
+  function XHR(){this.open=(method,url)=>{this.method=method;this.url=url;};this.setRequestHeader=()=>{};this.send=body=>{const report=JSON.parse(body);requests.push({method:this.method,url:this.url,report});if(!online){this.onerror();return;}this.status=200;this.responseText=JSON.stringify({saved:true,session_id:report.session_id,revision:report.revision});this.onload();};}
+  const window={crypto:{randomUUID:()=>id},addEventListener(type,fn){listeners[type]=fn;}};
+  const context={window,document:{createElement(){throw new Error('No diagnostic UI may be created');}},location:{origin:'http://127.0.0.1:1',pathname:'/web/prosody-checker/'},navigator:{userAgent:'test-browser'},localStorage:storage,Date,Math,JSON,String,Blob,XMLHttpRequest:XHR,setTimeout(fn){timers.set(++next,fn);return next;},clearTimeout(id){timers.delete(id);}};
+  vm.runInNewContext(code,context);
+  return {window,listeners,tick(){const key=timers.keys().next().value;assert(key);const fn=timers.get(key);timers.delete(key);fn();}};
+}
+const first=page('11111111-1111-1111-1111-111111111111');
+first.listeners.error({target:first.window,filename:'http://127.0.0.1:1/site.js',message:'module blocked',lineno:1,colno:1,error:{stack:'fixture stack'}});
+assert(saved.size===1);first.tick();assert(saved.size===1,'Failed delivery must not erase pending errors');
+assert([...saved.values()].some(value=>value.includes('fixture stack')));
+const second=page('22222222-2222-2222-2222-222222222222');online=true;
+second.tick();second.tick();assert.equal(saved.size,0,'Only persisted acknowledgments clear pending reports');
+assert(requests.some(item=>item.report.events.some(event=>event.message.includes('module blocked'))));
+second.window.ShijuStartup.ready();second.listeners.unhandledrejection({reason:new Error('runtime failure after ready')});second.tick();
+assert(requests.at(-1).report.events.some(event=>event.message.includes('runtime failure after ready')));
+assert(requests.every(item=>item.method==='POST'&&item.url==='/v1/startup-diagnostics/browser'));
+assert(!code.includes('createElement')&&!code.includes('/export'));
+console.log('Silent browser logger: pre-module failure, retry, reload replay and runtime error passed');
+"""
     result=subprocess.run(['node','-e',script,str(ROOT / 'web/prosody-checker/index.html')],capture_output=True,text=True)
     assert result.returncode == 0, result.stdout + result.stderr

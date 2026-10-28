@@ -201,6 +201,7 @@ function Format-FailureDetails($state) {
         if($state.log_truncated) { $text+="（日志较长，以下显示末尾 64 KiB，完整内容保留在日志文件）`r`n" }
         if($state.log_content) { $text+=$state.log_content } else { $text+="（进程日志为空；如有验证报告，具体原因已显示在上方。）" }
     }
+    if ($state.diagnostics.log_path) { $text += "`r`n阶段日志：$($state.diagnostics.log_path)`r`n诊断编号：$($state.diagnostics.diagnostic_id)" }
     return $text
 }
 function Restore-DeploymentSession($session) {

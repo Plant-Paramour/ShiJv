@@ -19,7 +19,7 @@ def check_application_environment(python):
     import tempfile
     with tempfile.TemporaryDirectory(prefix='shiju-core-') as temporary:
         output = Path(temporary) / 'report.json'
-        process = subprocess.run([str(path), str(Path(__file__).with_name('environment_probe.py')),
+        process = subprocess.run([str(path), '-I', str(Path(__file__).with_name('environment_probe.py')),
                                   '--mode', 'core', '--output', str(output)],
                                  env=python_process_env(path), capture_output=True, timeout=600,
                                  creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
@@ -85,6 +85,8 @@ def main():
     parser.add_argument('--device-uuid', default='')
     parser.add_argument('--application-python', default='')
     args = parser.parse_args()
+    from apps.launcher.diagnostics import OperationDiagnostic
+    diagnostic = OperationDiagnostic(args.data_dir, 'model-acceptance', os.getenv('SHIJU_DIAGNOSTIC_ID'))
     if args.device_uuid:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device_uuid
         os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
@@ -92,7 +94,7 @@ def main():
     from apps.launcher.model_catalog import validate_model, scan, report_path, fingerprint
     from apps.api.environment import assess_model, check_managed_runtime
     result = {'ok': False, 'python': sys.executable, 'model': args.model, 'checks': [], 'started_at': time.time(),
-              'device_uuid': args.device_uuid or os.getenv('CUDA_VISIBLE_DEVICES', '')}
+              'device_uuid': args.device_uuid or os.getenv('CUDA_VISIBLE_DEVICES', ''), 'diagnostics': diagnostic.metadata}
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     runner = None
@@ -102,6 +104,7 @@ def main():
         temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
         temporary.replace(output)
     def report(key, name, state, detail):
+        diagnostic.event('check', check=key, state=state)
         previous = next((c for c in result['checks'] if c['id'] == key), {})
         started = previous.get('started_at', time.time())
         result['checks'] = [c for c in result['checks'] if c['id'] != key] + [dict(id=key, name=name, state=state, detail=detail,
@@ -133,6 +136,8 @@ def main():
                     result['models'].append(dict(path=path, supported=False, reason=str(exc)))
             result['ok'] = True
             write()
+            diagnostic.save(dict(completed=True, ok=True, diagnostics=diagnostic.metadata))
+            diagnostic.close()
             return 0
         model = validate_model(args.model)
         initial_fingerprint = fingerprint(model)
@@ -158,7 +163,10 @@ def main():
             raise ValueError('模型、依赖或生成代码在测试期间发生变化，请重新完整测试')
         result['ok'] = True
     except Exception as exc:
-        result['error'] = f'{type(exc).__name__}: {exc}'
+        import traceback
+        result['error'] = diagnostic.fail(exc, 'MODEL_ACCEPTANCE_FAILED')
+        result['diagnostics'] = diagnostic.metadata
+        diagnostic.save(dict(completed=True, ok=False, traceback=traceback.format_exc(), diagnostics=diagnostic.metadata))
         result['code'] = 'MODEL_OUT_OF_MEMORY' if 'out of memory' in str(exc).lower() else 'MODEL_ACCEPTANCE_FAILED'
         running = next((c for c in result['checks'] if c['state'] == 'running'), None)
         if running:
@@ -199,9 +207,13 @@ def main():
                 LauncherMemory(args.data_dir).adopt_verified_pair(args.application_python, sys.executable, args.model)
                 result['pair_saved'] = True
             except (OSError, ValueError) as exc:
-                result.update(ok=False, error=str(exc), code='PAIR_SAVE_FAILED')
+                result.update(ok=False, error=diagnostic.fail(exc, 'PAIR_SAVE_FAILED'), code='PAIR_SAVE_FAILED', diagnostics=diagnostic.metadata)
                 target.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
             write()
+    diagnostic.event('completed', ok=result['ok'])
+    diagnostic.save(dict(completed=True, ok=result['ok'], error=result.get('error'),
+                         environment=result.get('environment'), plan=result.get('plan'), diagnostics=diagnostic.metadata))
+    diagnostic.close()
     return 0 if result['ok'] else 1
 
 

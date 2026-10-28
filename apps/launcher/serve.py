@@ -25,10 +25,16 @@ def main():
         print(f"\n启动服务 {datetime.now().isoformat()} · Python: {sys.executable}", flush=True)
         from apps.launcher.build_info import build_info
         print('应用版本：' + json.dumps(build_info(), ensure_ascii=False), flush=True)
+        snapshot = directory / 'startup-diagnostics/service.json'
+        record.update(application='ShiJu', python=sys.executable, workspace=os.getenv('SHIJU_LAUNCHER_WORKSPACE_ROOT', str(Path(__file__).resolve().parents[2])),
+                      data_root=str(directory), build=build_info(), started_at=datetime.now().isoformat())
+        from apps.api.startup_diagnostics import write_report
+        write_report(snapshot, dict(record, state='starting'))
         try:
             import uvicorn
             from apps.api.main import create_app
             app = create_app()
+            app.router.on_startup.append(lambda: write_report(snapshot, dict(record, state='running')))
             server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port,
                                                   timeout_graceful_shutdown=10))
             app.state.launcher_shutdown = lambda: setattr(server, "should_exit", True)
@@ -37,7 +43,9 @@ def main():
             temporary.write_text(json.dumps(record), encoding="utf-8")
             temporary.replace(instance_file)
             server.run()
-        except BaseException:
+            write_report(snapshot, dict(record, state='stopped'))
+        except BaseException as exc:
+            write_report(snapshot, dict(record, state='failed', error=str(exc)))
             traceback.print_exc()
             raise
         finally:

@@ -189,6 +189,9 @@ class Operation(DownloadTransport):
         self.events = []
         self.context = {}
         self.source_preference = 'auto'
+        from .diagnostics import OperationDiagnostic
+        self.diagnostic = OperationDiagnostic(self.report.parent, 'deployment')
+        self.context['diagnostics'] = self.diagnostic.metadata
 
     def check(self):
         if self.cancel and self.cancel.exists():
@@ -197,35 +200,63 @@ class Operation(DownloadTransport):
     def update(self, stage, **details):
         self.check()
         self.stage = stage
+        self.diagnostic.event('stage', stage=stage)
         save(self.report, dict(ok=False, state='running', stage=stage, **(self.context | details)))
 
 
     def run(self, command, *, env=None, timeout=1800):
         self.check()
-        log = self.report.parent / ('process-' + uuid.uuid4().hex + '.log')
-        with log.open('w', encoding='utf-8') as stream:
-            process = subprocess.Popen(list(map(str, command)), cwd=ROOT, env=env,
-                stdin=subprocess.DEVNULL, stdout=stream, stderr=subprocess.STDOUT, creationflags=_flags())
-            start = time.monotonic()
-            try:
-                while process.poll() is None:
-                    self.check()
-                    if time.monotonic() - start > timeout:
-                        raise RuntimeError('本阶段超时，请查看日志后重试')
-                    time.sleep(.2)
-            except BaseException as exc:
+        from .diagnostics import OperationDiagnostic
+        import threading
+        diagnostic = OperationDiagnostic(self.report.parent, 'process-' + uuid.uuid4().hex, self.diagnostic.id)
+        log = Path(diagnostic.metadata['log_path']) if diagnostic.root else None
+        process = None
+        reader = None
+        try:
+            if log is None:
+                raise OSError(diagnostic.describe('无法创建部署进程日志'))
+            child_env = (env or os.environ).copy()
+            child_env['SHIJU_DIAGNOSTIC_ID'] = diagnostic.id
+            process = subprocess.Popen(list(map(str, command)), cwd=ROOT, env=child_env,
+                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=_flags())
+            def capture():
+                try:
+                    for line in iter(process.stdout.readline, b''):
+                        diagnostic.logger.info(line.decode('utf-8', errors='replace').rstrip())
+                finally:
+                    process.stdout.close()
+            reader = threading.Thread(target=capture, daemon=True)
+            reader.start()
+            started = time.monotonic()
+            diagnostic.event('process_start', executable=str(command[0]), stage=self.stage)
+            while process.poll() is None:
+                self.check()
+                if time.monotonic() - started > timeout:
+                    raise RuntimeError('本阶段超时，请查看日志后重试')
+                time.sleep(.2)
+            reader.join(timeout=5)
+            diagnostic.event('process_exit', exit_code=process.returncode)
+            if process.returncode:
+                raise process_failure(self.stage, log, f'退出码 {process.returncode}')
+            return log
+        except BaseException as exc:
+            if process is not None and process.poll() is None:
                 if os.name == 'nt':
                     subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True, creationflags=_flags())
                 else:
                     process.kill()
                 process.wait(timeout=30)
-                if isinstance(exc, Cancelled):
-                    raise
-                stream.flush()
+            if reader:
+                reader.join(timeout=5)
+            diagnostic.fail(exc, 'CANCELLED' if isinstance(exc, Cancelled) else 'DEPLOYMENT_PROCESS_FAILED')
+            if isinstance(exc, (Cancelled, DeploymentFailure)):
+                raise
+            if log is not None:
                 raise process_failure(self.stage, log, str(exc)) from exc
-        if process.returncode:
-            raise process_failure(self.stage, log, f'退出码 {process.returncode}')
-        return log
+            raise
+        finally:
+            diagnostic.save(dict(completed=True, ok=process is not None and process.returncode == 0, diagnostics=diagnostic.metadata))
+            diagnostic.close()
 
 
 def check_space(path, required):
@@ -470,17 +501,8 @@ def extract_python(archive, target):
 
 
 def process_env(environment, report):
-    environment = Path(environment)
-    env = {k: v for k, v in os.environ.items() if not k.upper().startswith(
-        ('PYTHON', 'CONDA', 'CUDA', 'TRITON', 'VIRTUAL_ENV', 'PIP_', 'HF_', 'HUGGINGFACE', 'TORCH', 'NVIDIA', 'VCINSTALL', 'VCTOOLS', 'WINDOWSSDK', 'VSINSTALL'))
-        and k.upper() not in {'CC', 'CXX', 'INCLUDE', 'LIB', 'LIBPATH', 'CMAKE_PREFIX_PATH', 'CPATH'}}
-    windows = Path(os.getenv('SystemRoot', 'C:/Windows'))
-    env.update(PATH=os.pathsep.join(map(str, (environment, environment / 'Scripts', environment / 'Library/bin', windows / 'System32', windows))),
-               PYTHONNOUSERSITE='1', PYTHONIOENCODING='utf-8', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
-               TRITON_CACHE_DIR=str(Path(report).parent / 'jit-cache/triton'),
-               TORCHINDUCTOR_CACHE_DIR=str(Path(report).parent / 'jit-cache/inductor'),
-               PIP_CONFIG_FILE=os.devnull, PIP_CACHE_DIR=str(Path(report).parent / 'pip-cache'))
-    return env
+    from .process_environment import isolated_environment
+    return isolated_environment(environment, report)
 
 
 def dependency_versions(python, operation, env):
@@ -886,11 +908,17 @@ def main():
                 if actual.is_file():
                     result['actual_packages'] = read(actual).get('packages', {})
             save(args.plan, result)
-        save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result))
+        operation.diagnostic.event('completed', ok=True)
+        operation.diagnostic.save(dict(completed=True, ok=True, diagnostics=operation.diagnostic.metadata))
+        save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result, diagnostics=operation.diagnostic.metadata))
         return 0
     except Exception as exc:
-        save(args.report, dict(ok=False, state='cancelled' if isinstance(exc, Cancelled) else 'failed', stage=operation.stage, error=str(exc), **failure_details(exc)))
+        error = operation.diagnostic.fail(exc, 'CANCELLED' if isinstance(exc, Cancelled) else 'DEPLOYMENT_FAILED')
+        operation.diagnostic.save(dict(completed=True, ok=False, error=str(exc), diagnostics=operation.diagnostic.metadata))
+        save(args.report, dict(ok=False, state='cancelled' if isinstance(exc, Cancelled) else 'failed', stage=operation.stage, error=error, diagnostics=operation.diagnostic.metadata, **failure_details(exc)))
         return 1
+    finally:
+        operation.diagnostic.close()
 
 
 if __name__ == '__main__':

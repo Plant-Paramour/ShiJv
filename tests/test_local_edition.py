@@ -64,12 +64,78 @@ def test_static_types_cache_and_missing_files(tmp_path, monkeypatch):
             assert head.headers['content-type'] == response.headers['content-type']
             old_etag = FileResponse(tmp_path / ('asset' + suffix), stat_result=(tmp_path / ('asset' + suffix)).stat()).headers['etag']
             assert client.get(url, headers={'If-None-Match': old_etag}).status_code == 200
+            assert client.get(url, headers={'If-None-Match': old_etag, 'If-Modified-Since': response.headers['last-modified']}).status_code == 200
+            assert client.get(url, headers={'If-Modified-Since': response.headers['last-modified']}).status_code == 200
             cached = client.get(url, headers={'If-None-Match': response.headers['etag']})
             assert cached.status_code == 304
             assert cached.headers['cache-control'] == 'no-cache'
         assert client.get('/assets/').headers['content-type'].startswith('text/html')
         assert client.get('/assets/missing.js').status_code == 404
         assert client.get('/assets/%2e%2e/outside.js').status_code == 404
+
+
+def test_entire_page_dependency_graph_over_http(local_app, monkeypatch):
+    from apps.launcher.web_assets import check_web_assets
+    mimetypes.init()
+    for suffix in ('.js', '.mjs', '.css', '.html'):
+        monkeypatch.setitem(mimetypes.types_map, suffix, 'text/plain')
+    with TestClient(local_app) as client:
+        state = client.get('/health/web').json()
+        assert state['state'] == 'ready'
+        assert set(state['files']) == set(check_web_assets(ROOT))
+        for name, digest in state['files'].items():
+            response = client.get('/' + name)
+            assert response.status_code == 200, name
+            assert hashlib.sha256(response.content).hexdigest() == digest, name
+            expected = {'.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html'}[Path(name).suffix]
+            assert response.headers['content-type'].split(';')[0] == expected, name
+        missing = client.get('/web/prosody-checker/missing.js')
+        assert missing.status_code == 404
+        assert missing.headers['content-type'].startswith('application/json')
+        assert '<html' not in missing.text
+
+
+def test_build_dependency_validation_rejects_missing_and_case_mismatch():
+    from apps.launcher.web_assets import web_assets
+    entries = {'web/prosody-checker/index.html': b'<script type="module" src="./app.js?v=1"></script>',
+               'web/prosody-checker/app.js': b'import { x } from "./Dependency.js?v=2";',
+               'web/prosody-checker/dependency.js': b'export const x=1;'}
+    with pytest.raises(ValueError, match='Dependency.js'):
+        web_assets(entries)
+    entries['web/prosody-checker/Dependency.js'] = entries.pop('web/prosody-checker/dependency.js')
+    assert len(web_assets(entries)) == 3
+    del entries['web/prosody-checker/app.js']
+    with pytest.raises(ValueError, match='app.js'):
+        web_assets(entries)
+
+
+def test_web_manifest_rejects_mixed_release(tmp_path):
+    from apps.launcher.web_assets import check_web_assets
+    page = tmp_path / 'web/prosody-checker/index.html'
+    page.parent.mkdir(parents=True)
+    page.write_text('<p>release</p>', encoding='utf-8')
+    manifest = {'files': {'web/prosody-checker/index.html': hashlib.sha256(page.read_bytes()).hexdigest()}}
+    (tmp_path / 'RELEASE-MANIFEST.json').write_text(json.dumps(manifest))
+    assert check_web_assets(tmp_path)
+    page.write_text('<p>other release</p>', encoding='utf-8')
+    with pytest.raises(ValueError, match='发布清单不一致'):
+        check_web_assets(tmp_path)
+
+
+def test_missing_web_assets_keep_diagnostics_live_but_not_ready(tmp_path, monkeypatch):
+    import apps.launcher.web_assets as assets
+    monkeypatch.setenv('SHIJU_DATA_DIR', str(tmp_path))
+    def missing(root):
+        raise ValueError('网页资源缺失：web/prosody-checker/core.js')
+    monkeypatch.setattr(assets, 'check_web_assets', missing)
+    app = create_app()
+    with TestClient(app) as client:
+        assert client.get('/health/live').status_code == 200
+        assert client.get('/health/ready').status_code == 503
+        state = client.get('/health/web').json()
+        assert state['state'] == 'failed'
+        assert 'core.js' in state['error']
+        assert Path(state['diagnostics']['log_path']).is_file()
 
 
 def test_local_worker_plain_transport_preserves_jobs_without_authentication(local_app):

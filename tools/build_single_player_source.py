@@ -27,6 +27,9 @@ FILES = {
     'tools/environment-tool.ps1', 'tools/probe_managed_candidate.py',
     'tools/build_environment_tool.py', 'tools/EnvironmentDeployer.cs',
     'tools/build_single_player_source.py',
+    'tests/test_candidate_module_paths.py',
+    'tests/test_inference_process_environment.py',
+    'tests/test_runtime_diagnostics.py',
     'deploy/environment-tool/model.json', 'deploy/environment-tool/recommended-plan.json',
     'deploy/environment-tool/small-models.json', 'deploy/environment-tool/cpu-torch.json', 'deploy/environment-tool/vc-runtime.json', 'tests/test_cpu_inference_support.py', 'tests/test_deployer_download.py', 'tests/test_deployer_install_target.py', 'tests/test_deployment_profiles.py', 'tests/test_deployer_diagnostics.py',
     'deploy/managed-runtime/windows-qwen35-bnb4-wheels.json',
@@ -115,6 +118,11 @@ def build(output: Path, root: Path = ROOT):
         entries[name] = data
     if findings:
         raise ValueError('发布检查未通过（不显示敏感原文）：' + json.dumps(findings, ensure_ascii=False))
+    import sys
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from apps.launcher.web_assets import web_assets
+    web_assets(entries)
     manifest = {'edition': 'single-player', 'files': {name: hashlib.sha256(data).hexdigest() for name, data in entries.items()},
                 'excluded': ['server deployment and handover notes', 'user data and backups', 'existing archives and screenshots', 'Git history'],
                 'checks': ['explicit file selection', 'reviewed URL hosts', 'known credential and infrastructure patterns'],

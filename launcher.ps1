@@ -60,14 +60,39 @@ function New-PythonProcessInfo([string]$Python, [string]$Arguments) {
     if ($Arguments.StartsWith('-m ')) {
         $Arguments = '"{0}" {1}' -f (Join-Path $root 'apps\launcher\python_entry.py'), $Arguments
     }
-    $info.FileName = $Python; $info.Arguments = $Arguments; $info.WorkingDirectory = $root
+    $info.FileName = $Python; $info.Arguments = '-I ' + $Arguments; $info.WorkingDirectory = $root
     $info.UseShellExecute = $false; $info.CreateNoWindow = $true
     $info.RedirectStandardOutput = $true; $info.RedirectStandardError = $true
     $prefix = Split-Path -Parent $Python
     $info.EnvironmentVariables['PATH'] = "$prefix;$(Join-Path $prefix 'Library\bin');$(Join-Path $prefix 'Scripts');$env:PATH"
     $info.EnvironmentVariables.Remove('PYTHONHOME'); $info.EnvironmentVariables.Remove('PYTHONPATH')
     $info.EnvironmentVariables['PYTHONIOENCODING'] = 'utf-8'
+    $info.EnvironmentVariables['SHIJU_DATA_DIR'] = $dataRoot
+    if (-not $script:operationId) { $script:operationId = [Guid]::NewGuid().ToString('N') }
+    $info.EnvironmentVariables['SHIJU_DIAGNOSTIC_ID'] = $script:operationId
     return $info
+}
+function Write-LauncherFailure([string]$Message) {
+    if (-not $script:operationId) { $script:operationId = [Guid]::NewGuid().ToString('N') }
+    foreach ($base in @((Join-Path $dataRoot 'diagnostics'), (Join-Path ([IO.Path]::GetTempPath()) 'ShiJu\diagnostics'))) {
+        try {
+            $directory = Join-Path $base $script:operationId
+            New-Item -ItemType Directory -Force -Path $directory | Out-Null
+            $path = Join-Path $directory 'launcher.log'
+            $clean = [regex]::Replace($Message,'(?i)(Bearer\s+)[\w.\-]+','$1[redacted]')
+            $clean = [regex]::Replace($clean,'(?i)((?:api[_-]?key|password|secret)["\s]*[:=]["\s]*)[^\s,";}]+','$1[redacted]')
+            if ((Test-Path -LiteralPath $path) -and (Get-Item -LiteralPath $path).Length -gt 10MB) {
+                for ($i=3; $i -ge 1; $i--) { $source=if($i -eq 1){$path}else{"$path.$($i-1)"}; if(Test-Path -LiteralPath $source){ Move-Item -LiteralPath $source -Destination "$path.$i" -Force } }
+            }
+            Add-Content -LiteralPath $path -Value ((Get-Date).ToString('o') + " FAILED " + $clean) -Encoding UTF8
+            return "$Message`r`n启动器日志：$path`r`n诊断编号：$script:operationId"
+        } catch {}
+    }
+    return "$Message`r`n日志写入失败：数据目录和临时目录均不可写。"
+}
+trap {
+    Write-Error (Write-LauncherFailure $_.Exception.Message) -ErrorAction Continue
+    exit 1
 }
 
 function Invoke-EnvironmentProbe([string]$Python, [string]$Mode) {
@@ -75,8 +100,7 @@ function Invoke-EnvironmentProbe([string]$Python, [string]$Mode) {
     New-Item -ItemType Directory -Path $tempRoot | Out-Null
     $reportFile = Join-Path $tempRoot 'report.json'
     try {
-        $probeScript = Join-Path $root 'apps\launcher\environment_probe.py'
-        $info = New-PythonProcessInfo $Python ('"{0}" --mode {1} --output "{2}"' -f $probeScript, $Mode, $reportFile)
+        $info = New-PythonProcessInfo $Python ('-m apps.launcher.environment_probe --mode {0} --output "{1}"' -f $Mode, $reportFile)
         $script:activeProbe = [Diagnostics.Process]::Start($info)
         $script:activeProbe.BeginOutputReadLine(); $script:activeProbe.BeginErrorReadLine()
         $watch = [Diagnostics.Stopwatch]::StartNew()
@@ -123,8 +147,59 @@ function Start-ShiJu([string]$AppPython, [string]$ModelPython, [bool]$Local) {
     try {
         try { $owned = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $owned = $true }
         if (-not $owned) { throw '另一个启动器正在启动此软件，请稍候再试。' }
-        return Start-ShiJuCore $AppPython $ModelPython $Local
+        $health = Start-ShiJuCore $AppPython $ModelPython $Local
+        Test-WebResources
+        if ($Local) { Wait-GeneratorReady }
+        return $health
     } finally { if ($owned) { $mutex.ReleaseMutex() }; $mutex.Dispose() }
+}
+function Test-WebResources {
+    $state = Invoke-RestMethod -Uri "http://127.0.0.1:$script:Port/health/web" -TimeoutSec 10
+    if ($state.state -ne 'ready') { throw "网页资源检查失败：$($state.error)" }
+    $client = New-Object Net.WebClient
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+        foreach ($file in $state.files.PSObject.Properties) {
+            if ($script:cancelled) { throw '网页资源检查已取消' }
+            $name = [string]$file.Name
+            $url = "http://127.0.0.1:$script:Port/" + $name
+            $bytes = $client.DownloadData($url)
+            $type = ($client.ResponseHeaders['Content-Type'] -split ';')[0].Trim()
+            $expected = switch ([IO.Path]::GetExtension($name)) { '.js' { 'text/javascript' }; '.mjs' { 'text/javascript' }; '.css' { 'text/css' }; '.html' { 'text/html' } }
+            $digest = ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-','').ToLowerInvariant()
+            if ($type -ne $expected -or $digest -ne $file.Value) { throw "网页资源响应错误：$url；Content-Type=$type；文件内容与服务启动时不一致。日志：$(Join-Path $dataRoot 'api-startup.log')" }
+        }
+    } finally { $client.Dispose(); $sha.Dispose() }
+}
+function Wait-GeneratorReady {
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    $phaseWatch = [Diagnostics.Stopwatch]::StartNew()
+    $lastPhase = ''
+    while ($true) {
+        if ($script:cancelled) {
+            try { $null = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:$script:Port/v1/local-runtime/stop" -TimeoutSec 10 } catch {}
+            throw '启动等待已取消；诊断服务保留，可手动打开网页。'
+        }
+        if ($script:form) { [Windows.Forms.Application]::DoEvents() }
+        $state = Invoke-RestMethod -Uri "http://127.0.0.1:$script:Port/v1/local-runtime" -TimeoutSec 5
+        $worker = $state.worker
+        $phase = [string]$worker.phase
+        if ($phase -ne $lastPhase) { $phaseWatch.Restart(); $lastPhase = $phase }
+        if ($worker.state -in @('ready','released')) { return }
+        $log = if ($worker.diagnostics.log_path) { $worker.diagnostics.log_path } else { Join-Path $dataRoot 'api-startup.log' }
+        if ($worker.state -eq 'failed') { throw "整体启动失败：$($worker.error)`r`n日志：$log`r`n诊断编号：$($worker.diagnostics.diagnostic_id)" }
+        if ($worker.state -eq 'stopped') {
+            if (-not $state.config.model_path) { throw "整体启动失败：尚未配置本地模型。日志：$log" }
+            $null = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:$script:Port/v1/local-runtime/start" -TimeoutSec 5
+        }
+        $limit = if ($phase -eq 'checking') { 600 } elseif ($worker.plan.device -eq 'cpu' -or $worker.plan.label -like '*CPU*') { 7200 } else { 1800 }
+        if ($phaseWatch.Elapsed.TotalSeconds -gt $limit) {
+            try { $null = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:$script:Port/v1/local-runtime/stop" -TimeoutSec 10 } catch {}
+            throw "整体启动失败：阶段 $phase 超时。日志：$log；诊断服务已保留。"
+        }
+        if ($script:statusBox) { $statusBox.Text = "等待生成器就绪：$($worker.message)；已等待 $([int]$watch.Elapsed.TotalSeconds) 秒。日志：$log" }
+        Start-Sleep -Milliseconds 300
+    }
 }
 function Start-ShiJuCore([string]$AppPython, [string]$ModelPython, [bool]$Local) {
     New-Item -ItemType Directory -Path $dataRoot -Force | Out-Null
@@ -171,7 +246,7 @@ function Start-ShiJuCore([string]$AppPython, [string]$ModelPython, [bool]$Local)
         try { $health = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 1; if ($health.application -eq 'ShiJu' -and $health.pid -eq $service.Id) { return $health } } catch { }
         Start-Sleep -Milliseconds 500
     }
-    $service.Kill(); throw '软件启动超时，请检查 api-startup.log'
+    $service.Kill(); throw "软件启动超时，日志：$(Join-Path $dataRoot 'api-startup.log')"
 }
 
 if ($CheckOnly -or $Headless) {
@@ -187,7 +262,10 @@ if ($CheckOnly -or $Headless) {
     } else { $report = Test-SelectedEnvironments $ApplicationPython $InferencePython ([bool]$EnableLocal) }
     $report | ConvertTo-Json -Depth 8
     if (-not $report.ok) { exit 1 }
-    if ($Headless) { Start-ShiJu $ApplicationPython $InferencePython ([bool]$EnableLocal) | ConvertTo-Json -Depth 5 }
+    if ($Headless) {
+        try { Start-ShiJu $ApplicationPython $InferencePython ([bool]$EnableLocal) | ConvertTo-Json -Depth 5 }
+        catch { throw (Write-LauncherFailure $_.Exception.Message) }
+    }
     exit 0
 }
 
@@ -228,7 +306,7 @@ $poetryButton = New-Object Windows.Forms.Button; $poetryButton.Text = '选择本
 $poetryButton.Location = New-Object Drawing.Point(30, 326); $poetryButton.Size = New-Object Drawing.Size(700, 32)
 $form.Controls.Add($poetryButton)
 . (Join-Path $root 'scripts\launcher-models.ps1')
-$poetryButton.Add_Click({ try { $appBox.Text = Resolve-PythonPath $appBox.Text; $modelBox.Text = Resolve-PythonPath $modelBox.Text; Show-ModelSelection } catch { $statusBox.Text = $_.Exception.Message } })
+$poetryButton.Add_Click({ try { $appBox.Text = Resolve-PythonPath $appBox.Text; $modelBox.Text = Resolve-PythonPath $modelBox.Text; Show-ModelSelection } catch { $statusBox.Text = Write-LauncherFailure $_.Exception.Message } })
 $statusBox = New-Object Windows.Forms.TextBox; $statusBox.Multiline = $true; $statusBox.ReadOnly = $true; $statusBox.ScrollBars = 'Vertical'
 $statusBox.Location = New-Object Drawing.Point(30, 368); $statusBox.Size = New-Object Drawing.Size(700, 112)
 $statusBox.BackColor = [Drawing.Color]::FromArgb(255, 254, 250)
@@ -247,13 +325,13 @@ $openButton = New-Object Windows.Forms.Button; $openButton.Text = '打开已有�
 $restartButton = New-Object Windows.Forms.Button; $restartButton.Text = '重新启动软件'; $restartButton.Location = New-Object Drawing.Point(220, 568); $restartButton.Size = New-Object Drawing.Size(174, 40)
 $form.Controls.AddRange(@($openButton, $restartButton))
 $startupDiagnosticsButton = New-Object Windows.Forms.Button
-$startupDiagnosticsButton.Text = '导出启动诊断'
+$startupDiagnosticsButton.Text = '从日志文件导出诊断'
 $startupDiagnosticsButton.Location = New-Object Drawing.Point(410, 568)
 $startupDiagnosticsButton.Size = New-Object Drawing.Size(174, 40)
 $startupDiagnosticsButton.Add_Click({
     try {
         & (Join-Path $root 'scripts/export-startup-diagnostics.ps1') -Workspace $root -DataDirectory $dataRoot -Port $script:Port
-    } catch { $statusBox.Text = '诊断导出失败：' + $_.Exception.Message }
+    } catch { $statusBox.Text = Write-LauncherFailure ('诊断导出失败：' + $_.Exception.Message) }
 })
 $form.Controls.Add($startupDiagnosticsButton)
 $savedPath = Join-Path $dataRoot 'launcher.json'
@@ -287,6 +365,7 @@ $localCheck.Add_CheckedChanged({ Set-EnvironmentControls $true })
 Set-EnvironmentControls $true
 $run = {
     param([bool]$Start, [bool]$Restart = $false)
+    $script:operationId = [Guid]::NewGuid().ToString('N')
     $checkButton.Enabled = $false; $startButton.Enabled = $false; $stopButton.Enabled = $false; $openButton.Enabled = $false; $restartButton.Enabled = $false
     $selectedApp = $appBox.Text.Trim(); $selectedModel = $modelBox.Text.Trim(); $selectedLocal = $localCheck.Checked
     Set-EnvironmentControls $false
@@ -328,7 +407,7 @@ $run = {
             $lines += '环境检测通过并已记住。已通过测试的模型配对可直接启动；新模型请先完整测试。'
         }
         $statusBox.Text = $lines -join "`r`n"
-    } catch { if (-not $form.IsDisposed) { $statusBox.Text = $_.Exception.Message } }
+    } catch { if (-not $form.IsDisposed) { $statusBox.Text = Write-LauncherFailure $_.Exception.Message } }
     finally { if (-not $form.IsDisposed) { $checkButton.Enabled = $true; $startButton.Enabled = $true; $stopButton.Enabled = $true; $openButton.Enabled = $true; $restartButton.Enabled = $true; Set-EnvironmentControls $true } }
 }
 $checkButton.Add_Click({ & $run $false }); $startButton.Add_Click({ & $run $true })
@@ -344,7 +423,7 @@ $stopButton.Add_Click({
     $statusBox.Text = '正在退出软件并释放端口，请稍候…'
     [Windows.Forms.Application]::DoEvents()
     try { Stop-LauncherInstance $script:Port; if (-not $form.IsDisposed) { $statusBox.Text = '软件已退出，端口已释放。可以重新选择环境并启动。' } }
-    catch { if (-not $form.IsDisposed) { $statusBox.Text = $_.Exception.Message } }
+    catch { if (-not $form.IsDisposed) { $statusBox.Text = Write-LauncherFailure $_.Exception.Message } }
     finally { if (-not $form.IsDisposed) { foreach ($button in @($checkButton,$startButton,$stopButton,$openButton,$restartButton)) { $button.Enabled = $true }; Set-EnvironmentControls $true } }
 })
 $pairBox.Add_SelectedIndexChanged({
