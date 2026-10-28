@@ -268,10 +268,13 @@ def check_space(path, required):
         raise ValueError(f'磁盘空间不足：{path} 需要约 {required / 1024**3:.1f} GiB，可用 {free / 1024**3:.1f} GiB')
 
 
-def check_install_space(target, cache, environment_bytes, download_bytes):
+def check_install_space(target, cache, environment_bytes, download_bytes, model=None, model_bytes=0):
     """Add simultaneous allocations when cache and environment share a volume."""
     volumes = {}
-    for path, required in ((target, environment_bytes + 1024**3), (cache, download_bytes)):
+    allocations = [(target, environment_bytes + 1024**3), (cache, download_bytes)]
+    if model is not None:
+        allocations.append((model, model_bytes))
+    for path, required in allocations:
         existing = Path(path).resolve()
         while not existing.exists():
             existing = existing.parent
@@ -301,7 +304,11 @@ def discover_models(data_directory):
 
 
 def inspect_selected_model(directory):
-    """Existing official weights keep official identity only after full hashing."""
+    """Recognize named local Qwen models without requiring a pinned revision."""
+    from .resource_advice import named_official_model
+    if model_id := named_official_model(Path(directory).name):
+        spec = local_model(directory)
+        return dict(route='local', model=spec, label=f'已识别官方模型：{model_id}')
     for model_id in ('Qwen/Qwen3.5-4B', 'Qwen/Qwen3.5-2B', 'Qwen/Qwen3.5-0.8B'):
         spec = official_model(model_id)
         try:
@@ -361,7 +368,8 @@ def local_model(directory):
                 raise ValueError('模型文件不能指向目录外')
             files[name] = dict(sha256=sha256_file(path), bytes=path.stat().st_size)
     revision = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
-    return dict(model_id=root.name, revision=revision, source_url='local', model_type=config['model_type'], files=files)
+    from .resource_advice import named_official_model
+    return dict(model_id=named_official_model(root.name) or root.name, revision=revision, source_url='local', model_type=config['model_type'], files=files)
 
 
 def requirements(device='cuda'):
@@ -851,7 +859,7 @@ def install(plan, model, target, cache, operation, data_directory, continue_exis
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['inspect', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'install-vc-runtime', 'resume', 'import-wheels', 'inspect-target', 'diagnostics'])
+    parser.add_argument('action', choices=['inspect', 'preview', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'install-vc-runtime', 'resume', 'import-wheels', 'inspect-target', 'diagnostics'])
     parser.add_argument('--profile', choices=['auto', *PROFILES], default='auto')
     parser.add_argument('--source', choices=['auto', 'mirror', 'official'], default='auto')
     parser.add_argument('--continue-existing', action='store_true')
@@ -884,6 +892,22 @@ def main():
             result = inspect_selected_model(args.model)
         elif args.action == 'download':
             result = dict(model=download_model(args.model, operation, args.model_id))
+        elif args.action == 'preview':
+            operation.update('检查安装方案与磁盘空间')
+            from .resource_advice import snapshot
+            for label, path in (('模型', args.model), ('运行环境', args.target), ('缓存', args.cache)):
+                if not path or not Path(path).is_absolute():
+                    raise ValueError(f'请选择{label}的完整目录路径')
+                if Path(path).exists() and not Path(path).is_dir():
+                    raise ValueError(f'{label}位置是文件，请选择目录：{path}')
+            host = inspect_host(args.target or args.data_dir)
+            advisory = snapshot(host)
+            spec = official_model(args.model_id) if args.route == 'official' else inspect_selected_model(args.model)['model']
+            profile = choose_profile(host, spec, args.profile, advisory['resources'])
+            result = plan_policy(spec, args.route, profile)
+            inspect_existing_target(result, args.target, operation)
+            check_install_space(args.target, args.cache, result['environment_required_bytes'], result['download_bytes'],
+                                args.model if args.route == 'official' else None, result['model_bytes'])
         elif args.action == 'plan':
             operation.update('核验模型并生成清单')
             from .resource_advice import snapshot
@@ -926,13 +950,13 @@ def main():
                 if actual.is_file():
                     result['actual_packages'] = read(actual).get('packages', {})
             save(args.plan, result)
-        if args.action in {'plan', 'import', 'resume', 'inspect-target'}:
-            from .resource_advice import snapshot, assess_selection
+        if args.action in {'preview', 'plan', 'import', 'resume', 'inspect-target'}:
+            from .resource_advice import snapshot, assess_selection, MODEL_IDS
             if advisory is None:
                 advisory = snapshot(inspect_host(args.target or args.data_dir))
             selected_plan = result['plan'] if args.action == 'resume' else (read(args.plan) if args.action == 'inspect-target' else result)
             advisory['selection'] = assess_selection(advisory['resources'], selected_plan['model']['model_id'],
-                                                     selected_plan['profile'], known=selected_plan['route'] == 'official',
+                                                     selected_plan['profile'], known=selected_plan['route'] == 'official' or selected_plan['model']['model_id'] in MODEL_IDS,
                                                      weight_bytes=model_bytes(selected_plan['model']))
         operation.diagnostic.event('completed', ok=True)
         operation.diagnostic.save(dict(completed=True, ok=True, diagnostics=operation.diagnostic.metadata))

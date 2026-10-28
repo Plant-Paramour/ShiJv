@@ -17,7 +17,8 @@ def resources(vram=8, free_vram=7, ram=32, free_ram=20):
 
 @pytest.mark.parametrize('vram,free,model,profile', [
     (4, 3.5, '2B', 'cuda-bnb'), (6, 5.5, '4B', 'cuda-bnb'),
-    (8, 7, '4B', 'cuda-fp16'), (24, 22, '4B', 'cuda-fp16'),
+    (8, 7, '4B', 'cuda-bnb8'), (12, 11, '4B', 'cuda-bnb8'),
+    (16, 14, '4B', 'cuda-bnb8'), (24, 22, '4B', 'cuda-bnb8'),
     (0, 0, '0.8B', 'cpu'),
 ])
 def test_recommendation_tiers(vram, free, model, profile):
@@ -27,16 +28,16 @@ def test_recommendation_tiers(vram, free, model, profile):
 
 def test_current_usage_warns_without_downgrading_hardware_tier():
     r = resources(8, 7, ram=16, free_ram=7.6)
-    assert advice.recommended(r) == dict(model_id='Qwen/Qwen3.5-4B', profile='cuda-fp16')
-    assert advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')['state'] == 'recommended'
+    assert advice.recommended(r) == dict(model_id='Qwen/Qwen3.5-4B', profile='cuda-bnb8')
+    assert advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')['state'] == 'usable'
     r['gpu_available'] = advice.GIB
-    assert advice.recommended(r)['profile'] == 'cuda-fp16'
+    assert advice.recommended(r)['profile'] == 'cuda-bnb8'
     result = advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')
     assert result['state'] == 'tight'
     assert '不因此改变本机推荐档位' in result['text']
     r['gpu_available'] = None
     r['ram_available'] = None
-    assert advice.recommended(r)['profile'] == 'cuda-fp16'
+    assert advice.recommended(r)['profile'] == 'cuda-bnb8'
 
 
 def test_total_capacity_and_actual_usage_have_separate_meanings():
@@ -52,7 +53,7 @@ def test_total_capacity_and_actual_usage_have_separate_meanings():
 
 def test_recommended_loose_tight_and_risk_have_distinct_messages():
     r = resources()
-    assert advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')['state'] == 'recommended'
+    assert advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')['state'] == 'usable'
     loose = advice.assess_selection(r, 'Qwen/Qwen3.5-2B', 'cuda-bnb')
     assert loose['state'] == 'usable' and '更大的模型' in loose['text']
     tight = advice.assess_selection(resources(6, 4, free_ram=5), 'Qwen/Qwen3.5-2B', 'cuda-fp16')
@@ -61,13 +62,29 @@ def test_recommended_loose_tight_and_risk_have_distinct_messages():
     assert risk['state'] == 'risk' and '8 GB 显存' in risk['text']
 
 
+def test_popup_notice_only_explains_current_selection():
+    loose = advice.assess_selection(resources(8, 7.1, ram=15.71, free_ram=7.94),
+                                    'Qwen/Qwen3.5-2B', 'cuda-fp16')
+    assert loose['notice'] == '当前方案对本机相对宽松。若您优先考虑速度或较低占用，可以保留；若无这些要求，建议考虑推荐的更大的模型。'
+    tight = advice.assess_selection(resources(8, 1), 'Qwen/Qwen3.5-2B', 'cuda-fp16')
+    assert '关闭' in tight['notice'] and '更大的模型' not in tight['notice']
+    for result in (loose, tight):
+        assert '参考实测' not in result['notice'] and 'GiB' not in result['notice']
+
+
 def test_4b_fp16_matches_user_product_baseline():
     for capacity in [8, 12, 24]:
         r = resources(capacity, 7, ram=16, free_ram=7)
         result = advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')
-        assert result['state'] == 'recommended'
+        assert result['state'] == 'usable'
         assert '10 GiB' not in result['text']
         assert '16GB 系统内存＋8GB 显存' in result['text']
+
+
+def test_8gb_vram_defaults_to_8bit_but_manual_fp16_remains_available():
+    r = resources(8, 7, ram=16, free_ram=10)
+    assert advice.auto_profile(r, 'Qwen/Qwen3.5-4B') == 'cuda-bnb8'
+    assert advice.assess_selection(r, 'Qwen/Qwen3.5-4B', 'cuda-fp16')['state'] == 'usable'
 
 
 def test_bf16_is_not_a_default_recommendation():
@@ -91,19 +108,19 @@ def test_local_model_name_does_not_borrow_official_measurements():
 
 
 def test_auto_preserves_selected_model_but_uses_its_best_fitting_profile():
-    assert advice.auto_profile(resources(), 'Qwen/Qwen3.5-4B') == 'cuda-fp16'
+    assert advice.auto_profile(resources(), 'Qwen/Qwen3.5-4B') == 'cuda-bnb8'
     assert advice.auto_profile(resources(), 'Qwen/Qwen3.5-2B') == 'cuda-fp16'
     assert advice.auto_profile(resources(0, 0), 'Qwen/Qwen3.5-4B') == 'cpu'
     options = advice.snapshot(None, resources())['options']
     auto = next(x for x in options if x['model_id'].endswith('4B') and x['requested_profile'] == 'auto')
-    assert auto['profile'] == 'cuda-fp16'
+    assert auto['profile'] == 'cuda-bnb8'
 
 
 def test_profile_selection_uses_the_same_resource_snapshot_as_advice():
     host = HostReport('windows', 'x64', 19045, 'D:/', 100 * advice.GIB,
                       (GPU(0, 'GPU-test', 'test', '570.0', 8 * advice.GIB, '8.9'),), ())
     spec = deployer.official_model()
-    assert deployer.choose_profile(host, spec, resources=resources()) == 'cuda-fp16'
+    assert deployer.choose_profile(host, spec, resources=resources()) == 'cuda-bnb8'
     # Explicit selection is reviewable even when over budget; actual verification remains mandatory.
     assert deployer.choose_profile(host, spec, 'cuda-fp16', resources=resources()) == 'cuda-fp16'
     assert 'bnb-int8' in deployer.verification_policy('cuda-bnb8')

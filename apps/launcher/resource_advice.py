@@ -53,6 +53,12 @@ def model_size(model_id):
     return model_id.rsplit('-', 1)[-1] if model_id in MODEL_IDS else None
 
 
+def named_official_model(name):
+    """Use the model-name substring for local model selection and advice."""
+    lowered = str(name).casefold()
+    return next((model for model in MODEL_IDS if model.split('/')[-1].casefold() in lowered), None)
+
+
 def gpu_budget_for_weights(model_type, weight_bytes, profile):
     """Recognize fixed Qwen3.5 weight sizes, never an arbitrary directory name."""
     if model_type == 'qwen3_5':
@@ -140,7 +146,7 @@ def fits(resources, size, profile):
 def recommended(resources):
     capacity = (resources.get('gpu_total') or 0) / GIB
     # Product tiers are based on installed capacity. Current usage only adds warnings.
-    for size, profile, minimum in [('4B', 'cuda-fp16', 7.8), ('4B', 'cuda-bnb', 5.8),
+    for size, profile, minimum in [('4B', 'cuda-bnb8', 7.8), ('4B', 'cuda-bnb', 5.8),
                                     ('2B', 'cuda-bnb', 3.8), ('0.8B', 'cuda-fp16', 3.2)]:
         if capacity >= minimum and fits(resources, size, profile):
             return dict(model_id='Qwen/Qwen3.5-' + size, profile=profile)
@@ -234,11 +240,28 @@ def assess_selection(resources, model_id, profile, *, known=True, weight_bytes=N
         if size == '2B' and chosen == 'cpu':
             lines.append('16GB 主机曾在加载时物理内存达到约 9.54 GiB 后触发测试保护；最终峰值未知，该结果仅作占用提醒。')
         if size == '4B' and chosen == 'cuda-fp16':
-            lines.append('本产品按 16GB 系统内存＋8GB 显存推荐此方案。专项复测中，补齐子模块预加载的 FP16 对照路径正常生成，显存峰值约 6.09 GiB；部分权重保存在 CPU 并由钩子调入 GPU 计算。原路径的加载兼容问题已定位，对照修正仅在测试脚本中验证，不用于否定此硬件档位。')
+            lines.append('16GB 系统内存＋8GB 显存默认推荐 4B 8bit；GPU FP16 略紧张但可尝试。专项复测中，补齐子模块预加载的 FP16 对照路径正常生成，显存峰值约 6.09 GiB；部分权重保存在 CPU 并由钩子调入 GPU 计算。原路径的加载兼容问题已定位，对照修正仅在测试脚本中验证，不用于否定此硬件档位。')
     else:
         lines.append('本地模型不能仅凭目录名称套用官方模型数据；请通过实际加载与生成评估，不将未经校准的估算作为推荐档位依据。')
     lines.append('推荐档位用于选择方案；实际占用受输入长度、其他程序和加载方式影响。部署后仍须通过本机生成验收；磁盘空间另行检查。')
-    return dict(state=state, title=title, model_id=model_id, profile=chosen, requested_profile=profile,
+    notice = {
+        'recommended': '当前方案适合本机，可以继续。',
+        'usable': '当前选择可用，可以保留。',
+        'tight': '当前内存或显存占用偏高，建议先关闭占用资源的程序再继续。',
+        'risk': '本机配置低于当前方案需求，建议选择更小的模型或更换运行方式。',
+        'unknown': '暂时无法确认当前方案是否适合本机，安装后将通过实际生成检查。',
+    }[state]
+    if state == 'usable':
+        rec = recommended(resources)
+        if rec and model_size(rec['model_id']) and size:
+            levels = {'0.8B': .8, '2B': 2, '4B': 4}
+            if levels[model_size(rec['model_id'])] > levels[size]:
+                notice = '当前方案对本机相对宽松。若您优先考虑速度或较低占用，可以保留；若无这些要求，建议考虑推荐的更大的模型。'
+    if state == 'risk' and gpu and not resources.get('gpu_uuid'):
+        notice = '未检测到当前方案所需的受支持显卡，建议改用 CPU 运行。'
+    if not known:
+        notice = '自带模型的兼容性尚未确认，安装后将通过实际加载和生成检查。'
+    return dict(state=state, title=title, notice=notice, model_id=model_id, profile=chosen, requested_profile=profile,
                 text=title + '\n' + '\n'.join(lines), budget=budget,
                 requires_confirmation=state != 'recommended')
 
