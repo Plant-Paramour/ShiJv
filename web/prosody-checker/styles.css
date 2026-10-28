@@ -3816,6 +3816,7 @@ input:focus {
 .job-progress__scrolls { display: grid; gap: 24px; }
 .job-progress__scrolls > .poem-handscroll[hidden], .job-progress__scroll-nav[hidden] { display: none !important; }
 .job-progress__scroll-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+.job-progress__poem-id { margin: 14px 0 0; color: var(--site-ink-soft); font-size: 12px; text-align: center; overflow-wrap: anywhere; user-select: text; }
 .job-progress__scroll-ordinal { width: 4.5em; padding: 3px 6px; font: inherit; color: inherit; text-align: center; }
 .job-progress__scroll-nav .quiet-button:disabled { color: #888; border-color: #ccc; background: #eee; opacity: 1; cursor: not-allowed; box-shadow: none; }
 .job-progress__scroll-position { color: var(--site-ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }

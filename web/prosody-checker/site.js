@@ -1003,9 +1003,7 @@ async function openPoemEditorFromScroll(poem) {
       ? { id: poem.id }
       : await apiFetch(`/v1/profile/poems/by-job/${encodeURIComponent(poem.job_id)}/${Number(poem.candidate_ordinal)}`);
     poemPageState.returnHash = window.location.hash || "#profile";
-    const forest = await apiFetch(`/v1/profile/poems/${encodeURIComponent(source.id)}/tree`);
-    const defaultPoemId = forest.marked_poem_id || forest.viewer_latest_poem_id || forest.owner_latest_poem_id || source.id;
-    window.location.hash = `poem/edit/${encodeURIComponent(defaultPoemId)}`;
+    window.location.hash = `poem/edit/${encodeURIComponent(source.id)}`;
   } catch (error) {
     announce(`无法打开作品：${error.message}`);
   }
@@ -1897,6 +1895,7 @@ function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evalua
     ? groupSongCiStanzas(sourceStanzas, stanzaEnds)
     : sourceStanzas;
   article.className = `poem-handscroll${songCi ? " poem-handscroll--ci" : isTangPoem(value) ? " poem-handscroll--tang" : " poem-handscroll--single-column"}`;
+  if (value.id) article.dataset.poemId = value.id;
 
   const leftRoller = document.createElement("span");
   leftRoller.className = "poem-handscroll__roller poem-handscroll__roller--left";
@@ -2016,12 +2015,24 @@ function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evalua
       favorite.setAttribute("aria-label", favorite.title);
       favorite.setAttribute("aria-pressed", String(active));
     };
-    const resolvePoem = () => apiFetch(value.id
-      ? `/v1/profile/poems/${encodeURIComponent(value.id)}`
-      : `/v1/profile/poems/by-job/${encodeURIComponent(value.job_id)}/${Number(value.candidate_ordinal)}`);
+    const resolvePoem = async () => {
+      const detail = await apiFetch(value.id
+        ? `/v1/profile/poems/${encodeURIComponent(value.id)}`
+        : `/v1/profile/poems/by-job/${encodeURIComponent(value.job_id)}/${Number(value.candidate_ordinal)}`);
+      if (detail.id) {
+        value.id = detail.id;
+        article.dataset.poemId = detail.id;
+        delete article.dataset.poemIdUnavailable;
+        article.dispatchEvent(new CustomEvent("poem-identity-resolved", { bubbles: true }));
+      }
+      return detail;
+    };
     updateFavorite();
     favorite.disabled = Boolean(currentUser);
-    if (currentUser) resolvePoem().then((detail) => { savedPoem = detail; updateFavorite(); }).catch(() => {}).finally(() => { favorite.disabled = false; });
+    if (currentUser) resolvePoem().then((detail) => { savedPoem = detail; updateFavorite(); }).catch(() => {
+      article.dataset.poemIdUnavailable = "true";
+      article.dispatchEvent(new CustomEvent("poem-identity-resolved", { bubbles: true }));
+    }).finally(() => { favorite.disabled = false; });
     favorite.addEventListener("click", async () => {
       if (!requireLocalProfile()) return;
       favorite.disabled = true;
@@ -4138,6 +4149,11 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
     list = document.createElement("div");
     list.className = "job-progress__scrolls";
     container.append(list);
+    const identity = document.createElement("p");
+    identity.className = "job-progress__poem-id";
+    identity.setAttribute("aria-live", "polite");
+    container.append(identity);
+    list.addEventListener("poem-identity-resolved", () => updateScrollNavigation(container));
     const navigation = document.createElement("nav");
     navigation.className = "job-progress__scroll-nav";
     navigation.setAttribute("aria-label", "切换诗稿卷轴");
@@ -4211,6 +4227,9 @@ function updateScrollNavigation(container) {
   if (selected < 0) selected = 0;
   container.dataset.selectedScroll = scrolls[selected].dataset.candidateOrdinal;
   scrolls.forEach((scroll, index) => { scroll.hidden = index !== selected; });
+  const identity = container.querySelector(".job-progress__poem-id");
+  const selectedScroll = scrolls[selected];
+  if (identity) identity.textContent = `作品 ID：${selectedScroll.dataset.poemId || (selectedScroll.dataset.poemIdUnavailable ? "暂不可用" : "正在读取……")}`;
   const navigation = container.querySelector(".job-progress__scroll-nav");
   navigation.hidden = scrolls.length < 2;
   const [previous, next] = navigation.querySelectorAll("button");
