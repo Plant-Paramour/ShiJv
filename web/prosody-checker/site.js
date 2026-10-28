@@ -4142,7 +4142,25 @@ function renderAvailableScrolls(container, job, requestMeta, { autoEvaluate = tr
     navigation.className = "job-progress__scroll-nav";
     navigation.setAttribute("aria-label", "切换诗稿卷轴");
     const previous = document.createElement("button"); previous.type = "button"; previous.className = "quiet-button"; previous.textContent = "上一首";
-    const position = document.createElement("span"); position.className = "job-progress__scroll-position"; position.setAttribute("aria-live", "polite");
+    const position = document.createElement("span"); position.className = "job-progress__scroll-position";
+    const count = document.createElement("span"); count.className = "job-progress__scroll-count"; count.setAttribute("aria-live", "polite");
+    const ordinalLabel = document.createElement("label"); ordinalLabel.textContent = " · 候选 ";
+    const ordinalInput = document.createElement("input"); ordinalInput.type = "number"; ordinalInput.min = "1"; ordinalInput.step = "1";
+    ordinalInput.className = "job-progress__scroll-ordinal"; ordinalInput.setAttribute("aria-label", "跳转到候选编号");
+    const jump = () => {
+      const ordinal = Number(ordinalInput.value);
+      const target = [...list.children].find((scroll) => Number(scroll.dataset.candidateOrdinal) === ordinal);
+      ordinalInput.setCustomValidity(target ? "" : "请输入已生成的候选编号");
+      if (!target) { ordinalInput.reportValidity(); return; }
+      container.dataset.selectedScroll = target.dataset.candidateOrdinal;
+      updateScrollNavigation(container);
+    };
+    ordinalInput.addEventListener("input", () => ordinalInput.setCustomValidity(""));
+    ordinalInput.addEventListener("change", jump);
+    ordinalInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); jump(); }
+    });
+    ordinalLabel.append(ordinalInput); position.append(count, ordinalLabel);
     const next = document.createElement("button"); next.type = "button"; next.className = "quiet-button"; next.textContent = "下一首";
     const change = (step) => {
       const scrolls = [...list.children];
@@ -4197,7 +4215,12 @@ function updateScrollNavigation(container) {
   navigation.hidden = scrolls.length < 2;
   const [previous, next] = navigation.querySelectorAll("button");
   previous.disabled = selected === 0; next.disabled = selected === scrolls.length - 1;
-  navigation.querySelector(".job-progress__scroll-position").textContent = `${selected + 1} / ${scrolls.length} · 候选 ${scrolls[selected].dataset.candidateOrdinal}`;
+  navigation.querySelector(".job-progress__scroll-count").textContent = `${selected + 1} / ${scrolls.length}`;
+  const ordinalInput = navigation.querySelector(".job-progress__scroll-ordinal");
+  if (document.activeElement !== ordinalInput) {
+    ordinalInput.value = scrolls[selected].dataset.candidateOrdinal;
+    ordinalInput.setCustomValidity("");
+  }
   requestAnimationFrame(() => updatePoemLayout(scrolls[selected]));
 }
 
@@ -4208,8 +4231,9 @@ function startJobProgress(jobId, initialJob = null, anchor = null, conversationI
   const existing = chatThread.querySelector(`.job-progress[data-job-id="${CSS.escape(jobId)}"]`);
   if (existing) return;
   if (activeJobPolls.has(jobId)) return;
+  let terminalAtStart = initialJob?.status ? !["queued", "running"].includes(initialJob.status) : null;
   const details = document.createElement("details");
-  details.className = "job-progress"; details.open = true;
+  details.className = "job-progress"; details.open = terminalAtStart !== true;
   details.dataset.jobId = jobId;
   details.dataset.conversationId = conversationId || "";
   details.dataset.createdAt = String(anchor?.dataset.createdAt || initialJob?.created_at || Date.now() / 1000);
@@ -4224,16 +4248,19 @@ function startJobProgress(jobId, initialJob = null, anchor = null, conversationI
   let stopped = false;
   let inFlight = false;
   let settled = false;
-  const terminalAtStart = initialJob && !["queued", "running"].includes(initialJob.status);
   const archivedOrdinals = new Set();
-  let previousActiveCandidate = null;
+  const seenStartedCandidates = new Set();
   let requestMeta = initialJob?.request || {};
   const render = async (job) => {
     if (stopped || progressVersion !== conversationLoadVersion || currentConversationId !== conversationId || details.parentElement !== chatThread) return true;
+    if (terminalAtStart === null && job.status) {
+      terminalAtStart = !["queued", "running"].includes(job.status);
+      if (terminalAtStart) details.open = false;
+    }
     if (job.request) requestMeta = job.request;
     const labels = {
-      queued: job.waiting_for_worker ? "正在自动启动或加载本地模型，任务已排队……" : "已进入生成队列……",
-      running: "模型生成中……",
+      queued: job.generation_phase === "loading" ? "模型加载中……" : job.waiting_for_worker ? "正在自动启动或加载本地模型，任务已排队……" : "已进入生成队列……",
+      running: job.generation_phase === "loading" ? "模型加载中……" : "模型生成中……",
       succeeded: "生成完成",
       failed: "生成失败",
     };
@@ -4242,13 +4269,13 @@ function startJobProgress(jobId, initialJob = null, anchor = null, conversationI
     countNode.textContent = `${job.completed ?? job.result?.candidates?.length ?? 0} / ${job.total ?? job.request?.candidate_count ?? 0}`;
     if (Array.isArray(job.candidates)) {
       const openCandidates = new Set([...candidatesNode.querySelectorAll("details[open]")].map((item) => item.dataset.candidateOrdinal));
-      const activeCandidate = job.candidates.find((candidate) => ["running", "retrying"].includes(candidate.status));
-      const activeOrdinal = activeCandidate ? String(activeCandidate.ordinal) : null;
-      if (activeOrdinal && activeOrdinal !== previousActiveCandidate) {
-        if (previousActiveCandidate) openCandidates.delete(previousActiveCandidate);
-        openCandidates.add(activeOrdinal);
-      }
-      if (activeOrdinal) previousActiveCandidate = activeOrdinal;
+      job.candidates.forEach((candidate) => {
+        const ordinal = String(candidate.ordinal);
+        if (["running", "retrying"].includes(candidate.status) && !seenStartedCandidates.has(ordinal)) {
+          openCandidates.add(ordinal);
+          seenStartedCandidates.add(ordinal);
+        }
+      });
       candidatesNode.replaceChildren(...job.candidates.map((candidate) => candidateDetail(candidate, openCandidates.has(String(candidate.ordinal)), job.kind)));
       const completedOrdinals = job.candidates.filter((candidate) => candidate.status === "succeeded").map((candidate) => candidate.ordinal);
       const hasNewCandidate = completedOrdinals.some((ordinal) => !archivedOrdinals.has(ordinal));

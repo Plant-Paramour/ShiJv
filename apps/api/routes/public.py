@@ -302,7 +302,14 @@ def get_poetry_job_state(job_id: str, request: Request):
     except JobNotFound as exc:
         raise HTTPException(status_code=404, detail='job not found') from exc
     _check_job_access(request, job, user_id)
-    return request.app.state.jobs.snapshot(job_id)
+    value = request.app.state.jobs.snapshot(job_id)
+    if (job.kind in {'generate', 'partial_generate', 'rewrite'}
+            and job.status in {'queued', 'running'}
+            and job.worker_id in {None, 'local-poetry'}):
+        worker = request.app.state.local_runtime.status()
+        if worker['state'] in {'loading', 'released'}:
+            value['generation_phase'] = 'loading'
+    return value
 
 @router.get('/{job_id}/snapshot')
 def get_poetry_job_snapshot(job_id: str, request: Request):

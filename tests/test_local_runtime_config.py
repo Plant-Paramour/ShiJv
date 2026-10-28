@@ -212,3 +212,32 @@ def test_local_worker_watch_does_not_overwrite_completed_task(runtime_client):
     while job.id in runtime.watched_jobs and time.monotonic()<deadline: time.sleep(.05)
     assert app.state.jobs.get(job.id).status == 'succeeded'
     runtime.process=None
+
+
+@pytest.mark.parametrize('kind', ['generate', 'partial_generate', 'rewrite'])
+@pytest.mark.parametrize('worker_id', ['local-poetry', 'external-worker'])
+def test_job_state_distinguishes_model_loading_from_generation(runtime_client, monkeypatch, kind, worker_id):
+    client, app, _ = runtime_client
+    user = app.state.users.local_profile()
+    payload = {'theme': '春'}
+    if kind == 'rewrite':
+        payload['source_poem_id'] = 'fixture-source'
+    job = app.state.jobs.submit(kind, payload, user_id=user['id'])
+    if worker_id == 'local-poetry':
+        monkeypatch.setattr(app.state.local_runtime, 'status', lambda: {'state': 'loading'})
+        queued = client.get(f'/v1/poetry/jobs/{job.id}/state').json()
+        assert queued['status'] == 'queued'
+        assert queued['generation_phase'] == 'loading'
+    app.state.jobs.claim(worker_id, {'tasks': [kind]})
+    for state in ['loading', 'released', 'ready']:
+        monkeypatch.setattr(app.state.local_runtime, 'status', lambda: {'state': state})
+        response = client.get(f'/v1/poetry/jobs/{job.id}/state')
+        assert response.status_code == 200
+        assert response.json()['status'] == 'running'
+        should_load = worker_id == 'local-poetry' and state in {'loading', 'released'}
+        assert response.json().get('generation_phase') == ('loading' if should_load else None)
+    app.state.jobs.complete(job.id, worker_id, {'candidates': []})
+    monkeypatch.setattr(app.state.local_runtime, 'status', lambda: {'state': 'loading'})
+    response = client.get(f'/v1/poetry/jobs/{job.id}/state')
+    assert response.json()['status'] == 'succeeded'
+    assert 'generation_phase' not in response.json()

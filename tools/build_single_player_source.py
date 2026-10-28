@@ -42,6 +42,12 @@ FILES = {
 }
 EXCLUDED = set()
 PUBLIC_HOSTS = {
+    'www.apache.org', 'mozilla.org', 'developer.mozilla.org', 'w3c.github.io',
+    'html.spec.whatwg.org', 'stackoverflow.com', 'url.spec.whatwg.org',
+    'datatracker.ietf.org', 'tex.stackexchange.com', 'en.wikibooks.org',
+    'www.unicode.org', 'scripts.sil.org', 'www.tug.org', 'www.math.lsu.edu',
+    'www.w3schools.com', 'mirrors.concertpass.com', 'en.wikipedia.org',
+    'ctan.math.illinois.edu', 'ctan.math.washington.edu', 'daringfireball.net',
     '127.0.0.1', 'localhost', '::1', 'testserver', 'www.w3.org', 'www.nvidia.com',
     'modelscope.cn', 'www.modelscope.cn', 'api.nuget.org', 'aka.ms', 'download.visualstudio.microsoft.com', 'learn.microsoft.com', 'pypi.org',
     'mirror.sjtu.edu.cn', 'mirrors.tuna.tsinghua.edu.cn', 'files.pythonhosted.org', 'download.pytorch.org', 'download-r2.pytorch.org',
@@ -76,6 +82,10 @@ def export_content(name: str, data: bytes) -> bytes:
 
 def inspect_content(name: str, data: bytes) -> list[dict]:
     """Fail closed on unreviewed destinations; report locations without secret values."""
+    if Path(name).suffix == '.woff2':
+        if not data.startswith(b'wOF2'):
+            raise ValueError(f'无效的 WOFF2 字体文件：{name}')
+        return []
     text = data.decode('utf-8-sig')
     findings = []
     if name.startswith('apps/') and name.endswith('.py'):

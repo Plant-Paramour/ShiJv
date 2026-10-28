@@ -207,3 +207,44 @@ test("legacy task restoration uses message links, never UUIDs mentioned in chat 
   ] });
   assert.deepEqual(requests, ["/v1/conversations/conversation/state", "/v1/poetry/jobs/owned/state"]);
 });
+
+test("生成面板在实时完成时保持展开，恢复已完成任务时默认收起", async () => {
+  const start = source.indexOf("function startJobProgress(");
+  const end = source.indexOf('chatForm.addEventListener("submit",', start);
+  for (const initial of [{ status: 'queued' }, { status: 'queued', generation_phase: 'loading' }, { status: 'running' }, { status: 'running', generation_phase: 'loading' }, { status: 'succeeded' }, { status: 'failed' }, null]) {
+    const status = { textContent: '', replaceChildren() {} };
+    const details = { dataset: {}, querySelector: (selector) => selector === '.job-progress__status'
+      ? status : { textContent: '', replaceChildren() {} } };
+    const thread = { querySelector: () => null };
+    const timers = [];
+    const responses = initial?.generation_phase === 'loading'
+      ? [{ status: 'running' }, { status: 'succeeded' }] : [{ status: 'succeeded' }];
+    const context = vm.createContext({
+      currentConversationId: 'same', conversationLoadVersion: 1, currentUser: { id: 'fixture' },
+      chatThread: thread, CSS: { escape: (value) => value }, activeJobPolls: new Map(),
+      document: { createElement: () => details, visibilityState: 'visible', addEventListener() {}, removeEventListener() {} },
+      insertChatTimelineNode: (node) => { node.parentElement = thread; },
+      chatThreadScroll: {}, Date,
+      window: { setTimeout: (callback) => { timers.push(callback); return timers.length; } },
+      apiFetch: async () => responses.shift(),
+      renderAvailableScrolls() {}, loadPoems: async () => {},
+    });
+    vm.runInContext(source.slice(start, end), context);
+    context.startJobProgress('job', initial);
+    await new Promise((resolve) => setImmediate(resolve));
+    const startedActive = initial && ['queued', 'running'].includes(initial.status);
+    assert.equal(details.open, Boolean(startedActive));
+    if (initial?.generation_phase === 'loading') {
+      assert.equal(status.textContent, '模型加载中……');
+      timers.shift()();
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(status.textContent, '模型生成中……');
+    }
+    if (startedActive) {
+      timers.shift()();
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(details.open, true);
+      assert.equal(status.textContent, '生成完成');
+    }
+  }
+});
