@@ -95,7 +95,11 @@ class ModelRunner:
         self.load_telemetry["tokenizer_load_seconds"] = time.perf_counter() - stage_started
         stage_started = time.perf_counter()
         dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-        if quantization in {"none", "fp16", "float16", ""}:
+        if quantization == 'bf16':
+            if torch.cuda.is_available():
+                raise ValueError('当前 BF16 配置仅支持 CPU 环境')
+            dtype = torch.bfloat16
+        if quantization in {"none", "fp16", "float16", "", "bf16"}:
             self._model = model_class.from_pretrained(
                 name,
                 torch_dtype=dtype,
@@ -119,7 +123,7 @@ class ModelRunner:
             )
         else:
             raise ValueError(
-                f"不支持的量化参数: {self.settings.quantization!r}，可选 none、8bit、4bit"
+                f"不支持的量化参数: {self.settings.quantization!r}，可选 none、bf16（CPU）、8bit、4bit"
             )
         self._model.eval()
         if torch.cuda.is_available():

@@ -106,8 +106,7 @@ class LocalRuntime:
             environment = inspect_environment(self.directory, refresh=True, cancel=self._cancel_event)
             diagnostic.event('environment_checked', diagnostics=environment.get('diagnostics'),
                              python=environment.get('inference_python'), model=config['model_path'])
-            plan = assess_model(config["model_path"], environment)
-            plan['device'] = 'cuda' if environment.get('cuda') else 'cpu'
+            precision = None
             deployed = Path(environment['inference_python']).parent / 'shiju-install.json'
             if deployed.is_file():
                 selected = json.loads(deployed.read_text(encoding='utf-8'))
@@ -117,11 +116,15 @@ class LocalRuntime:
                 if precision is None and Path(selected.get('model', '')).resolve() == Path(config['model_path']).resolve():
                     precision = selected.get('precision')
                 if precision is not None:
+                    plan = assess_model(config['model_path'], environment, precision=precision) if precision in {'bf16', '4bit', '8bit'} else assess_model(config['model_path'], environment)
                     if precision not in environment.get('quantization', []):
                         raise ValueError('已验证配对的推理方式未通过当前环境检测，请重新测试此模型')
                     if precision == 'none' and plan['quantization'] != 'none':
                         raise ValueError('当前可用显存不足以采用已验证的 FP16 方案，请释放显存或重新验收其他精度')
                     plan.update(quantization=precision, label='采用当前环境—模型配对已验证的推理方式')
+            if precision is None:
+                plan = assess_model(config['model_path'], environment, precision='bf16') if config.get('quantization') == 'bf16' else assess_model(config['model_path'], environment)
+            plan['device'] = 'cuda' if environment.get('cuda') else 'cpu'
             with self.lock:
                 if generation != self._start_generation:
                     diagnostic.event('cancelled')

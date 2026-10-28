@@ -72,7 +72,7 @@ def main():
     parser.add_argument("--model")
     parser.add_argument("--model-report")
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cuda")
-    parser.add_argument("--precision", choices=["none", "4bit"], default="4bit")
+    parser.add_argument("--precision", choices=["none", "bf16", "4bit", "8bit"], default="4bit")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent
     sys.path.insert(0, str(root / "app"))
@@ -88,7 +88,9 @@ def main():
             raise RuntimeError("Inference dependency/operation probe failed")
         if report["environment"]["cuda"] != (args.device == "cuda"):
             raise RuntimeError("Selected device does not match actual inference device")
-        if args.device == "cuda" and args.precision == "4bit":
+        if args.precision == 'bf16' and (args.device != 'cpu' or 'bf16' not in report['environment']['quantization']):
+            raise RuntimeError('CPU BF16 运算检查未通过')
+        if args.device == "cuda" and args.precision in {"4bit", "8bit"}:
             backend = root / "Lib/site-packages/triton/backends/nvidia"
             compiler = root / "Lib/site-packages/triton/runtime/tcc/tcc.exe"
             for required in (compiler, backend / "bin/ptxas.exe", backend / "include/cuda.h", backend / "lib/x64/cuda.lib"):

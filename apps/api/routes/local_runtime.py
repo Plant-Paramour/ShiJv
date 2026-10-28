@@ -18,7 +18,7 @@ class RuntimeConfig(BaseModel):
     instructions: str = Field(default="", max_length=8000)
     max_tool_rounds: int = Field(default=8, ge=1, le=20)
     model_path: str = Field(default="", max_length=2048)
-    quantization: str = Field(default="auto", pattern="^(auto|4bit|8bit|none)$")
+    quantization: str = Field(default="auto", pattern="^(auto|4bit|8bit|none|bf16)$")
     auto_start: bool = False
     allow_unverified: bool = False
     idle_unload_seconds: int = Field(default=300, ge=0, le=86400)

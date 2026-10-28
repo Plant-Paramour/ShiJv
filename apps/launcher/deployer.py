@@ -368,7 +368,7 @@ def requirements(device='cuda'):
     return dict(os='windows', arch='x64', min_windows_build=19041,
                 device=device, min_driver='560.76', compute_capabilities=CUDA_ARCHITECTURES,
                 min_vram_bytes=2_000_000_000,
-                scope='GPU 按本机实测验收；不符合条件时使用 CPU FP32')
+                scope='GPU 按本机实测验收；CPU 方案须单独检查可用内存与精度')
 
 
 def compatibility(host, rules):
@@ -388,13 +388,13 @@ def compatibility(host, rules):
 
 def inference_policy(profile):
     selected = PROFILES[profile]
-    return dict(precision=selected['precision'], reason=selected['label'] + '；硬件预算仅供预选，须通过本机真实生成验收')
+    return dict(precision=selected['precision'], reason=selected['label'] + ('；首次生成验收使用 ' + selected['precision'] + '，可在模型设置中切换量化位数，无需重建环境' if profile in {'cuda-bnb', 'cuda-bnb8'} else '') + '；硬件预算仅供预选，须通过本机真实生成验收')
 
 
 def verification_policy(profile):
-    checks = ['cpu-fp32'] if profile == 'cpu' else ['cuda-fp16']
-    if profile == 'cuda-bnb':
-        checks += ['bnb-nf4', 'triton-jit']
+    checks = ['cpu-bf16' if profile == 'cpu-bf16' else 'cpu-fp32'] if PROFILES[profile]['device'] == 'cpu' else ['cuda-fp16']
+    if profile in {'cuda-bnb', 'cuda-bnb8'}:
+        checks += ['bnb-int8' if profile == 'cuda-bnb8' else 'bnb-nf4', 'triton-jit']
     return ['pip-check', 'exact-versions'] + checks + ['model-load', 'short-inference', 'poetry-constraints']
 
 
@@ -413,12 +413,21 @@ def plan_policy(spec, route, profile):
                 environment_required_bytes=PROFILES[profile]['disk_gib'] * 1024**3)
 
 
-def choose_profile(host, spec, requested='auto'):
+def choose_profile(host, spec, requested='auto', resources=None):
     if requested != 'auto' and requested not in PROFILES:
         raise ValueError('未知依赖组合')
-    if requested == 'cpu':
+    if requested in {'cpu', 'cpu-bf16'}:
         compatibility(host, requirements('cpu'))
-        return 'cpu'
+        return requested
+    from .resource_advice import model_size, auto_profile, collect_resources
+    if model_size(spec.get('model_id', '')):
+        if requested != 'auto':
+            compatibility(host, requirements())
+            # Resource risks are presented for explicit user review, not hidden
+            # behind the old file-size-only rejection formula.
+            return requested
+        compatibility(host, requirements('cpu'))
+        return auto_profile(resources if resources is not None else collect_resources(host), spec['model_id'])
     try:
         gpu = compatibility(host, requirements())
     except ValueError:
@@ -429,7 +438,8 @@ def choose_profile(host, spec, requested='auto'):
     fp16_fits = gpu.memory_bytes > model_bytes(spec) * 1.3 + 1536 * 1024**2
     bnb_fits = gpu.memory_bytes > model_bytes(spec) * .35 + 1536 * 1024**2
     if requested != 'auto':
-        if not (fp16_fits if requested == 'cuda-fp16' else bnb_fits):
+        fits = fp16_fits if requested == 'cuda-fp16' else (gpu.memory_bytes > model_bytes(spec) * .65 + 1536 * 1024**2 if requested == 'cuda-bnb8' else bnb_fits)
+        if not fits:
             raise ValueError('所选组合的显存预算不足，请选择更小模型或 CPU')
         return requested
     if fp16_fits:
@@ -439,12 +449,12 @@ def choose_profile(host, spec, requested='auto'):
     return 'cpu'
 
 
-def make_plan(model, route, model_id='Qwen/Qwen3.5-4B', host=None, profile='auto'):
+def make_plan(model, route, model_id='Qwen/Qwen3.5-4B', host=None, profile='auto', resources=None):
     if route not in {'official', 'local'}:
         raise ValueError('未知模型路线')
     spec = official_model(model_id) if route == 'official' else local_model(model)
     verify_model(model, spec)
-    profile = choose_profile(host or inspect_host(model), spec, profile)
+    profile = choose_profile(host or inspect_host(model), spec, profile, resources=resources)
     return plan_policy(spec, route, profile)
 
 
@@ -862,8 +872,12 @@ def main():
     operation.source_preference = args.source
     try:
         operation.update('准备')
+        advisory = None
         if args.action == 'inspect':
-            result = dict(host=asdict(inspect_host(args.target or args.data_dir)), models=discover_models(args.data_dir),
+            from .resource_advice import snapshot
+            host = inspect_host(args.target or args.data_dir)
+            advisory = snapshot(host)
+            result = dict(host=asdict(host), models=discover_models(args.data_dir),
                           vc_runtime=check_vc_runtime(operation, required=False), **discover_environments())
         elif args.action == 'verify-model':
             operation.update('检查已有模型文件，请稍候')
@@ -872,7 +886,11 @@ def main():
             result = dict(model=download_model(args.model, operation, args.model_id))
         elif args.action == 'plan':
             operation.update('核验模型并生成清单')
-            result = make_plan(args.model, args.route, args.model_id, profile=args.profile)
+            from .resource_advice import snapshot
+            host = inspect_host(args.target or args.data_dir)
+            advisory = snapshot(host)
+            result = make_plan(args.model, args.route, args.model_id, profile=args.profile,
+                               host=host, resources=advisory['resources'])
             compatibility(inspect_host(args.target or args.data_dir), result['hardware'])
             save(args.plan, result)
         elif args.action == 'import':
@@ -908,9 +926,18 @@ def main():
                 if actual.is_file():
                     result['actual_packages'] = read(actual).get('packages', {})
             save(args.plan, result)
+        if args.action in {'plan', 'import', 'resume', 'inspect-target'}:
+            from .resource_advice import snapshot, assess_selection
+            if advisory is None:
+                advisory = snapshot(inspect_host(args.target or args.data_dir))
+            selected_plan = result['plan'] if args.action == 'resume' else (read(args.plan) if args.action == 'inspect-target' else result)
+            advisory['selection'] = assess_selection(advisory['resources'], selected_plan['model']['model_id'],
+                                                     selected_plan['profile'], known=selected_plan['route'] == 'official',
+                                                     weight_bytes=model_bytes(selected_plan['model']))
         operation.diagnostic.event('completed', ok=True)
         operation.diagnostic.save(dict(completed=True, ok=True, diagnostics=operation.diagnostic.metadata))
-        save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result, diagnostics=operation.diagnostic.metadata))
+        save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result,
+                               advisory=advisory, diagnostics=operation.diagnostic.metadata))
         return 0
     except Exception as exc:
         error = operation.diagnostic.fail(exc, 'CANCELLED' if isinstance(exc, Cancelled) else 'DEPLOYMENT_FAILED')

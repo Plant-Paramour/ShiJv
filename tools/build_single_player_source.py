@@ -20,7 +20,7 @@ TREES = {
 }
 FILES = {
     'README.md', '.gitignore', 'pyproject.toml', 'requirements-api.txt', 'requirements-gpu.txt',
-    'launcher.ps1', 'start-single-player.ps1', '诗矩单机版.bat', '单机版使用说明.md',
+    'launcher.ps1', 'start-single-player.ps1', '诗矩单机版.bat', '使用说明.md', '推荐配置.md',
     'scripts/launcher-instance.ps1', 'scripts/launcher-memory.ps1', 'scripts/launcher-models.ps1',
     'scripts/data-directory.ps1',
     'scripts/export-startup-diagnostics.ps1',
@@ -28,6 +28,7 @@ FILES = {
     'tools/build_environment_tool.py', 'tools/EnvironmentDeployer.cs',
     'tools/build_single_player_source.py',
     'tests/test_candidate_module_paths.py',
+    'tests/test_resource_advice.py',
     'tests/test_inference_process_environment.py',
     'tests/test_runtime_diagnostics.py',
     'deploy/environment-tool/model.json', 'deploy/environment-tool/recommended-plan.json',

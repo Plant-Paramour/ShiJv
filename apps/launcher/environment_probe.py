@@ -67,6 +67,16 @@ def probe(mode="core"):
                 result["cpu_operation"] = "fp32_matmul_passed"
                 result["quantization"] = ["none"]
                 try:
+                    with torch.inference_mode():
+                        operand = torch.ones((32, 32), device="cpu", dtype=torch.bfloat16)
+                        product = operand @ operand
+                        if product.dtype != torch.bfloat16 or not bool(torch.all(product == 32).item()):
+                            raise RuntimeError("CPU BF16 矩阵运算结果不正确")
+                    result["quantization"].append("bf16")
+                    result["cpu_bf16_operation"] = "bf16_matmul_passed"
+                except Exception as exc:
+                    result["cpu_bf16_note"] = f"CPU BF16 不可用：{type(exc).__name__}: {exc}"
+                try:
                     import psutil
                     result["cpu_memory_available_bytes"] = psutil.virtual_memory().available
                 except Exception:
@@ -106,6 +116,26 @@ def probe(mode="core"):
                         result["bnb_operation"] = "nf4_linear_passed"
                 except Exception as exc:
                     result["quantization_note"] = f"4bit 不可用：{type(exc).__name__}: {exc}"
+                try:
+                    import bitsandbytes
+                    from bitsandbytes.cextension import lib
+                    if lib is None or not getattr(lib, 'compiled_with_cuda', False):
+                        raise RuntimeError('bitsandbytes 未加载 CUDA 后端')
+                    if result['gpu']['capability'][0] < 7 or (result['gpu']['capability'][0] == 7 and result['gpu']['capability'][1] < 5):
+                        raise RuntimeError('BNB 8bit 需要计算能力 7.5 或以上')
+                    with torch.inference_mode():
+                        layer = bitsandbytes.nn.Linear8bitLt(64, 64, bias=False,
+                                                            has_fp16_weights=False).to('cuda')
+                        sample = torch.ones((1, 64), device='cuda', dtype=torch.float16)
+                        output = layer(sample)
+                        torch.cuda.synchronize()
+                        if not bool(torch.isfinite(output).all().item()):
+                            raise RuntimeError('BNB 8bit 运算结果包含无效数值')
+                        del layer, sample, output
+                    result['quantization'].append('8bit')
+                    result['bnb8_operation'] = 'int8_linear_passed'
+                except Exception as exc:
+                    result['bnb8_note'] = f'8bit 不可用：{type(exc).__name__}: {exc}'
             from transformers import AutoConfig, AutoModelForCausalLM, AutoModelForImageTextToText
             from transformers.models.auto.configuration_auto import CONFIG_MAPPING_NAMES
             # These are the two loading paths implemented by ModelRunner. Check

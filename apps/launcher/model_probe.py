@@ -81,7 +81,7 @@ def main():
     parser.add_argument('--data-dir', required=True)
     parser.add_argument('--scan', action='store_true')
     parser.add_argument('--root', default='')
-    parser.add_argument('--precision', choices=['auto', 'none', '4bit'], default='auto')
+    parser.add_argument('--precision', choices=['auto', 'none', 'bf16', '4bit', '8bit'], default='auto')
     parser.add_argument('--device-uuid', default='')
     parser.add_argument('--application-python', default='')
     args = parser.parse_args()
@@ -141,7 +141,7 @@ def main():
             return 0
         model = validate_model(args.model)
         initial_fingerprint = fingerprint(model)
-        result['plan'] = assess_model(model, environment)
+        result['plan'] = assess_model(model, environment, precision=args.precision) if args.precision in {'bf16', '4bit', '8bit'} else assess_model(model, environment)
         if args.precision != 'auto':
             if args.precision not in environment.get('quantization', []):
                 raise ValueError(f'所选精度 {args.precision} 未通过环境运算检查')
@@ -149,7 +149,7 @@ def main():
             if args.precision == 'none' and result['plan']['quantization'] != 'none':
                 raise ValueError('当前可用显存不足以执行 FP16 验收；未尝试加载，也未宣称 FP16 通过')
             result['plan']['quantization'] = args.precision
-            result['plan']['label'] = ('指定 CPU FP32' if not environment.get('cuda') else '指定 FP16') if args.precision == 'none' else '指定 BNB 4bit'
+            result['plan']['label'] = '指定 CPU BF16' if args.precision == 'bf16' else (('指定 CPU FP32' if not environment.get('cuda') else '指定 FP16') if args.precision == 'none' else '指定 BNB ' + args.precision)
         report('environment', '依赖、CUDA 与模型架构', 'passed', result['plan']['label'])
         from shiju.generation.model_runner import ModelRunner
         from shiju.generation.result import ModelSettings

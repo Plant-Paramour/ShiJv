@@ -24,6 +24,10 @@ $script:savedPlan = ''
 $script:detected = $false
 $script:modelReady = $false
 $script:planReady = $false
+$script:advisory = $null
+$script:activePlan = $null
+$script:currentAdvice = $null
+$script:profileIds = @('auto','cpu','cuda-fp16','cuda-bnb','cpu-bf16')
 $form = New-Object Windows.Forms.Form
 $form.Text = '诗矩 · 环境部署'
 $form.ClientSize = New-Object Drawing.Size(1220,720)
@@ -85,7 +89,9 @@ $script:localModelPath=''
 $script:selectedModelRoute='official'
 function Reset-ModelSelection {
     $script:modelReady=$false; $script:planReady=$false; $script:verified=$false
+    $script:activePlan=$null
     $create.Enabled=$false; $enter.Enabled=$false; $planButton.Enabled=$false
+    if($script:advisory) { Show-SelectionAdvice }
 }
 $route.Add_SelectedIndexChanged({
     Reset-ModelSelection
@@ -120,7 +126,7 @@ $export=Button '导出安装文件' 326 358 130
 $planStatus=New-Object Windows.Forms.Label; $planStatus.Text='请先完成模型选择'; $null=Add-Control $planStatus 470 361 420 28
 $runtimeProfile=New-Object Windows.Forms.ComboBox
 $runtimeProfile.DropDownStyle='DropDownList'
-$runtimeProfile.Items.AddRange(@('推理组合：自动选择','CPU FP32','GPU FP16（通用运算）','GPU BNB 4bit + Triton'))
+$runtimeProfile.Items.AddRange(@('推理组合：自动选择','CPU FP32','GPU FP16（通用运算）','GPU BNB + Triton','CPU BF16（待本机验收）'))
 $runtimeProfile.SelectedIndex=0
 $null=Add-Control $runtimeProfile 24 399 285 30
 $source=New-Object Windows.Forms.ComboBox
@@ -130,11 +136,13 @@ $source.SelectedIndex=0
 $null=Add-Control $source 325 399 270 30
 $runtimeProfile.Add_SelectedIndexChanged({
     $script:planReady=$false; $script:verified=$false
+    $script:activePlan=$null
     $create.Enabled=$false; $enter.Enabled=$false
     $planStatus.Text='推理组合已改变，请重新生成清单'
+    if($script:advisory) { Show-SelectionAdvice }
 })
 Label '第四步：创建 / 继续部署环境' 24 451 830 28
-Label '可选空文件夹；失败可原目录继续。CPU / GPU 占用见右侧清单。' 24 479 570 28
+Label '可选空文件夹；失败可原目录继续。运行资源与磁盘空间见右侧。' 24 479 570 28
 $target=TextBox (Join-Path $store 'environments\qwen35') 24 511 395
 $browseTarget=Button '选择新环境目录' 435 508 160
 $create=Button '创建 / 继续部署' 24 551 170; $create.Enabled=$false
@@ -170,9 +178,16 @@ $rightPanel.Controls.Add($informationTitle)
 $detectStatus.SetBounds(20,58,550,42)
 $modelStatus.SetBounds(20,104,550,52)
 $planStatus.SetBounds(20,160,550,38)
-$status.SetBounds(20,208,550,72)
-$progress.SetBounds(20,286,550,12)
-$details.SetBounds(20,312,550,384)
+$resourceAdvice=New-Object Windows.Forms.TextBox
+$resourceAdvice.Multiline=$true; $resourceAdvice.ReadOnly=$true
+$resourceAdvice.WordWrap=$true; $resourceAdvice.ScrollBars='Vertical'
+$resourceAdvice.Text='完成第一步后，此处将显示本机推荐配置与资源预算。'
+$resourceAdvice.SetBounds(20,204,550,210)
+$resourceAdvice.Anchor='Top,Left,Right'
+$rightPanel.Controls.Add($resourceAdvice)
+$status.SetBounds(20,422,550,52)
+$progress.SetBounds(20,479,550,12)
+$details.SetBounds(20,503,550,193)
 $details.Anchor='Top,Bottom,Left,Right'
 $details.WordWrap=$true
 $details.ScrollBars='Vertical'
@@ -180,6 +195,29 @@ foreach($control in @($detectStatus,$modelStatus,$planStatus,$progress,$status))
     $control.Anchor='Top,Left,Right'
 }
 $script:planPath=Join-Path $store 'plan.json'
+function Show-SelectionAdvice {
+    if(-not $script:advisory) { return }
+    if($script:activePlan -and $script:advisory.selection) {
+        $script:currentAdvice=$script:advisory.selection
+    } elseif($deployRoute.Checked) {
+        $id=switch($route.SelectedIndex){1 {'Qwen/Qwen3.5-2B'} 2 {'Qwen/Qwen3.5-0.8B'} default {'Qwen/Qwen3.5-4B'}}
+        $profile=$script:profileIds[$runtimeProfile.SelectedIndex]
+        $script:currentAdvice=@($script:advisory.options | Where-Object { $_.model_id -eq $id -and $_.requested_profile -eq $profile }) | Select-Object -First 1
+    } else {
+        $script:currentAdvice=[pscustomobject]@{state='unknown';title='待评估：已有本地模型';requires_confirmation=$true;text=($script:advisory.summary+"`r`n已有本地模型不能仅凭目录名称套用官方模型实测。请选择模型并生成清单，核对资源预算后再创建环境。")}
+    }
+    if($script:currentAdvice) {
+        $resourceAdvice.Text=($script:currentAdvice.text -replace "`n","`r`n")+"`r`n`r`n当前显示上次检测结果；创建环境前会重新检测资源。"
+        $resourceAdvice.ForeColor=switch($script:currentAdvice.state){'recommended' {[Drawing.Color]::DarkGreen} 'risk' {[Drawing.Color]::DarkRed} default {[Drawing.Color]::FromArgb(100,65,10)}}
+    } else { $resourceAdvice.Text=$script:advisory.summary }
+}
+function Confirm-ResourceAdvice {
+    if(-not $script:currentAdvice) { throw '请先检测电脑并查看配置建议。' }
+    if(-not $script:currentAdvice.requires_confirmation) { return $true }
+    $message=($script:currentAdvice.text -replace "`n","`r`n")+"`r`n`r`n是否在了解上述资源需求与限制后继续？"
+    $answer=[Windows.Forms.MessageBox]::Show($form,$message,'配置与硬件资源评估',[Windows.Forms.MessageBoxButtons]::YesNo,[Windows.Forms.MessageBoxIcon]::Warning,[Windows.Forms.MessageBoxDefaultButton]::Button2)
+    return ($answer -eq [Windows.Forms.DialogResult]::Yes)
+}
 $script:controls=@($detect,$deployRoute,$localRoute,$route,$browseModel,$browseTarget,$model,$target,$officialButton,$existingButton,$planButton,$import,$export,$create,$diagnostics,$runtimeProfile,$source,$resume,$importWheels,$openCache)
 function Busy([bool]$value) {
     foreach($control in $script:controls) { $control.Enabled=-not $value }
@@ -210,7 +248,9 @@ function Restore-DeploymentSession($session) {
     $model.Text=$session.model; $target.Text=$session.target
     $script:cache=$session.cache
     $script:selectedModelRoute=$p.route; $script:selectedModelId=$p.model.model_id
-    $runtimeProfile.SelectedIndex=[Array]::IndexOf(@('auto','cpu','cuda-fp16','cuda-bnb'),[string]$p.profile)
+    $restoredProfile=[string]$p.profile
+    if($restoredProfile -eq 'cuda-bnb8') { $restoredProfile='cuda-bnb' }
+    $runtimeProfile.SelectedIndex=[Array]::IndexOf($script:profileIds,$restoredProfile)
     $script:detected=$true; $script:modelReady=$true
     $modelStatus.Text='已恢复：'+$p.model.model_id
     return $p
@@ -293,7 +333,7 @@ function Start-Backend {
     if(-not $deployRoute.Checked -and $script:selectedModelId) { $modelId=$script:selectedModelId }
     $modelRoute=if($deployRoute.Checked){'official'}else{$script:selectedModelRoute}
     $arguments=@((Join-Path $root 'apps\launcher\python_entry.py'),'-m','apps.launcher.deployer',$script:action,'--data-dir',$data,'--report',$script:report,'--cancel',$script:cancelFile,'--model',$model.Text,'--model-id',$modelId,'--target',$target.Text,'--cache',$cache,'--plan',$script:planPath,'--route',$modelRoute)
-    $runtimeProfileId=@('auto','cpu','cuda-fp16','cuda-bnb')[$runtimeProfile.SelectedIndex]
+    $runtimeProfileId=$script:profileIds[$runtimeProfile.SelectedIndex]
     $sourceId=@('auto','mirror','official')[$source.SelectedIndex]
     $arguments+=@('--profile',$runtimeProfileId,'--source',$sourceId)
     if($script:action -eq 'install' -and $script:continueExisting) { $arguments+='--continue-existing' }
@@ -323,6 +363,8 @@ $officialButton.Add_Click({ try {
     if(-not $script:detected) { throw '请先完成第一步：检测电脑。' }
     if(-not $deployRoute.Checked) { throw '请先选择下载部署推荐模型。' }
     if(-not $model.Text) { throw '请先选择推荐模型保存目录。' }
+    Show-SelectionAdvice
+    if(-not (Confirm-ResourceAdvice)) { $status.Text='已取消下载。请根据资源建议调整模型或运行方式。'; return }
     $modelStatus.Text='正在通过 ModelScope 准备所选推荐模型...'
     Begin-Action 'download'
 } catch { Busy $false; $status.Text=$_.Exception.Message } })
@@ -434,12 +476,21 @@ $timer.Add_Tick({
             if($script:job.HasExited) {
                 $code=$script:job.ExitCode; $script:job.Dispose(); $script:job=$null
                 if($state) { $details.Text=$state | ConvertTo-Json -Depth 30 }
+                if($state.ok -and $state.advisory) { $script:advisory=$state.advisory }
                 if($state.ok -and $script:action -eq 'inspect') {
+                    $firstDetection=-not $script:detected
                     $script:detected=$true; $detectStatus.Text='检测完成，可以选择模型'
+                    if($firstDetection -and $deployRoute.Checked -and -not $script:modelReady -and $script:advisory.recommendation) {
+                        $recommendedId=$script:advisory.recommendation.model_id
+                        $route.SelectedIndex=switch($recommendedId){'Qwen/Qwen3.5-2B' {1} 'Qwen/Qwen3.5-0.8B' {2} default {0}}
+                        $runtimeProfile.SelectedIndex=0
+                    }
+                    Show-SelectionAdvice
                     $hostInfo=$state.result.host
                     $lines=@("系统：Windows $($hostInfo.windows_build) / $($hostInfo.arch)","环境磁盘可用：$([Math]::Round($hostInfo.free_bytes/1GB,1)) GiB",'', '显卡：')
                     foreach($gpu in $hostInfo.gpus) { $lines+="$($gpu.name) · $([Math]::Round($gpu.memory_bytes/1GB,1)) GiB · 驱动 $($gpu.driver_version) · 计算能力 $($gpu.compute_capability)" }
-                    if(-not $hostInfo.gpus) { $lines+='未检测到可用 NVIDIA GPU，将使用 CPU FP32；建议选择 0.8B 或 2B，生成速度较慢。' }
+                    if(-not $hostInfo.gpus) { $lines+='未检测到 NVIDIA GPU。CPU 默认候选为 Qwen3.5-0.8B FP32；仍需检查当前可用内存。' }
+                    $lines+=@($script:advisory.resources.errors)
                     $lines+=@($hostInfo.errors)
                     $vc=$state.result.vc_runtime
                     if($vc.ok) { $lines+=@('VC++ x64 运行库：可用 '+$vc.version) } else { $lines+=@('VC++ x64 运行库：缺失或不可用，创建环境时将自动补装；请允许系统权限提示。')+@($vc.problems) }
@@ -466,9 +517,11 @@ $timer.Add_Tick({
                     if($script:action -eq 'resume') {
                         $session=$state.result; $p=Restore-DeploymentSession $session
                     }
+                    $script:activePlan=$p
+                    Show-SelectionAdvice
                     $script:planReady=$true; $create.Enabled=$true; $planStatus.Text='清单已生成，可以创建新环境'
                     $decimalGB=1000000000; $modelGB=[Math]::Round($p.model_bytes/$decimalGB,2); $downloadGB=[Math]::Round($p.download_bytes/$decimalGB,2); $environmentGB=[Math]::Round($p.environment_required_bytes/$decimalGB,1)
-                    $lines=@("模型：$($p.model.model_id)","依赖组合：$($p.profile)；共 $($p.dependencies.Count) 个包","模型文件大小：约 $modelGB GB（已有完整文件会复用）","基础 Python + 依赖下载：约 $downloadGB GB","新虚拟环境占用：约 $environmentGB GB","建议至少预留：约 $([Math]::Round($p.environment_required_bytes/1GB + $p.download_bytes/1GB + 1,1)) GB","推理方式：$($p.hardware.device) · $($p.inference.reason)","说明：创建前还会再次检查目标磁盘空间。")
+                    $lines=@("模型：$($p.model.model_id)","依赖组合：$($p.profile)；共 $($p.dependencies.Count) 个包","模型文件大小：约 $modelGB GB（已有完整文件会复用）","基础 Python + 依赖下载：约 $downloadGB GB","新虚拟环境磁盘占用：约 $environmentGB GB","目标磁盘建议至少预留：约 $([Math]::Round($p.environment_required_bytes/1GB + $p.download_bytes/1GB + 1,1)) GiB","推理方式：$($p.hardware.device) · $($p.inference.reason)","说明：创建前还会再次检查目标磁盘空间。运行内存与显存请查看上方资源评估。")
                     if($p.route -eq 'local') { $lines+=@('自带模型：不保证兼容；出错请联系开发者。') }
                     $details.Text=($lines -join "`r`n")+"`r`n`r`n完整清单：`r`n"+($p | ConvertTo-Json -Depth 30)
                 }
@@ -498,15 +551,17 @@ $timer.Add_Tick({
                     $form.Close()
                 }
                 if($state.ok -and $script:action -eq 'inspect-target') {
-                    $proceed=$true
-                    if($state.result.kind -eq 'existing') {
+                    $script:activePlan=Get-Content -LiteralPath $script:planPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                    Show-SelectionAdvice
+                    $proceed=Confirm-ResourceAdvice
+                    if($proceed -and $state.result.kind -eq 'existing') {
                         $missing=@($state.result.missing) -join "`r`n"
                         if(-not $missing) { $missing='清单依赖已齐全，将继续实际运行验证。' }
                         $answer=[Windows.Forms.MessageBox]::Show($form, "已有虚拟环境符合清单要求。`r`n待补装依赖：`r`n$missing`r`n`r`n是否在此环境基础上继续配置？", '继续配置已有环境', [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question, [Windows.Forms.MessageBoxDefaultButton]::Button2)
                         $proceed=($answer -eq [Windows.Forms.DialogResult]::Yes)
                         $script:continueExisting=$proceed
                     }
-                    if($proceed) { Begin-Action 'install' } else { $status.Text='已取消，已有环境未修改。' }
+                    if($proceed) { Begin-Action 'install' } else { $status.Text='已取消创建环境。请调整配置或释放资源后重试。' }
                 }
                 if($script:closing) { $form.Close() }
             }
@@ -556,13 +611,16 @@ if($UiSmokeTest) {
     if($script:modelReady -or $script:planReady) { throw '模型目录变更未清除旧检查结果' }
     $script:modelReady=$true; $script:planReady=$true
     $runtimeProfile.SelectedIndex=1
-    if($script:planReady -or -not $script:modelReady -or $runtimeProfile.Items.Count -ne 4) { throw '组合选择未正确失效清单或错误清除模型状态' }
+    if($script:planReady -or -not $script:modelReady -or $runtimeProfile.Items.Count -ne $script:profileIds.Count) { throw '组合选择未正确失效清单或错误清除模型状态' }
     $script:planReady=$true
     $source.SelectedIndex=2
     if(-not $script:planReady) { throw '仅切换下载源不应失效清单' }
     $session=[pscustomobject]@{plan=[pscustomobject]@{route='official';profile='cuda-fp16';model=[pscustomobject]@{model_id='Qwen/Qwen3.5-0.8B'}};model='D:\Models\restored';target='D:\Envs\restored';cache=$cache}
     $null=Restore-DeploymentSession $session
     if($runtimeProfile.SelectedIndex -ne 2 -or $model.Text -ne $session.model -or $target.Text -ne $session.target -or -not $script:modelReady -or $script:selectedModelRoute -ne 'official') { throw '恢复部署未还原组合或路径' }
+    $session.plan.profile='cuda-bnb8'
+    $null=Restore-DeploymentSession $session
+    if($runtimeProfile.SelectedIndex -ne 3 -or $runtimeProfile.Items.Count -ne 5 -or $runtimeProfile.Items[3] -ne 'GPU BNB + Triton') { throw 'BNB 共用环境选项或旧记录恢复失败' }
     $failure=[pscustomobject]@{ok=$false;error='failed';log_path='D:\reports\test.log';log_content="DLL load failed`r`nVC++ runtime missing";log_truncated=$false}
     $formatted=Format-FailureDetails $failure
     if(-not $formatted.Contains("日志内容：`r`nDLL load failed`r`nVC++ runtime missing")) { throw '失败详情未显示可读的原始日志' }

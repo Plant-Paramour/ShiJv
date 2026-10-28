@@ -116,7 +116,7 @@ def test_restart_rechecks_dependencies_before_skipping_install(tmp_path, monkeyp
     assert restored['plan'] == plan and restored['target'] == str(target)
 
 
-@pytest.mark.parametrize('profile', ['cpu', 'cuda-fp16', 'cuda-bnb'])
+@pytest.mark.parametrize('profile', ['cpu', 'cpu-bf16', 'cuda-fp16', 'cuda-bnb', 'cuda-bnb8'])
 def test_conda_export_is_standalone_and_matches_profile(tmp_path, profile):
     import subprocess
     import sys
@@ -125,10 +125,16 @@ def test_conda_export_is_standalone_and_matches_profile(tmp_path, profile):
     directory = tmp_path / 'export'
     export_environment(plan, directory)
     lock = (directory / 'requirements-offline.lock').read_text(encoding='utf-8')
-    assert ('torch==2.8.0+cpu' in lock) == (profile == 'cpu')
-    assert ('triton-windows==' in lock) == (profile == 'cuda-bnb')
+    assert ('torch==2.8.0+cpu' in lock) == (profile in {'cpu', 'cpu-bf16'})
+    assert ('triton-windows==' in lock) == (profile in {'cuda-bnb', 'cuda-bnb8'})
     result = subprocess.run([sys.executable, str(directory / 'download-dependencies.py'), '--help'],
                             cwd=tmp_path, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert '--source' in result.stdout
     assert '--no-index' in (directory / 'install-conda.ps1').read_text(encoding='utf-8-sig')
+
+
+def test_bnb_quantization_modes_share_environment_dependencies():
+    assert wheels("cuda-bnb") == wheels("cuda-bnb8")
+    assert deployer.inference_policy("cuda-bnb")["precision"] == "4bit"
+    assert deployer.inference_policy("cuda-bnb8")["precision"] == "8bit"

@@ -133,7 +133,7 @@ def inspect_environment(directory, *, refresh=False, cancel=None):
         return selected | report
 
 
-def assess_model(model, environment):
+def assess_model(model, environment, precision='auto'):
     """Conservative support scope. No guessed options are exposed to users."""
     if not environment.get("ok"):
         raise ValueError("；".join(environment.get("errors") or ["推理环境检查未通过"]))
@@ -154,24 +154,37 @@ def assess_model(model, environment):
         size = sum(p.stat().st_size for p in path.glob("*.safetensors")) or sum(p.stat().st_size for p in path.glob("pytorch_model*.bin"))
     reserve = 1536 * 1024**2
     options = environment.get("quantization", [])
+    if precision == 'bf16' and (environment.get('cuda') is not False or 'bf16' not in options):
+        raise ValueError('所选环境未通过 CPU BF16 运算检查')
+    if precision in {'4bit', '8bit'} and (not environment.get('cuda') or precision not in options):
+        raise ValueError('所选环境未通过 GPU ' + precision + ' 运算检查')
     if environment.get("cuda") is False:
         free = environment.get("cpu_memory_available_bytes") or 0
-        required = size * 2.6 + reserve
-        if "none" in options and required < free:
-            return {"quantization": "none", "label": "CPU FP32（原始权重）",
+        selected = 'bf16' if precision == 'bf16' else 'none'
+        from apps.launcher.resource_advice import cpu_reference_for_weights
+        reference = cpu_reference_for_weights(model_type, size, selected)
+        required = reference if reference is not None else size * (1.6 if selected == 'bf16' else 2.6) + reserve
+        if selected in options and required < free:
+            return {"quantization": selected, "label": "CPU BF16（原始权重）" if selected == 'bf16' else "CPU FP32（原始权重）",
                     "estimated": True, "note": "CPU 内存估算仅供参考；必须通过实际加载和短推理后才会就绪"}
+        basis = '实测参考占用' if reference is not None else '估算，并非实测峰值'
         raise ValueError(
-            f"系统可用内存不足，暂时无法加载模型。当前可用 {free / 1024**3:.2f} GiB，"
-            f"预计需要至少 {required / 1024**3:.2f} GiB（含运行余量，并非实测峰值）。"
+            f"系统可用内存不足，当前可用 {free / 1024**3:.2f} GiB，参考需要 {required / 1024**3:.2f} GiB（{basis}）。"
             "请释放内存后重试，或选择占用内存更少的模型。"
         )
     free = environment.get("gpu", {}).get("free_bytes", 0)
-    if "none" in options and size * 1.3 + reserve < free:
-        precision = "none"
-    elif "4bit" in options and size * .35 + reserve < free:
-        precision = "4bit"
-    else:
+    from apps.launcher.resource_advice import gpu_budget_for_weights
+    profiles = {'none': 'cuda-fp16', '4bit': 'cuda-bnb', '8bit': 'cuda-bnb8'}
+    budgets = {name: gpu_budget_for_weights(model_type, size, profile) for name, profile in profiles.items()}
+    for name, factor in [('none', 1.3), ('4bit', .35), ('8bit', .65)]:
+        if budgets[name] is None:
+            budgets[name] = size * factor + reserve
+    candidates = [precision] if precision in profiles else ['none', '4bit', '8bit']
+    selected = next((name for name in candidates if name in options and budgets[name] < free), None)
+    if selected is None:
         extra = environment.get("quantization_note", "")
-        raise ValueError(f"当前可用显存与依赖无法提供合适的运行方案。请关闭其他占用显存的程序或选择更小模型。{extra}")
-    return {"quantization": precision, "label": "自动选择 FP16" if precision == "none" else "自动选择 4bit",
+        budget = min((budgets[name] for name in candidates), default=0)
+        raise ValueError(f"当前可用显存与依赖无法提供合适的运行方案。当前可用 {free / 1024**3:.2f} GiB，"
+                         f"所评估方案建议至少预留 {budget / 1024**3:.2f} GiB。请关闭其他占用显存的程序或选择更小模型。{extra}")
+    return {"quantization": selected, "label": "自动选择 FP16" if selected == "none" else "选择 BNB " + selected,
             "estimated": True, "note": "显存估算仅用于选择方案；必须通过实际加载和短推理后才会就绪"}
