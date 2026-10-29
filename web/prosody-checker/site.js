@@ -11,7 +11,7 @@ window.ShijuStartup?.mark("入口模块及静态依赖执行成功");
 const routeTitles = {
   chat: "AI 对话 · 诗矩",
   prosody: "格律检测 · 诗矩",
-  "sentence-search": "佳句检索 · 诗矩",
+  "sentence-search": "句式格律 · 诗矩",
   profile: "个人中心 · 诗矩",
   poem: "诗作修改 · 诗矩",
   settings: "模型设置 · 诗矩",
