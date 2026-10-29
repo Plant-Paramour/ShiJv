@@ -2,9 +2,9 @@
 
 CPU 和 GPU 推理均需要 Microsoft Visual C++ x64 v14 运行库。检测电脑时会检查注册版本及关键 DLL，部署前再次检查。缺失时部署流程会自动从微软固定地址下载、核对 SHA256 和微软签名后启动安装，可能出现系统权限提示；如需重启，重启后恢复部署即可。无需安装 Visual Studio 或 C++ 编译工具。
 
-完整解压后双击“诗矩环境部署.exe”。首次操作按需下载基础 Python，无需自行安装 Python、Conda 或输入命令。
+从 GitHub 下载源码并完整解压后，双击“诗矩环境部署.bat”。首次操作按需下载基础 Python，无需自行安装 Python、Conda 或输入命令。
 
-本仓库根目录已提供可双击的 `诗矩环境部署.exe`，入口源码为 `tools/EnvironmentDeployer.cs`。请保留整个源码目录，不能只复制 exe。若希望通过脚本打开，可运行 `诗矩环境部署.bat`。
+仓库使用 `诗矩环境部署.bat` 调用 `tools/environment-tool.ps1`。编译后的 EXE 不纳入 Git；通过下方构建命令生成的部署包提供 `诗矩环境部署.exe`，入口源码为 `tools/EnvironmentDeployer.cs`。使用部署包时请保留完整目录。
 
 窗口采用极简复古风格的四步向导。每页只显示当前需要完成的操作，技术日志和资源依据放在“查看详情”中。推荐模型统一从 ModelScope 下载，固定版本并校验文件摘要。
 

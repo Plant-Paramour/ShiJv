@@ -7,11 +7,10 @@
 ## 快速开始
 
 1. [下载源码 ZIP](https://github.com/Plant-Paramour/ShiJv/archive/refs/heads/main.zip)，右键选择“全部解压”。不要直接在压缩包里运行。
-2. **需要本地模型创作**：双击根目录的 `诗矩环境部署.exe`，按窗口提示检测电脑、下载或选择模型、创建新环境。完成后进入诗矩。详细步骤见[环境部署说明](docs/environment-tool-user.md)。此路线不需要预装 Python 或 Conda；工具按硬件与模型选择 CPU FP32、GPU FP16 或 GPU BNB 4bit 依赖组合，也可手动选择。没有 NVIDIA 显卡时可自动部署 CPU 环境，建议使用 Qwen3.5-2B 或 Qwen3.5-0.8B。下载支持国内镜像、官方回退和本地依赖包导入，失败后可以恢复部署；最终以本机真实生成验收为准，CPU 通常明显慢于 GPU。
+2. **需要本地模型创作**：双击根目录的 `诗矩环境部署.bat`，按窗口提示检测电脑、下载或选择模型、创建新环境。完成后进入诗矩。详细步骤见[环境部署说明](docs/environment-tool-user.md)。此路线不需要预装 Python 或 Conda；工具按硬件与模型选择 CPU FP32、GPU FP16 或 GPU BNB 4bit 依赖组合，也可手动选择。没有 NVIDIA 显卡时可自动部署 CPU 环境，建议使用 Qwen3.5-2B 或 Qwen3.5-0.8B。下载支持国内镜像、官方回退和本地依赖包导入，失败后可以恢复部署；最终以本机真实生成验收为准，CPU 通常明显慢于 GPU。
 3. **只使用格律检测或连接已有对话服务**：安装 Python 3.10+，在解压目录打开终端，执行 `python -m pip install -e ".[api]"`；然后双击 `诗矩单机版.bat`，选择该环境的 `python.exe`，点击“检查并启动”。
 4. 浏览器打开后，在“模型与运行设置”填写你自己的模型服务地址、模型名称和密钥。使用本地生成时，按设置页提示检查推理环境和模型。
 
-已有 Conda 的用户可使用仓库内的 [`Conda安装文件/`](Conda安装文件/使用说明.md)。其中包含环境 YAML、固定依赖清单、安装脚本和检查脚本；模型权重需要另行下载。
 
 启动器默认使用 `127.0.0.1:18763`，端口占用时自动选择空闲端口。应用目前以 Windows 启动器为主要使用入口。
 
@@ -39,14 +38,9 @@
 
 ## 开发
 
-```powershell
-python -m pip install -e ".[api,dev]"
-python -m pytest
-node --test web/prosody-checker/tests/*.test.mjs
-```
+安装开发依赖：`python -m pip install -e ".[api,dev]"`。
+本地测试目录不纳入 GitHub 仓库和源码导出包。真实模型加载、CUDA 和生成效果需在目标机器上通过启动器另行检测。
 
-测试无需下载模型权重。真实模型加载、CUDA 和生成效果需在目标机器上通过启动器另行检测。
+主要目录：`apps/` 为本地 API、Agent、启动器和 Worker，`shiju/` 为格律与生成引擎，`web/prosody-checker/` 为前端，`Rhyme/` 和 `Songci_Meter/` 为韵书与词谱。
 
-主要目录：`apps/` 为本地 API、Agent、启动器和 Worker，`shiju/` 为格律与生成引擎，`web/prosody-checker/` 为前端，`Rhyme/` 和 `Songci_Meter/` 为韵书与词谱，`tests/` 为回归测试。
-
-源码导出：`python tools/build_single_player_source.py --output dist/single-player-source.zip`。导出包不含用户数据、模型权重、运行日志、本地归档和 Git 历史。
+源码导出：`python tools/build_single_player_source.py --output dist/single-player-source.zip`。导出包不含本地测试、安装材料、用户数据、模型权重、运行日志、本地归档和 Git 历史。

@@ -54,3 +54,14 @@ models.toml
 .venv/
 node_modules/
 /build/
+
+# Local tests and installation exports (kept on this machine)
+/tests/
+/web/prosody-checker/tests/
+/Conda安装文件/
+/诗矩环境部署.exe
+
+# One-off audits and design metadata
+/Songci_Meter/display-layout-report.json
+/scripts/audit_diancang_page.py
+/web/prosody-checker/index.intent.json

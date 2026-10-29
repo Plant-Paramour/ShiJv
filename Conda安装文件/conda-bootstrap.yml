@@ -1,7 +1,0 @@
-name: shiju-qwen35
-channels:
-  - conda-forge
-  - nodefaults
-dependencies:
-  - python=3.12.10
-  - pip=25.0.1

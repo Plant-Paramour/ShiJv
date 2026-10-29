@@ -4,8 +4,4 @@
 
 韵书和词谱来自 `Rhyme/`、`Songci_Meter/`。前端使用原生 JavaScript 模块，运行应用不需要 npm 构建。
 
-前端回归测试：
-
-```powershell
-node --test web/prosody-checker/tests/*.test.mjs
-```
+前端回归测试仅在本地保留，不纳入仓库和源码导出包。
