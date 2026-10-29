@@ -113,7 +113,25 @@
           "仄",
           "仄"
         ]
-      }
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 1, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 1, "start": [9, 1], "end": [9, 1]}
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 2, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 2, "start": [9, 1], "end": [9, 1]}
+          ]
+        }
+      ]
     },
     {
       "name": "吕渭老",
@@ -171,7 +189,25 @@
           "平",
           "平"
         ]
-      }
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 1, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 1, "start": [9, 1], "end": [9, 1]}
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 2, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 2, "start": [9, 1], "end": [9, 1]}
+          ]
+        }
+      ]
     },
     {
       "name": "程垓",
@@ -315,7 +351,27 @@
           "平",
           "平"
         ]
-      }
+      },
+      "repetition_groups": [
+        {
+          "id": 1,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 1, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 1, "start": [9, 1], "end": [9, 1]},
+            {"stanza": 1, "start": [10, 1], "end": [10, 1]}
+          ]
+        },
+        {
+          "id": 2,
+          "type": "叠韵",
+          "positions": [
+            {"stanza": 2, "start": [8, 1], "end": [8, 1]},
+            {"stanza": 2, "start": [9, 1], "end": [9, 1]},
+            {"stanza": 2, "start": [10, 1], "end": [10, 1]}
+          ]
+        }
+      ]
     }
   ]
 }

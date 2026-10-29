@@ -1,7 +1,7 @@
 import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=17";
 import { flattenMeter } from "./core.js?v=22";
 import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
-import { getDatasetJson } from "./dataset-cache.js?v=3";
+import { getDatasetJson } from "./dataset-cache.js?v=4";
 import { renderChatMarkdown } from "./chat-markdown.js?v=3";
 import { createStreamingText } from "./stream-text.js?v=2";
 import renderMathInElement from "./vendor/katex/auto-render.mjs";
@@ -88,7 +88,7 @@ function openDrawer(drawer) {
 
 function showRoute(route, options = {}) {
   const resolvedRoute = views.has(route) ? route : "chat";
-  if (!window.location.hash || route === "home" || !views.has(route)) window.history.replaceState(null, "", "#chat");
+  if (!window.location.hash || !views.has(route)) window.history.replaceState(null, "", "#chat");
   for (const [name, view] of views) view.hidden = name !== resolvedRoute;
   if (resolvedRoute === "profile") activateProfileTab(profileTabFromHash());
   for (const link of navLinks) {
@@ -180,7 +180,7 @@ document.querySelectorAll("[data-drawer-close]").forEach((button) => button.addE
 drawerBackdrop?.addEventListener("click", closeDrawers);
 document.querySelectorAll("[data-drawer-route]").forEach((link) => link.addEventListener("click", () => closeDrawers()));
 
-document.querySelector("#login-button").addEventListener("click", () => {
+document.querySelector("#account-menu-button").addEventListener("click", () => {
   if (currentUser) {
     openDrawer(rightDrawer);
     return;
@@ -208,16 +208,6 @@ window.addEventListener("hashchange", () => {
   showRoute(routeFromHash(), { focus: true });
   const conversationId = conversationIdFromLocation();
   if (conversationId && currentUser) openConversation(conversationId).catch((error) => announce(`无法打开对话：${error.message}`));
-});
-
-document.querySelectorAll("[data-demo-action]").forEach((button) => {
-  button.addEventListener("click", () => {
-    if (button.dataset.demoAction === "login") {
-      requireLocalProfile();
-      return;
-    }
-    if (button.dataset.demoAction === "publish") openThreadDialog();
-  });
 });
 
 document.addEventListener("click", (event) => {
@@ -503,7 +493,7 @@ async function loadConversations({ restore = false } = {}) {
     if (activeConversation) setChatTitle(activeConversation.title);
     if (restore && linkedId && linkedId !== currentConversationId) await openConversation(linkedId);
     filterConversations();
-  } catch { /* 登录状态可能已过期，发送消息时会提示 */ }
+  } catch { /* 本地档案暂不可用，发送消息时会提示 */ }
 }
 
 async function openConversation(conversationId) {
@@ -708,8 +698,6 @@ let favoritePoems = [];
 let ownedPoemsHasMore = false;
 let ownedPoemsLoadingMore = false;
 let ownedPoemsRequestVersion = 0;
-let favoriteThreads = [];
-let favoriteThreadCollections = [];
 function collectionKey(name) { return String(name || "").trim().replace(/\s+/g, " ").toLocaleLowerCase(); }
 function mergeNamedCollections(items) {
   const merged = new Map();
@@ -727,27 +715,14 @@ function mergeNamedCollections(items) {
   return [...merged.values()];
 }
 let pendingCollection = null;
-async function migrateLegacyThreadCollections(userId) {
-  const marker = `shiju_thread_collections_migrated_${userId}`;
-  if (localStorage.getItem(marker)) return;
-  const legacyFavoriteThreads = JSON.parse(localStorage.getItem("shiju_favorite_threads") || "[]");
-  const legacyThreadCollections = JSON.parse(localStorage.getItem("shiju_thread_collections") || "[]");
-  const collections = mergeNamedCollections(legacyThreadCollections).map(({ name, items }) => ({ name, items }));
-  const favorites = [...new Set(legacyFavoriteThreads.map((item) => item.id).filter(Boolean))];
-  if (!collections.length && !favorites.length) { localStorage.setItem(marker, "1"); return; }
-  await apiFetch("/v1/profile/thread-collections/import-legacy", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ collections, favorite_threads: favorites }) });
-  localStorage.setItem(marker, "1");
-  localStorage.removeItem("shiju_thread_collections");
-  localStorage.removeItem("shiju_favorite_threads");
-}
 async function openCollectionManager(kind) {
   await loadCollectionData(kind);
   pendingCollection = { kind, manage: true };
   const modal = document.querySelector("#collection-modal");
   const list = document.querySelector("#collection-modal-list");
-  const collections = kind === "poem" ? profileCollections : favoriteThreadCollections;
-  document.querySelector("#collection-modal-title").textContent = kind === "poem" ? "管理作品合集" : "管理帖子合集";
-  document.querySelector(".collection-modal__dialog > .eyebrow").textContent = kind === "poem" ? "收藏的作品" : "收藏的帖子";
+  const collections = profileCollections;
+  document.querySelector("#collection-modal-title").textContent = "管理作品合集";
+  document.querySelector(".collection-modal__dialog > .eyebrow").textContent = "收藏的作品";
   document.querySelector("#collection-create-form").hidden = true;
   document.querySelector("#collection-create-status").textContent = "";
   document.querySelector("#collection-name-input").value = "";
@@ -769,9 +744,8 @@ async function openCollectionPicker(kind, item, onDone) {
   document.querySelector("#collection-modal-title").textContent = "选择合集";
   document.querySelector(".collection-modal__dialog > .eyebrow").textContent = "收藏整理";
   document.querySelector("#collection-create-form").hidden = true; document.querySelector("#collection-create-status").textContent = ""; document.querySelector("#collection-name-input").value = "";
-  if (!kind) { list.innerHTML = '<p class="collection-modal-hint">请选择要新建的合集类型</p>'; [ ["poem", "作品合集"], ["thread", "帖子合集"] ].forEach(([value, label]) => { const b = document.createElement("button"); b.type = "button"; b.className = "collection-choice"; b.textContent = `＋ 新建${label}`; b.addEventListener("click", () => openCollectionPicker(value, null)); list.append(b); }); document.querySelector("#collection-modal-new").hidden = true; modal.hidden = false; return; }
   document.querySelector("#collection-modal-new").hidden = false;
-  const names = kind === "poem" ? profileCollections.map((x) => x.name) : favoriteThreadCollections.map((x) => x.name); list.replaceChildren();
+  const names = profileCollections.map((x) => x.name); list.replaceChildren();
   if (!names.length) list.innerHTML = '<p class="empty-state">暂无合集，请先新建。</p>';
   names.forEach((name) => { const b = document.createElement("button"); b.type = "button"; b.className = "collection-choice"; b.textContent = name; b.addEventListener("click", async () => { try { await onDone?.(name); modal.hidden = true; } catch (error) { announce(`移动失败：${error.message}`); } }); list.append(b); }); modal.hidden = false;
 }
@@ -823,11 +797,11 @@ document.querySelector("#collection-create-submit")?.addEventListener("click", a
   const status = document.querySelector("#collection-create-status");
   const clean = input.value.trim();
   if (!clean) { status.textContent = "请输入合集名称"; return; }
-  const target = pendingCollection.kind === "poem" ? profileCollections : favoriteThreadCollections;
+  const target = profileCollections;
   if (target.some((item) => collectionKey(item.name) === collectionKey(clean))) { status.textContent = "同类合集不能重名"; return; }
   try {
     const pending = pendingCollection;
-    const endpoint = pending.kind === "poem" ? "/v1/profile/poem-collections" : "/v1/profile/thread-collections";
+    const endpoint = "/v1/profile/poem-collections";
     await apiFetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: clean }) });
     input.value = "";
     document.querySelector("#collection-create-form").hidden = true;
@@ -846,15 +820,9 @@ let profileLoadVersion = 0;
 
 async function loadCollectionData(kind) {
   const generation = profileGeneration;
-  if (kind === "thread") await migrateLegacyThreadCollections(currentUser.id);
-  const payload = await apiFetch(`/v1/profile/${kind === "poem" ? "poem" : "thread"}-collections`);
+  const payload = await apiFetch("/v1/profile/poem-collections");
   if (generation !== profileGeneration) return;
-  const collections = mergeNamedCollections(payload.items || []);
-  if (kind === "poem") profileCollections = collections;
-  else {
-    favoriteThreadCollections = collections;
-    favoriteThreads = [...new Set(collections.flatMap((collection) => collection.items || []))].map((id) => ({ id }));
-  }
+  profileCollections = mergeNamedCollections(payload.items || []);
 }
 
 function parsePoemFields(poem) {
@@ -2260,7 +2228,6 @@ document.querySelector("#collection-modal-list")?.addEventListener("click", asyn
       const collection = profileCollections.find((item) => item.id === id);
       await Promise.all([id, ...(collection?.duplicate_ids || [])].map((collectionId) => apiFetch(`/v1/profile/poem-collections/${encodeURIComponent(collectionId)}`, { method: "DELETE" })));
     }
-    else await apiFetch(`/v1/profile/thread-collections/${encodeURIComponent(id)}`, { method: "DELETE" });
     await loadProfileData();
     openCollectionManager(kind);
   } catch (error) { announce(`删除合集失败：${error.message}`); }
@@ -2271,17 +2238,6 @@ document.querySelector("#archive-list")?.addEventListener("click", async (event)
   const id = button.closest("[data-conversation-id]").dataset.conversationId;
   try { await apiFetch(`/v1/conversations/${id}/restore`, { method: "POST" }); await loadConversations(); await loadProfileData(); announce("对话已恢复"); } catch (error) { announce(`恢复失败：${error.message}`); }
 });
-document.querySelector("#favorite-thread-list")?.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-thread-collection-edit]"); if (!button) return;
-  const id = button.closest("[data-thread-id]")?.dataset.threadId;
-  openCollectionPicker("thread", id, async (name) => {
-    const target = favoriteThreadCollections.find((collection) => collection.name === name);
-    if (!target) return;
-    await apiFetch(`/v1/profile/thread-collections/${encodeURIComponent(target.id)}/items`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ thread_id: id }) });
-    await loadProfileData(); announce(`已加入「${name}」`);
-  });
-});
-
 function normalizeAssistantText(text) {
   return String(text)
     .replace(/\*\*([^*]+)\*\*/g, "$1")

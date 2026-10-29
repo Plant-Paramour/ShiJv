@@ -6,7 +6,7 @@ import {
   evaluateSongci,
   flattenMeter,
 } from "./core.js?v=22";
-import { getDatasetJson } from "./dataset-cache.js?v=3";
+import { getDatasetJson } from "./dataset-cache.js?v=4";
 
 export const RHYME_BOOKS = {
   Xinyun: { file: "Xinyun.json", name: "中华新韵" },

@@ -56,7 +56,7 @@ test("hidden poem lists cause no request; picker loads only selected source", as
   const calls = [];
   const context = vm.createContext({
     currentUser: {}, profileGeneration: 1, ownedPoems: [], favoritePoems: [], profilePoems: [],
-    document: { body: { dataset: { currentView: "forum" } }, querySelector: () => null },
+    document: { body: { dataset: { currentView: "chat" } }, querySelector: () => null },
     apiFetch: async (url) => { calls.push(url); return { items: [] }; },
     latestOwnedPoems: (items) => items, renderPoemList: () => {}, URLSearchParams, ownedPoemsRequestVersion: 0, ownedPoemsHasMore: false, ownedPoemsLoadingMore: false,
   });
@@ -112,7 +112,7 @@ test("favorites request only collections and fetch closed collection on expansio
   assert.equal(calls.length, 3);
 });
 
-test("prosody and sentence matching read rhyme books and meters through persistent dataset cache", () => {
+test("prosody and sentence matching read local datasets without persistent cache", () => {
   const source = readFileSync(new URL("../prosody-evaluation.js", import.meta.url), "utf8");
   const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");
   const search = readFileSync(new URL("../sentence-search.js", import.meta.url), "utf8");
@@ -122,9 +122,8 @@ test("prosody and sentence matching read rhyme books and meters through persiste
   assert.match(app, /getDatasetJson\("meter", "index\.json"\)/);
   assert.match(search, /getDatasetJson\("rhyme", books\[book\]\)/);
   assert.match(search, /getMeterBundle\(items\.map\(\(item\) => item\.file\)\)/);
-  assert.match(cache, /storedAt: new Date\(\)\.toISOString\(\)/);
-  assert.match(cache, /rhymeVersion/);
-  assert.match(cache, /meter-templates/);
+  assert.match(cache, /cache: "no-store"/);
+  assert.doesNotMatch(cache, /indexedDB|meter-templates|meter_version|rhymeVersion/);
 });
 
 test("drag priority order is applied lexicographically to all match criteria", () => {

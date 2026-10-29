@@ -43,6 +43,18 @@ def test_web_modules_ignore_system_plain_text_association(local_app, monkeypatch
         assert client.get('/', follow_redirects=False).headers['location'].endswith('#chat')
 
 
+def test_local_datasets_need_no_version_files_and_disable_caching(local_app):
+    assert not hasattr(local_app.state, 'meter_version')
+    assert not hasattr(local_app.state, 'rhyme_version')
+    with TestClient(local_app) as client:
+        for path in ('/Songci_Meter/index.json', '/Rhyme/Pinshui.json'):
+            response = client.get(path)
+            assert response.status_code == 200
+            assert response.headers['cache-control'] == 'no-store'
+        for path in ('/meter-version', '/meter-templates'):
+            assert client.get(path).status_code == 404
+
+
 def test_static_types_cache_and_missing_files(tmp_path, monkeypatch):
     from fastapi import FastAPI
     from apps.api.static_files import ApplicationStaticFiles
@@ -349,6 +361,21 @@ def test_source_is_plain_and_has_no_management_implementation():
     assert 'data-view="admin"' not in html
     assert not (ROOT / 'apps/api/routes/admin.py').exists()
     assert not (ROOT / 'apps/api/routes/forum.py').exists()
+    frontend = ROOT / 'web/prosody-checker'
+    assert not (frontend / 'register-page.css').exists()
+    for name in ('site.js', 'styles.css', 'index.html'):
+        source = (frontend / name).read_text(encoding='utf-8')
+        for marker in ('forum', 'thread-collections', 'favorite-thread',
+                       'register-panel', 'login-dialog', 'login-button',
+                       'home-hero', 'drawer-notifications', '#notifications'):
+            assert marker not in source, (name, marker)
+
+
+def test_local_app_has_no_retired_web_pages(local_app):
+    with TestClient(local_app) as client:
+        for path in ('/main', '/admin', '/forum', '/login', '/register',
+                     '/main.html', '/admin.html', '/forum.html'):
+            assert client.get(path).status_code == 404, path
 
 
 def test_plain_source_export_is_self_contained():

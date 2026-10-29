@@ -1,0 +1,84 @@
+@font-face{font-family:"汇文仿宋";src:url("./assets/fonts/汇文仿宋.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"又又意宋";src:url("./assets/fonts/又又意宋.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+.meter-book-launch{position:fixed;right:22px;bottom:100px;z-index:1200;width:58px;height:76px;border:1px solid #b9a984;border-left:7px solid #48645c;border-radius:3px 7px 7px 3px;background:repeating-linear-gradient(0deg,#f5eddb 0 3px,#e8dec8 3px 4px);color:#304c43;box-shadow:3px 4px 12px #302b2025;touch-action:none;cursor:grab;font:20px/1.3 serif;writing-mode:vertical-rl;letter-spacing:5px;display:grid;place-items:center}
+.meter-book-launch:focus-visible,.meter-book button:focus-visible{outline:3px solid #9b4738;outline-offset:3px}
+.meter-book{width:min(1020px,calc(100vw - 32px));height:min(780px,calc(100dvh - 48px));padding:0;border:1px solid #bdb198;border-radius:8px;background:#faf7ef;color:#302e28;box-shadow:0 20px 70px #25241d40;max-width:none;max-height:none}
+.meter-book::backdrop{background:#232c2855}.meter-book header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #ddd4c1}.meter-book header h2{font:24px serif;margin:0}.meter-book button{cursor:pointer;color:inherit}.meter-book-close{font-size:25px;border:0;background:none;padding:0 10px}.meter-book-layout{display:grid;grid-template-columns:220px minmax(0,1fr);height:calc(100% - 70px)}.meter-book-side{padding:16px;border-right:1px solid #ddd4c1;display:flex;flex-direction:column;min-height:0}.meter-book input,.meter-book select{width:100%;padding:10px;border:1px solid #c8bea9;background:#fffdf7;color:#302e28;border-radius:4px}.meter-book-list{overflow:auto;margin-top:12px;flex:1}.meter-book-list button{display:block;width:100%;text-align:left;border:0;border-radius:3px;background:none;padding:10px 12px}.meter-book-list button:hover,.meter-book-list button[aria-current=true]{background:#e5ece3;color:#304c43}.meter-book-main{overflow:auto;padding:24px 30px}.meter-book-main h3{font:30px serif;margin:0 0 8px}.meter-book-intro,.meter-book-summary,.meter-book-status{font-size:14px;line-height:1.8;color:#686252}.meter-book-main select{margin:12px 0}.meter-book-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;line-height:2;margin:12px 0 24px}.meter-book mark{color:#302e28;border-radius:3px;padding:1px 0}.meter-book-stanza{margin:22px 0}.meter-book-stanza h4{font-size:13px;color:#77705f;font-weight:400;border-bottom:1px solid #e1d9c8;padding-bottom:8px}.meter-book-line{display:flex;flex-wrap:wrap;gap:12px 0;margin:16px 0 20px}.meter-book-char{display:inline-flex;flex-direction:column;text-align:center;width:1.65em;position:relative;font:21px/1.7 'SimSun',serif}.meter-book-tone{font-size:15px;color:#666454}.meter-book-char.has-break{border-right:2px solid #a84332;margin-right:5px}.meter-book-char.has-break::after{content:'/';color:#a84332;font:bold 11px sans-serif;position:absolute;right:-6px;top:-8px}.meter-book-char.is-read{margin-right:12px}.meter-book-char.is-read::after{content:'、';position:absolute;right:-12px;top:0}.meter-book-rhyme{border-radius:3px;color:#fff!important}.meter-book details{border-top:1px solid #ddd4c1;padding-top:16px;margin-top:24px;line-height:1.9;white-space:pre-wrap}.meter-book summary{cursor:pointer;white-space:normal}.meter-book-note{font-size:13px;color:#856146}
+/* 参照断句工具：连续例词行与词谱行紧贴，句组之间只留少量空白。 */
+.meter-book [hidden]{display:none!important}
+.meter-book-layout{display:block;height:calc(100% - 88px);min-height:0}
+.meter-book{overflow:hidden;box-sizing:border-box}
+.meter-book-eyebrow{font:11px/1.8 sans-serif;letter-spacing:2px;color:#78705f}
+.meter-book-directory,.meter-book-main{height:100%;overflow:auto;box-sizing:border-box}
+.meter-book-directory{padding:0 28px 24px}
+.meter-book-toolbar{position:sticky;top:0;z-index:1;background:#faf7ef;padding-top:20px}
+.meter-book-toolbar input{max-width:420px;font-size:15px;padding:11px 14px}
+.meter-book-categories{display:flex;gap:24px;border-bottom:1px solid #d8cfbc;margin-top:15px}
+.meter-book-categories button{border:0;border-bottom:3px solid transparent;background:none;padding:10px 2px;font:16px serif;color:#6c6557}
+.meter-book-categories button[aria-pressed=true]{border-bottom-color:#48645c;color:#304c43;font-weight:700}
+.meter-book-count{font-size:12px;color:#706957;margin:14px 0}
+.meter-book-list{overflow:visible;margin:0}
+.meter-book-catalog-section{margin:0 0 22px;border:1px solid #dfd7c7;background:#fffdf7;padding:16px 20px}
+.meter-book-catalog-section h3{font:20px serif;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #e8e1d2}
+.meter-book-catalog-section h3 small{font:12px sans-serif;color:#77705f;margin-left:8px}
+.meter-book-catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:2px 14px}
+.meter-book-list .meter-book-entry{display:flex;align-items:baseline;gap:5px;padding:7px 2px;min-width:0;font-size:15px;line-height:1.5;color:#365c54}
+.meter-book-entry small{font-size:11px;color:#77705f}.meter-book-entry span{overflow-wrap:anywhere}
+.meter-book-back{display:block;border:0;background:none;padding:0;margin:0 0 6px;font:14px sans-serif;color:#48645c!important}
+.meter-book header{flex:0 0 auto}
+.meter-book{display:flex;flex-direction:column}
+.meter-book:not([open]){display:none}
+.meter-book .meter-book-layout{height:auto;flex:1;min-height:0;overflow:hidden}
+.meter-book-empty{padding:32px 0;color:#706957}
+.meter-book details.meter-book-catalog-section{white-space:normal;margin:0 0 8px;padding:0 14px;border:1px solid #d8cfbc}
+.meter-book-catalog-section>summary{padding:8px 0;font:16px/1.4 serif;color:#304c43}
+.meter-book-catalog-section>summary small{font:12px sans-serif;color:#706957;margin-left:10px}
+.meter-book-catalog-section[open]>summary{border-bottom:1px solid #e8e1d2;margin-bottom:10px}
+.meter-book-catalog-section[open]>.meter-book-catalog-grid{padding-bottom:14px}
+.meter-book-repeat-key{border:2px solid #343d48;padding:0 5px;position:relative}
+.meter-book-char.meter-book-repeat{border-width:2px 0;border-color:#343d48;box-sizing:content-box}
+.meter-book-repeat.is-repeat-start{border-left-width:2px}
+.meter-book-repeat.is-repeat-end{border-right-width:2px}
+.meter-book-repeat-number{position:absolute;top:-8px;left:0;font:bold 10px/1 sans-serif;color:#343d48;background:#faf7ef;padding:0 2px;z-index:1}
+.meter-book-rhyme{position:relative;padding:1px 4px}
+.meter-book-tone.meter-book-rhyme{padding:0}
+.meter-book-rhyme-number{font:bold 9px/1 sans-serif;position:absolute;right:-2px;top:-4px;background:#fffdf7;color:#25231f;border-radius:50%;min-width:10px;text-align:center}
+@media(max-width:600px){.meter-book-directory{padding:0 14px 18px}.meter-book-categories{gap:18px;justify-content:flex-start}.meter-book-categories button{font-size:15px}.meter-book-catalog-section{padding:12px}.meter-book-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 10px}.meter-book-list .meter-book-entry{padding:7px 0}.meter-book-layout{height:calc(100% - 84px)}}
+.meter-book-variants{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.meter-book-variants button{padding:5px 10px;border:1px solid #c8bea9;border-radius:4px;background:#fffdf7;font:inherit;font-size:14px;line-height:1.5}
+.meter-book-variants button:hover{background:#e5ece3}
+.meter-book-variants button[aria-pressed=true]{background:#304c43;border-color:#304c43;color:#fff}
+.meter-book-line{display:flex;flex-wrap:wrap;gap:0;margin:0 0 7px;font-size:20px;line-height:1.55}
+.meter-book-sentence{display:inline-flex;flex-wrap:wrap;max-width:100%;vertical-align:top}
+.meter-book-char{width:1em;font:20px/1.55 'SimSun',serif;color:#336699;flex:0 0 1em}
+.meter-book-tone{font-size:20px;color:#302e28;line-height:1.55}
+.meter-book-char.has-break{border:0;margin:0}.meter-book-char.has-break::after{content:none}
+.meter-book-char.is-read{margin-right:1em}.meter-book-char.is-read::after{right:-1em}
+.meter-book-punctuation{width:1em}.meter-book-stanza{margin:14px 0 20px}
+.meter-book-stanza h4{margin:0 0 10px;padding-bottom:5px}
+.meter-book-intro{margin:6px 0 10px}.meter-book-summary{margin:4px 0}
+.meter-book-legend{margin:8px 0 14px;gap:8px}.meter-book-status:empty{display:none}
+.meter-book-main{padding:20px 24px}.meter-book details{margin-top:18px;padding-top:12px}
+@media(max-width:600px){.meter-book{width:calc(100vw - 16px);height:calc(100dvh - 24px)}.meter-book-layout{grid-template-columns:110px minmax(0,1fr)}.meter-book-side{padding:10px 6px}.meter-book-main{padding:18px 12px}.meter-book-list button{padding:10px 6px}.meter-book input{padding:8px 4px;font-size:13px}.meter-book-char,.meter-book-tone{font-size:18px}.meter-book header{padding:16px}.meter-book-launch{width:48px;height:66px}}
+/* 覆盖组件中的 font 简写，使词谱书各层内容统一使用本地字体。 */
+.meter-book-launch{font-family:"汇文仿宋","FangSong",serif}
+.meter-book-launch>span{transform:translateX(-4px);pointer-events:none}
+.meter-book,.meter-book *{font-family:"汇文仿宋","FangSong",serif}
+.meter-book header h2,.meter-book-main h3{font-family:"又又意宋","SimSun",serif;font-weight:700}
+.meter-book .meter-book-summary{font-family:"FangSong","仿宋","STFangsong",serif;font-weight:400}
+.meter-book-description{border-top:1px solid #ddd4c1;margin-top:18px;padding-top:12px;line-height:1.9}
+.meter-book-description h4{margin:0 0 8px;font-size:16px}
+.meter-book-description p{margin:0;white-space:pre-wrap}
+.meter-book .meter-book-categories button,
+.meter-book .meter-book-catalog-section>summary,
+.meter-book .meter-book-catalog-section>h3{font-family:"又又意宋","SimSun",serif}
+.meter-book-search-rows{display:grid;min-width:0}
+.meter-book-search-section{padding:4px 0}
+.meter-book-ink-divider{height:3px;border:0;margin:18px 0;background:linear-gradient(90deg,transparent,#7b807366 12%,#434c43b3 40%,#69736188 72%,transparent);clip-path:polygon(0 40%,12% 20%,35% 35%,57% 0,78% 30%,100% 45%,94% 75%,66% 65%,43% 100%,18% 70%,0 80%)}
+.meter-book-list .meter-book-search-row{display:flex;align-items:baseline;gap:32px;width:100%;min-width:0;padding:10px 0;border:0;border-bottom:1px solid #e8e1d2;border-radius:0;background:none;text-align:left;line-height:1.7}
+.meter-book-search-row:last-child{border-bottom:0}
+.meter-book-list .meter-book-search-row>.meter-book-search-identity{display:flex;align-items:baseline;gap:5px;flex:0 0 155px;width:155px;min-width:0;padding:0;white-space:nowrap;color:#365c54;font-size:15px;line-height:1.5}
+.meter-book-search-identity small{font-size:12px;color:#77705f}
+.meter-book-search-snippet{display:block;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#625c50}
+.meter-book-search-snippet mark{background:#f4dfab;color:#302e28}
+@media(max-width:600px){.meter-book-list .meter-book-search-row{gap:18px}.meter-book-list .meter-book-search-row>.meter-book-search-identity{flex-basis:120px;width:120px;font-size:14px}.meter-book-search-snippet{font-size:13px}}

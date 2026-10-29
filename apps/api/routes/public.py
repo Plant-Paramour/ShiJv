@@ -107,7 +107,7 @@ def _meter_catalog(request: Request):
     items = []
     if base.is_dir():
         for path in sorted(base.glob('*.json')):
-            if path.name.lower() in {'index.json', 'meter-version.json'}:
+            if path.name.lower() in {'index.json', 'search-index.json', 'display-layouts.json', 'display-layout-report.json'}:
                 continue
             try:
                 data = json.loads(path.read_text(encoding='utf-8'))
@@ -130,27 +130,6 @@ def _meter_catalog(request: Request):
 @router.get('/meters')
 def list_meters(request: Request):
     return _meter_catalog(request)
-
-@router.get('/meter-version')
-def get_meter_version(request: Request):
-    from fastapi.responses import JSONResponse
-    response = JSONResponse({'meter_version': request.app.state.meter_version, 'rhyme_version': request.app.state.rhyme_version})
-    response.headers['Cache-Control'] = 'public, max-age=300, stale-while-revalidate=86400'
-    return response
-
-@router.get('/meter-templates')
-def get_meter_templates(request: Request, meter_version: str):
-    from fastapi.responses import JSONResponse
-    if meter_version != request.app.state.meter_version:
-        raise HTTPException(status_code=409, detail='词谱版本已更新，请重新检查版本')
-    payload = getattr(request.app.state, 'meter_payload', None)
-    if payload is None:
-        directory = request.app.state.meter_directory
-        payload = {'meter_version': request.app.state.meter_version, 'items': [{'file': path.name, 'data': json.loads(path.read_text(encoding='utf-8'))} for path in sorted(directory.glob('*.json')) if path.name.lower() not in {'index.json', 'meter-version.json'}]}
-        request.app.state.meter_payload = payload
-    response = JSONResponse(payload)
-    response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-    return response
 
 @router.get('/rhyme-options', deprecated=True)
 @router.get('/rhyme-part', deprecated=True)

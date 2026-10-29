@@ -9,7 +9,7 @@ import {
 import {
   getLexicon,
 } from "./prosody-evaluation.js?v=17";
-import { getDatasetJson } from "./dataset-cache.js?v=3";
+import { getDatasetJson } from "./dataset-cache.js?v=4";
 
 let METER_FILES = [];
 let meterCatalog = [];

@@ -95,7 +95,7 @@
   <title>诗矩 · 中文诗词创作空间</title>
   <link rel="stylesheet" href="./han/han-scoped.css">
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="./styles.css?v=102">
+  <link rel="stylesheet" href="./styles.css?v=105">
   <link rel="stylesheet" href="./prosody-workbook.css?v=20">
 </head>
 <body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
@@ -120,10 +120,9 @@
       </nav>
 
       <div class="site-actions">
-        <button class="account-entry" type="button" id="login-button" aria-label="打开用户菜单">
+        <button class="account-entry" type="button" id="account-menu-button" aria-label="打开用户菜单">
           <span class="header-avatar user-avatar" id="header-avatar" aria-hidden="true">客</span>
           <span class="account-entry__label" id="account-entry-label">本地档案</span>
-          <span class="notification-badge" id="header-notification-badge" hidden>0</span>
         </button>
       </div>
     </div>
@@ -157,10 +156,6 @@
       <button type="button" data-profile-drawer-tab="archive"><span class="drawer-menu__icon" aria-hidden="true">档</span><span>归档对话</span></button>
       <a href="#settings" data-drawer-route="settings"><span class="drawer-menu__icon" aria-hidden="true">设</span><span>运行设置</span></a>
     </nav>
-    <section class="drawer-notifications" aria-labelledby="drawer-notifications-title" hidden>
-      <div class="drawer-section-heading"><h3 id="drawer-notifications-title">你的通知</h3><a href="#notifications" data-drawer-route="notifications">查看全部</a></div>
-      <div id="drawer-notification-list"><p class="drawer-empty">暂无新通知</p></div>
-    </section>
     <footer class="site-drawer__footer">
     </footer>
   </aside>
@@ -566,8 +561,8 @@
     </div>
   </dialog>
 
-  <dialog class="confirm-dialog" id="archive-dialog" aria-labelledby="archive-dialog-title"><form method="dialog"><h2 id="archive-dialog-title">归档这段对话？</h2><p>归档后将从聊天侧栏移除，可在个人中心的“归档对话”中查看和恢复。</p><div class="login-dialog__actions"><button type="submit" value="cancel" class="quiet-button">取消</button><button type="submit" value="confirm" class="primary-button" id="archive-confirm">确认归档</button></div></form></dialog>
-  <dialog class="confirm-dialog" id="backup-restart-dialog" aria-labelledby="backup-restart-title" aria-describedby="backup-restart-description"><form method="dialog"><h2 id="backup-restart-title">备份已恢复</h2><p id="backup-restart-description">重启诗矩后，恢复的数据才能完整生效。是否立即重启？</p><div class="login-dialog__actions"><button type="submit" value="later" class="quiet-button">稍后重启</button><button type="submit" value="restart" class="primary-button">立即重启</button></div></form></dialog>
+  <dialog class="confirm-dialog" id="archive-dialog" aria-labelledby="archive-dialog-title"><form method="dialog"><h2 id="archive-dialog-title">归档这段对话？</h2><p>归档后将从聊天侧栏移除，可在个人中心的“归档对话”中查看和恢复。</p><div class="dialog-actions"><button type="submit" value="cancel" class="quiet-button">取消</button><button type="submit" value="confirm" class="primary-button" id="archive-confirm">确认归档</button></div></form></dialog>
+  <dialog class="confirm-dialog" id="backup-restart-dialog" aria-labelledby="backup-restart-title" aria-describedby="backup-restart-description"><form method="dialog"><h2 id="backup-restart-title">备份已恢复</h2><p id="backup-restart-description">重启诗矩后，恢复的数据才能完整生效。是否立即重启？</p><div class="dialog-actions"><button type="submit" value="later" class="quiet-button">稍后重启</button><button type="submit" value="restart" class="primary-button">立即重启</button></div></form></dialog>
 
   <dialog class="avatar-crop-dialog" id="avatar-crop-dialog" aria-labelledby="avatar-crop-title">
     <form class="avatar-crop-shell" id="avatar-crop-form">
@@ -583,5 +578,7 @@
   <script type="module" src="./site.js?v=154"></script>
   <script type="module" src="./app.js?v=36"></script>
   <script type="module" src="./sentence-search.js?v=18"></script>
+  <link rel="stylesheet" href="./meter-book.css?v=20">
+  <script type="module" src="./meter-book.js?v=17"></script>
 </body>
 </html>

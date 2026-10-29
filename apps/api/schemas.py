@@ -133,20 +133,6 @@ class CollectionItemModel(BaseModel):
     model_config = ConfigDict(extra='forbid')
     poem_id: str = Field(min_length=1, max_length=128)
 
-class ThreadCollectionItemModel(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    thread_id: str = Field(min_length=1, max_length=128)
-
-class LegacyThreadCollectionModel(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    name: str = Field(min_length=1, max_length=120)
-    items: list[str] = Field(default_factory=list)
-
-class ThreadCollectionsImportModel(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    collections: list[LegacyThreadCollectionModel] = Field(default_factory=list)
-    favorite_threads: list[str] = Field(default_factory=list)
-
 class GenerateJobModel(BaseModel):
     model_config = ConfigDict(extra='forbid')
     meter_type: str

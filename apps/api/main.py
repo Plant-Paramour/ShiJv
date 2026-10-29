@@ -24,7 +24,6 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
     from .routes.profile import router as profile_router
     from .routes.profile import legacy_avatar_file
     from .routes.public import router as public_router
-    from .meter_cache import meter_version, rhyme_version
     from .routes.worker import router as worker_router
     from .routes.local_profile import router as local_profile_router
     from .routes.model_config import router as model_config_router
@@ -114,9 +113,6 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
         return JSONResponse(status_code=exc.status_code,
             content={'detail': exc.detail, 'diagnostics': metadata},
             headers={**(exc.headers or {}), 'X-ShiJu-Diagnostic-Id': metadata['diagnostic_id']})
-    app.state.meter_version = meter_version(meter_dir)
-    app.state.rhyme_directory = project_root / 'Rhyme'
-    app.state.rhyme_version = rhyme_version(app.state.rhyme_directory)
     logger = logging.getLogger('shiju.http')
 
     @app.middleware('http')
@@ -155,8 +151,7 @@ def create_app(settings: ApiSettings | None=None, *, agent_service=None):
         if request.url.path.startswith(('/v1/poetry/jobs/', '/v1/conversations/')):
             response.headers['Cache-Control'] = 'private, no-store'
         elif request.url.path.startswith(('/Rhyme/', '/Songci_Meter/')):
-            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-            response.headers.setdefault('ETag', '"' + str(response.headers.get('content-length', 'dataset')) + '"')
+            response.headers['Cache-Control'] = 'no-store'
         logger.info('request request_id=%s method=%s path=%s source=%s status=%s content_type=%s duration_ms=%.2f db_duration_ms=%.2f db_query_count=%s pool_wait_ms=%.2f', request_id, request.method, request.url.path, source, response.status_code, response.headers.get('content-type', ''), duration_ms, stats.db_duration_ms if stats else 0, stats.db_query_count if stats else 0, stats.pool_wait_ms if stats else 0)
         return response
     app.state.agent_service = agent_service
