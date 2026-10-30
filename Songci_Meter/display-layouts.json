@@ -73801,36 +73801,6 @@
         }
       }
     },
-    "归字谣": {
-      "4": {
-        "name": "张孝祥",
-        "stanzas": {
-          "stanza1": [
-            {
-              "source_row": 0,
-              "sentences": [
-                {
-                  "line": 1,
-                  "punctuation": "。"
-                },
-                {
-                  "line": 2,
-                  "punctuation": "。"
-                },
-                {
-                  "line": 3,
-                  "punctuation": "，"
-                },
-                {
-                  "line": 4,
-                  "punctuation": "。"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
     "归朝欢": {
       "1952": {
         "name": "柳永",

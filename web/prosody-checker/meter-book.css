@@ -63,7 +63,7 @@
 /* 覆盖组件中的 font 简写，使词谱书各层内容统一使用本地字体。 */
 .meter-book-launch{font-family:"汇文仿宋","FangSong",serif}
 .meter-book-launch>span{transform:translateX(-4px);pointer-events:none}
-.meter-book,.meter-book *{font-family:"汇文仿宋","FangSong",serif}
+.meter-book,.meter-book *,.meter-book-preview,.meter-book-preview *{font-family:"汇文仿宋","FangSong",serif}
 .meter-book header h2,.meter-book-main h3{font-family:"又又意宋","SimSun",serif;font-weight:700}
 .meter-book .meter-book-summary{font-family:"FangSong","仿宋","STFangsong",serif;font-weight:400}
 .meter-book-description{border-top:1px solid #ddd4c1;margin-top:18px;padding-top:12px;line-height:1.9}
@@ -82,3 +82,97 @@
 .meter-book-search-snippet{display:block;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#625c50}
 .meter-book-search-snippet mark{background:#f4dfab;color:#302e28}
 @media(max-width:600px){.meter-book-list .meter-book-search-row{gap:18px}.meter-book-list .meter-book-search-row>.meter-book-search-identity{flex-basis:120px;width:120px;font-size:14px}.meter-book-search-snippet{font-size:13px}}
+
+/* 抽屉只调整容器与命中提示；词谱内容沿用公共组件。 */
+.meter-book-preview{background:#faf7ef;color:#302e28}
+.meter-book-preview .meter-book-summary{font-family:"FangSong","仿宋","STFangsong",serif;font-weight:400}
+.meter-book-preview .meter-book-sentence.is-search-hit{background:#eee2b8;outline:1px solid #b9a984;border-radius:3px}
+.meter-drawer__actions{display:flex;justify-content:flex-end;margin-bottom:16px}
+
+/* 评分笺沿用词谱抽屉的纸色与字体，保留原有评分和错误标记。 */
+#prosody-inspector{background:#faf7ef;color:#302e28;border-left:1px solid #d5c9b1;box-shadow:-12px 0 28px #302b201a}
+#prosody-inspector,#prosody-inspector *{font-family:"汇文仿宋","FangSong",serif}
+#prosody-inspector .prosody-inspector__header{min-height:0;padding:16px 18px 12px;border-bottom:1px solid #ddd4c1;gap:12px}
+#prosody-inspector .prosody-inspector__header>div{min-width:0}
+#prosody-inspector .prosody-inspector__header .eyebrow{color:#ad352b;font-size:12px;letter-spacing:.15em;margin-bottom:4px}
+#prosody-inspector-title{font-family:"又又意宋","SimSun",serif;font-size:25px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
+#prosody-inspector .prosody-inspector__close{flex:0 0 32px;width:32px;height:32px;border:1px solid #d5c9b1;border-radius:3px;color:#8f3028}
+#prosody-inspector .prosody-inspector__close:hover{background:#ad352b0d;border-color:#ad352b}
+#prosody-inspector .prosody-inspector__body{padding:16px 18px 28px;overscroll-behavior:contain;scrollbar-gutter:stable}
+#prosody-inspector .prosody-inspector__meta{gap:5px;padding-bottom:14px;border-color:#ddd4c1}
+#prosody-inspector .prosody-inspector__meta strong{font-family:"又又意宋","SimSun",serif;font-size:21px;font-weight:700}
+#prosody-inspector .prosody-inspector__meta span{font-size:14px;color:#8f3028}
+#prosody-inspector .prosody-inspector__scores{margin:16px 0 8px;padding:10px 0;border-block:1px solid #ddd4c1;background:#eee5d54d}
+#prosody-inspector .prosody-inspector__scores div{padding:2px 5px;border-color:#ddd4c1}
+#prosody-inspector .prosody-inspector__scores dt{font-size:13px;color:#716754}
+#prosody-inspector .prosody-inspector__scores dd{margin:0;font-size:23px;line-height:1.4;color:#302e28}
+#prosody-inspector .prosody-inspector__scores div:first-child dd{color:#ad352b}
+#prosody-inspector .prosody-inspector__body section{padding:16px 0;border-color:#ddd4c1}
+#prosody-inspector .prosody-inspector__body h3{font-family:"又又意宋","SimSun",serif;font-size:18px;font-weight:700;margin-bottom:10px;color:#574b39}
+#prosody-inspector .prosody-inspector__body ul{font-size:15px;line-height:1.85;gap:7px;color:#625c50;padding-left:20px;overflow-wrap:anywhere}
+#prosody-inspector .prosody-inspector__empty{font-size:15px;line-height:1.8;color:#50654e}
+#prosody-inspector .prosody-inspector__lines{gap:12px}
+#prosody-inspector .prosody-inspector__lines>div{grid-template-columns:minmax(0,1fr);gap:3px;padding-bottom:12px;border-color:#d5c9b1}
+#prosody-inspector .prosody-inspector__lines p{margin:0;font-size:18px;line-height:1.8;overflow-wrap:anywhere}
+#prosody-inspector .prosody-inspector__lines .prosody-inspector__tones{font-size:15px;line-height:1.7;color:#8f3028;word-spacing:.12em}
+@media(max-width:600px){
+  #prosody-inspector .prosody-inspector__header{padding:12px 12px 10px}
+  #prosody-inspector .prosody-inspector__body{padding:12px 12px 24px}
+}
+
+/* 抽屉固定标题，正文独立滚动，避免继承目录面板的 100% 高度和网格拉伸。 */
+#meter-drawer{display:flex!important;flex-direction:column;box-sizing:border-box;width:min(408px,100vw);max-width:100vw;padding:0;overflow:hidden;background:#faf7ef}
+#meter-drawer>.site-drawer__header{flex:0 0 auto;min-height:0;margin:0;padding:16px 18px 12px}
+#meter-drawer-content{display:block;flex:1 1 0;min-height:0;min-width:0;width:100%;height:auto;box-sizing:border-box;padding:12px 18px 24px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+#meter-drawer-content>.meter-book-content{width:100%;min-width:0}
+#meter-drawer-content .meter-drawer__actions{margin:0 0 10px}
+#meter-drawer-content .meter-book-intro{overflow-wrap:anywhere}
+#meter-drawer>.site-drawer__header{align-items:center;gap:10px}
+#meter-drawer>.site-drawer__header>div:first-child{flex:1;min-width:0}
+#meter-drawer-title{font-family:"又又意宋","SimSun",serif;font-weight:700}
+#meter-drawer .site-drawer__header .eyebrow{font-family:"汇文仿宋","FangSong",serif}
+#meter-drawer .meter-drawer__actions{flex:0 0 auto;margin:0}
+#meter-drawer .meter-drawer__actions .secondary-button{border:1px solid #b63730;background:#b63730;color:#fff8ef;padding:7px 10px;white-space:nowrap;font-family:"汇文仿宋","FangSong",serif}
+#meter-drawer .meter-drawer__actions .secondary-button:hover{background:#9f3028;border-color:#9f3028}
+#meter-drawer .site-drawer__header .drawer-close{flex:0 0 auto}
+@media(max-width:600px){
+  #meter-drawer>.site-drawer__header{padding:12px 12px 10px}
+  #meter-drawer-content{padding:10px 12px 20px}
+}
+
+/* 每个原文字与平仄共用一个字格，换行也保持成对。 */
+#prosody-inspector .prosody-inspector__lines>div{display:flex;align-items:flex-start;gap:8px}
+#prosody-inspector .prosody-inspector__line-number{flex:0 0 1.8em;font-size:14px;line-height:2.3;color:#857966}
+#prosody-inspector .prosody-inspector__line-text{display:flex;flex-wrap:wrap;flex:1;min-width:0;gap:8px 0;font:18px/1.7 "汇文仿宋","FangSong",serif}
+#prosody-inspector .prosody-inspector__cell{display:inline-flex;flex-direction:column;align-items:center;flex:0 0 1.65em;text-align:center}
+#prosody-inspector .prosody-inspector__cell>span{font:inherit;line-height:inherit;letter-spacing:0;white-space:nowrap}
+#prosody-inspector .prosody-inspector__cell-tone{color:#8f3028}
+
+/* 逐字标注直接使用词谱的阕、句组、字格，不再使用编号列表。 */
+#prosody-inspector .prosody-inspector__annotations .meter-book-stanza{padding:0;margin:10px 0 18px}
+#prosody-inspector .prosody-inspector__annotations .meter-book-char,
+#prosody-inspector .prosody-inspector__annotations .meter-book-tone{font-family:"汇文仿宋","FangSong",serif;font-size:20px;line-height:1.55;letter-spacing:0}
+#prosody-inspector .prosody-inspector__annotations .meter-book-char{width:1em;flex:0 0 1em}
+#prosody-inspector .prosody-inspector__annotations .meter-book-stanza h4{font-size:14px;color:#77705f;font-weight:400}
+
+/* 宋词编辑沿用词谱的阕、显示行与紧贴的正文／平仄双行。 */
+#poem-editor-sentences.poem-editor-songci{padding:20px 16px;background:#faf7ef;border:1px solid #ddd4c1;border-radius:3px;color:#336699}
+#poem-editor-sentences.poem-editor-songci .poem-stanza{display:block;padding:0;border:0;margin:0 0 22px}
+#poem-editor-sentences.poem-editor-songci .meter-book-stanza h4{font:16px/1.6 "又又意宋","SimSun",serif;color:#77705f;font-weight:400}
+#poem-editor-sentences.poem-editor-songci .meter-book-line{gap:8px 0;align-items:flex-start;margin:0 0 10px}
+#poem-editor-sentences.poem-editor-songci .poem-sentence{display:block;flex:0 1 auto;min-width:0;padding:2px 0;margin:0;border-radius:2px}
+#poem-editor-sentences.poem-editor-songci .poem-sentence-text,
+#poem-editor-sentences.poem-editor-songci .poem-sentence-pattern,
+#poem-editor-sentences.poem-editor-songci .poem-sentence-cell{font:20px/1.55 "汇文仿宋","FangSong",serif;letter-spacing:0}
+#poem-editor-sentences.poem-editor-songci .poem-sentence-pattern{color:#302e28}
+#poem-editor-sentences.poem-editor-songci .poem-sentence-cell{flex:0 0 1em;width:1em}
+#poem-editor-sentences.poem-editor-songci .poem-sentence.is-selected{background:#eee2b866;border-color:#b9a984}
+#poem-editor-sentences.poem-editor-songci .poem-sentence-input{font:20px/1.7 "汇文仿宋","FangSong",serif;max-width:100%;box-sizing:border-box}
+@media(max-width:600px){#poem-editor-sentences.poem-editor-songci{padding:16px 10px}}
+
+/* 词谱与格律检查共用阅读参数，避免两套字位尺寸逐渐分离。 */
+.meter-book-rhyme-number{color:var(--rhyme-group-color,#25231f);z-index:5;pointer-events:none}
+:root{--meter-reading-font:"汇文仿宋","FangSong",serif;--meter-heading-font:"又又意宋","SimSun",serif;--meter-reading-size:20px;--meter-reading-leading:1.55;--meter-reading-cell:1em;--meter-poem-ink:#336699;--meter-tone-ink:#302e28}
+.meter-book-char{width:var(--meter-reading-cell);flex-basis:var(--meter-reading-cell);font-size:var(--meter-reading-size);line-height:var(--meter-reading-leading);color:var(--meter-poem-ink)}
+.meter-book-tone{font-size:var(--meter-reading-size);line-height:var(--meter-reading-leading);color:var(--meter-tone-ink)}
+@media(max-width:600px){:root{--meter-reading-size:18px}}

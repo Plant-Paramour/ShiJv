@@ -34,6 +34,8 @@ def submit_proposal(proposal_id: str, body: AgentProposalSubmitModel, request: R
     payload.update({'requirement': body.requirement, 'candidate_count': body.candidate_count, 'meter_type': body.meter_type, 'form_name': body.form_name, 'variant_name': body.variant_name, 'rhyme_dict_name': body.rhyme_dict_name, 'strict_polyphonic': body.strict_polyphonic, 'num_lines': body.num_lines, 'task_options': body.task_options, 'fixed_lines': body.fixed_lines})
     if body.theme is not None:
         payload['theme'] = body.theme
+    if body.task_type is not None:
+        payload['task_type'] = body.task_type
     if body.rhyme_mode is not None:
         payload['rhyme_mode'] = body.rhyme_mode
     if body.rhyme_parts is not None:

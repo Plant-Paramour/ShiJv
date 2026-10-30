@@ -96,7 +96,7 @@
         $script:selectedPoetryModel = $state.testedPath
         if ($state.untested) {
             $poetryButton.Text = '未验证模型：' + (Split-Path $state.testedPath -Leaf)
-            $statusBox.Text = '已选择未验证模型。点击直接启动时会先提示，再次点击可确认忽略验收。'
+            $statusBox.Text = '已选择未验证模型。点击“直接启动”后，可选择跳过检查启动，或检查环境通过后自动启动。'
             $dialog.Dispose(); return
         }
         $selectedPair = Invoke-LauncherMemory 'select' $appBox.Text $state.python $localCheck.Checked $state.testedPath

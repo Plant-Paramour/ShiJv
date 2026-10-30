@@ -221,7 +221,7 @@ def assess_selection(resources, model_id, profile, *, known=True, weight_bytes=N
             if not matches and rec:
                 levels = {'0.8B': .8, '2B': 2, '4B': 4}
                 if levels[model_size(rec['model_id'])] > levels[size]:
-                    lines.append('当前方案对本机相对宽松。若您优先考虑速度或较低占用，可以保留；若无这些要求，建议考虑上方推荐的更大的模型。')
+                    lines.append('当前方案可以使用，资源占用较低。你的电脑也可以选择更大的模型；可以保留当前选择并开始安装，也可以调整模型。')
                 else:
                     lines.append('当前选择与默认推荐不同，可以按精度、速度和资源占用偏好保留。')
             pressure = []
@@ -256,14 +256,14 @@ def assess_selection(resources, model_id, profile, *, known=True, weight_bytes=N
         if rec and model_size(rec['model_id']) and size:
             levels = {'0.8B': .8, '2B': 2, '4B': 4}
             if levels[model_size(rec['model_id'])] > levels[size]:
-                notice = '当前方案对本机相对宽松。若您优先考虑速度或较低占用，可以保留；若无这些要求，建议考虑推荐的更大的模型。'
+                notice = '当前方案可以使用，资源占用较低。你的电脑也可以选择更大的模型。你可以保留当前选择并开始安装，也可以调整模型。'
     if state == 'risk' and gpu and not resources.get('gpu_uuid'):
         notice = '未检测到当前方案所需的受支持显卡，建议改用 CPU 运行。'
     if not known:
         notice = '自带模型的兼容性尚未确认，安装后将通过实际加载和生成检查。'
     return dict(state=state, title=title, notice=notice, model_id=model_id, profile=chosen, requested_profile=profile,
                 text=title + '\n' + '\n'.join(lines), budget=budget,
-                requires_confirmation=state != 'recommended')
+                requires_confirmation=state in ('tight', 'risk', 'unknown'))
 
 
 def snapshot(host, resources=None):

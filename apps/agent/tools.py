@@ -55,6 +55,10 @@ class PendingProposal:
 
 
 class AgentToolbox:
+    def get_recent_rewrite_context(self):
+        getter = getattr(self._jobs, 'get_recent_rewrite_context', None)
+        return getter() if callable(getter) else None
+
     def __init__(self, project_root: str | Path, jobs: PoetryJobs, *, allow_text_submission: bool = True):
         self._root = Path(project_root)
         self._jobs = jobs
@@ -231,7 +235,7 @@ class AgentToolbox:
             ),
             ToolSpec(
                 "prepare_generation",
-                "准备并保存整首格律诗词生成方案。调用前先按实际押韵句规划韵书、韵组、平仄和适合的韵脚语义；用户未指定时优先新韵，仿宋词选词林正韵，仿唐诗或排律选平水韵，并用查询工具核实韵部/字。排律必须用 meter_type='排律'、form_name='五言排律'或'七言排律'，并单独传 num_lines；不要把句数写进 form_name。返回的 editable_prompt 和完整配置会由界面展示并直接提交；本轮不要调用 submit_generation。",
+                "准备并保存整首格律诗词生成方案。requirement 只整理用户的创作方向与明确限制，不自行增加逐句安排、意象清单或韵脚语义要求。韵书、韵部通过结构化参数传递；用户未指定时优先新韵，明确仿古时按体裁选择传统韵书，指定韵部时用工具核实。排律必须用 meter_type='排律'、form_name='五言排律'或'七言排律'，并单独传 num_lines；不要把句数写进 form_name。返回的 editable_prompt 和完整配置会由界面展示并直接提交；本轮不要调用 submit_generation。",
                 _generation_schema(),
                 self._prepare_generation,
             ),
@@ -998,7 +1002,7 @@ def _generation_schema() -> dict[str, Any]:
             "rhyme_parts": {"type": "object", "additionalProperties": {"type": "string"}, "description": "按韵组编号指定韵部，如 {\"1\":\"一东\"}；值为 random 可对该组随机选韵"},
             "requirement": {
                 "type": "string",
-                "description": "细化后的创作提示，包含意象、情绪、章法和特殊要求；不同要点使用真实换行符分段，保留用户指定的换行",
+                "description": "简短的方向性创作提示，忠实保留用户的主题、情绪、整体走向和明确限制；不自行补充逐句任务、意象清单、转折落点或韵脚语义，表达方式留给生成器自由发挥。用户指定的细节与换行须保留，不同要点可用真实换行分段",
             },
             "num_lines": {"type": "integer", "minimum": 10, "description": "排律必填，十句以上的偶数；十二句填数字 12。其他诗体不填"},
             "strict_polyphonic": {"type": "boolean"},

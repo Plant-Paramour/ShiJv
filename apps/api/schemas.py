@@ -60,6 +60,7 @@ class AgentProposalSubmitModel(BaseModel):
     sentence_inputs: dict[str, str] | None = None
     target_line_numbers: list[int] | None = Field(default=None, min_length=1, max_length=64)
     theme: str | None = None
+    task_type: str | None = None
     strict_polyphonic: bool = False
     num_lines: int | None = Field(default=None, ge=4, le=128)
     task_options: dict[str, Any] = Field(default_factory=dict)

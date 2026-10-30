@@ -70,6 +70,17 @@ class RepositoryPoetryJobs(PoetryJobs):
             raise ValueError('当前对话没有已提交的诗词任务')
         return self._repository.snapshot(row['id'])
 
+    def get_recent_rewrite_context(self) -> dict | None:
+        """只恢复当前用户、当前对话最近一次改写的必要参数。"""
+        if not self._user_id or not self._conversation_id:
+            return None
+        with self._repository.database.connect() as db:
+            row = db.execute("SELECT id,request_stored,request_json FROM jobs WHERE user_id=? AND conversation_id=? AND kind='rewrite' ORDER BY created_at DESC,id DESC LIMIT 1", (self._user_id, self._conversation_id)).fetchone()
+        if row is None:
+            return None
+        request = json.loads(row['request_stored'] or row['request_json'] or '{}')
+        return {'job_id': row['id'], **{key: request.get(key) for key in ('source_poem_id', 'target_line_numbers', 'candidate_count', 'requirement')}}
+
     def list_conversation_jobs(self) -> list[dict[str, Any]]:
         """列出当前对话的全部诗词任务，完整遍历仓储分页。"""
         if not self._user_id or not self._conversation_id:

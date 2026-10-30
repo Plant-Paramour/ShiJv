@@ -95,8 +95,8 @@
   <title>诗矩 · 中文诗词创作空间</title>
   <link rel="stylesheet" href="./han/han-scoped.css">
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="./styles.css?v=105">
-  <link rel="stylesheet" href="./prosody-workbook.css?v=20">
+  <link rel="stylesheet" href="./styles.css?v=115">
+  <link rel="stylesheet" href="./prosody-workbook.css?v=33">
 </head>
 <body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
   <a class="han-skip-link" href="#main-content">跳到主要内容</a>
@@ -161,7 +161,7 @@
   </aside>
   <aside class="site-drawer site-drawer--right meter-drawer" id="meter-drawer" aria-label="词牌格律详情" aria-hidden="true">
     <header class="site-drawer__header"><div><p class="eyebrow">词牌格律</p><h2 id="meter-drawer-title">格律详情</h2></div><button class="drawer-close" type="button" data-meter-drawer-close aria-label="关闭格律详情">×</button></header>
-    <div class="meter-drawer__body" id="meter-drawer-content"></div>
+    <div class="meter-drawer__body meter-book-preview meter-book-main" id="meter-drawer-content"></div>
   </aside>
 
   <main id="main-content" tabindex="-1">
@@ -199,14 +199,13 @@
           <div class="chat-thread-scroll" id="chat-thread-scroll">
             <div class="chat-thread" id="chat-thread" aria-live="polite">
               <section class="chat-welcome" id="chat-welcome" aria-labelledby="chat-welcome-title">
-                <div class="chat-welcome__avatar"><img src="./ai-avatar.svg" alt="诗矩 AI"></div>
-                <p class="eyebrow">诗矩 AI 诗词助手</p>
-                <h2 id="chat-welcome-title">从一句诗意开始</h2>
-                <p class="chat-welcome__lead">告诉我你的意象、情绪或残稿，我会陪你推敲格律、寻找韵脚，慢慢把诗写完整。</p>
-                <div class="prompt-suggestions" aria-label="示例提问">
-                  <button type="button" data-prompt="请用中华新韵查询“春”和“山”的平仄与韵部">查询韵书</button>
-                  <button type="button" data-prompt="请直接生成一首秋江夜泊的七言绝句">生成一首</button>
-                  <button type="button" data-prompt="请告诉我浣溪沙的格律">查询词牌</button>
+                <svg class="letterpress-filter" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none"><defs><filter id="letterpress-ink" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.17 0.61" numOctaves="4" seed="83" result="grain"/><feColorMatrix in="grain" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.7 0 0 0 -0.08" result="inkWear"/><feComposite in="SourceGraphic" in2="inkWear" operator="in"/></filter></defs></svg>
+                <div class="chat-welcome__note">
+                <figure class="chat-welcome__epigraph">
+                  <blockquote id="chat-welcome-title"><span>不必等到精通格律</span> <wbr><span>才开始创作自己的诗词</span></blockquote>
+                  <figcaption>——卡利弗斯</figcaption>
+                  <p class="chat-welcome__abilities">想写什么，直接告诉我；已经写了几句，也可以贴过来。<br>我可以帮你改字句、查平仄，也会说明为什么这样改。</p>
+                </figure>
                 </div>
               </section>
             </div>
@@ -432,10 +431,11 @@
 
 
 
-    <section class="app-view poem-editor-view" data-view="poem" aria-labelledby="poem-editor-title" hidden>
+    <section class="app-view poem-editor-view" data-han-intensity="1" data-view="poem" aria-labelledby="poem-editor-title" hidden>
       <div class="poem-editor-shell">
         <header class="poem-editor-header">
-          <div><button type="button" class="text-button" id="poem-editor-back">返回</button><p class="eyebrow">诗词创作</p><h1 id="poem-editor-title">修改诗作</h1><p id="poem-editor-source"></p></div>
+          <div><button type="button" class="text-button" id="poem-editor-back">返回</button><p class="eyebrow">诗词创作</p>
+            <h1 id="poem-editor-title">修改诗作</h1><p id="poem-editor-source"></p></div>
           <button type="button" class="primary-button" id="poem-editor-save" disabled>保存到我的创作</button>
         </header>
         <p class="form-status" id="poem-editor-status" role="status"></p>
@@ -575,10 +575,11 @@
   </dialog>
 
   <div id="site-status" class="site-status" role="status" aria-live="polite"></div>
-  <script type="module" src="./site.js?v=154"></script>
-  <script type="module" src="./app.js?v=36"></script>
-  <script type="module" src="./sentence-search.js?v=18"></script>
-  <link rel="stylesheet" href="./meter-book.css?v=20">
-  <script type="module" src="./meter-book.js?v=17"></script>
+  <script type="module" src="./site.js?v=159"></script>
+  <script type="module" src="./app.js?v=39"></script>
+  <script type="module" src="./sentence-search.js?v=20"></script>
+  <link rel="stylesheet" href="./meter-book.css?v=27">
+  <link rel="stylesheet" href="./poem-editor.css?v=5">
+  <script type="module" src="./meter-book.js?v=18"></script>
 </body>
 </html>

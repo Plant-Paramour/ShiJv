@@ -1,3 +1,11 @@
+function missingToneMessages(result) {
+  return (result.lines||[]).flatMap((line,li)=>(line.characters||[]).flatMap((c,ci)=>{
+    if(!(c.missingTone||Array.isArray(c.tones)&&c.tones.length===0))return [];
+    const required=c.expected;
+    const condition=required==='平'||required==='仄'?`若为${required}声，则符合此处平仄要求。`:'此处平仄不限。';
+    return [`第 ${li+1} 句第 ${ci+1} 字“${c.char}”：当前韵书未查得平仄，${condition}`];
+  }));
+}
 import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=17";
 import { flattenMeter } from "./core.js?v=22";
 import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
@@ -679,7 +687,7 @@ async function refreshConversationMessages(conversationId) {
       }
     });
     if (hasPending && refreshVersion === conversationLoadVersion && currentConversationId === conversationId) {
-      conversationRefreshDelay = Math.min(conversationRefreshDelay * 2, 10000);
+      conversationRefreshDelay = 1500;
       scheduleConversationRefresh(conversationId);
     } else {
       conversationRefreshDelay = 1500;
@@ -1068,7 +1076,7 @@ async function loadPoemTree(poemId, existingTree = null) {
 async function deleteCurrentPoem() {
   const source = poemPageState.source;
   if (!source || !source.can_delete) return;
-  if (!await confirmAction("确定删除这首作品吗？", { title: "删除作品", confirmLabel: "删除" })) return;
+  if (!await confirmAction("确定永久删除这首作品吗？删除后无法恢复，其他版本会保留。", { title: "删除作品", confirmLabel: "永久删除" })) return;
   try {
     await apiFetch(`/v1/profile/poems/${encodeURIComponent(source.id)}`, { method: "DELETE" });
     announce("作品已删除");
@@ -1147,9 +1155,12 @@ document.addEventListener("keydown", (event) => {
 function poemSentenceParts() {
   return [...document.querySelector("#poem-editor-content").value.matchAll(/[^，,。.？！；;!?\r\n]+[，,。.？！；;!?]?/gu)].filter((part) => part[0].trim());
 }
+let poemSentenceDisplayEnds = new Set();
 function renderPoemSentences() {
   const list = document.querySelector("#poem-editor-sentences");
   list.replaceChildren();
+  const isSongci=poemPageState.source?.meter_type === "宋词";
+  list.classList.toggle("poem-editor-songci",isSongci);
   const parts = poemSentenceParts();
   if (!parts.length) return;
   const stanzaEnds = poemSentenceStanzaEnds.length ? poemSentenceStanzaEnds : [parts.length - 1];
@@ -1165,7 +1176,13 @@ function renderPoemSentences() {
   stanzas.forEach((stanza, stanzaIndex) => {
     const line = document.createElement("div"); line.className = "poem-stanza"; line.setAttribute("role", "group");
     line.setAttribute("aria-label", `第 ${stanzaIndex + 1} 阕`);
+    if(isSongci){
+      line.classList.add("meter-book-stanza");
+      if(stanzas.length>1){const label=document.createElement("h4");label.textContent=stanzas.length===2?(stanzaIndex===0?"上阕":"下阕"):`第${stanzaIndex+1}阕`;line.append(label);}
+    }
+    let displayRow=null;
     stanza.forEach(({ part, index }) => {
+    if(isSongci&&(!displayRow||poemSentenceDisplayEnds.has(index-1))){displayRow=document.createElement("div");displayRow.className="meter-book-line";line.append(displayRow);}
     const row = document.createElement("div"); row.className = "poem-sentence";
     row.classList.toggle("is-selected", index === poemSentenceSelection);
     const sentenceText = part[0].trim();
@@ -1253,7 +1270,7 @@ function renderPoemSentences() {
         input.focus();
       }); row.append(edit);
     }
-    line.append(row);
+    if(isSongci){row.classList.add("meter-book-sentence");displayRow.append(row);}else line.append(row);
     });
     list.append(line);
   });
@@ -1261,7 +1278,7 @@ function renderPoemSentences() {
 async function loadPoemSentencePatterns() {
   const source = poemPageState.source; if (!source) return;
   const variant = document.querySelector("#poem-editor-variant").value;
-  poemSentencePatterns = []; poemSentenceCommaPositions = []; poemSentenceStanzaEnds = []; renderPoemSentences();
+  poemSentencePatterns = []; poemSentenceCommaPositions = []; poemSentenceStanzaEnds = []; poemSentenceDisplayEnds=new Set(); renderPoemSentences();
   if (source.meter_type !== "宋词") return;
   try {
     const meter = await getDatasetJson("meter", `${source.form_name}.json`);
@@ -1277,6 +1294,13 @@ async function loadPoemSentencePatterns() {
     const terminalPositions = new Set(flattened.rhymeGroups.flatMap((group) => group.positions));
     poemSentenceStanzaEnds.forEach((index) => terminalPositions.add(index));
     poemSentenceCommaPositions = flattened.clauses.map((_, index) => !terminalPositions.has(index));
+    poemSentenceDisplayEnds=new Set(terminalPositions);
+    try{
+      const layouts=await getDatasetJson("meter","display-layouts.json");
+      if(source!==poemPageState.source||variant!==document.querySelector("#poem-editor-variant").value)return;
+      const stanzas=layouts.items?.[meter.name]?.[String(selected.source_id)]?.stanzas;
+      if(stanzas){let offset=0;const ends=new Set();for(const key of Object.keys(selected).filter(k=>/^stanza\d+$/.test(k)).sort((a,b)=>Number(a.slice(6))-Number(b.slice(6)))){for(const row of stanzas[key]||[])ends.add(offset+row.sentences.at(-1).line-1);offset+=selected[key].lines.length;}poemSentenceDisplayEnds=ends;}
+    }catch{}
     renderPoemSentences();
   } catch (_) { /* The poem remains editable when its template is unavailable. */ }
 }
@@ -1633,7 +1657,7 @@ function rhymeViolationMessages(result = {}) {
       required: `${group.dominantPart}韵部`,
     })));
   return [...explicit, ...inferred].map((item) => item.message ||
-    `第 ${Number(item.lineIndex) + 1} 句第 ${Number(item.charIndex) + 1} 字“${item.char}”：未与本组主韵部“${item.required}”相合。`);
+    `第 ${Number(item.lineIndex) + 1} 句第 ${Number(item.charIndex) + 1} 字“${item.char}”：${item.actualParts?.length ? `属于“${item.actualParts.map(part => part + "韵部").join("、")}”，` : "当前韵书未查得所属韵部，"}未与本组主韵部“${item.required}”相合。`);
 }
 
 function scoreDeductionMessages(evaluation = {}) {
@@ -1734,6 +1758,63 @@ function appendInspectorList(parent, headingText, items, emptyText) {
   parent.append(section);
 }
 
+function inspectorScoreText(value) {
+  if(value == null || !Number.isFinite(Number(value)))return "—";
+  const n=Math.floor(Number(value));
+  if(n===100)return "满分";
+  const digits="零壹贰叁肆伍陆柒捌玖";
+  if(n<0||n>100)return String(n);
+  if(n<10)return digits[n];
+  return digits[Math.floor(n/10)]+"拾"+(n%10?digits[n%10]:"");
+}
+
+async function renderInspectorAnnotations(target,evaluation) {
+  const result=evaluation.result;
+  let variant=null,layouts=null;
+  const [name,author]=String(evaluation.form_name||"").split(/\s*·\s*/u);
+  // 先显示逐句谱，再按本地宋词原谱的阕与显示行重排。
+  const draw=()=>{
+    target.replaceChildren();
+    const stanzas=variant?Object.entries(variant).filter(([k])=>/^stanza\d+$/.test(k)):[];
+    const errors=errorPositions(result);let offset=0;
+    const groups=stanzas.length?stanzas:[["stanza1",{lines:result.lines}]];
+    for(const [key,stanza] of groups){
+      const block=document.createElement("div");block.className="meter-book-stanza";
+      if(groups.length>1){const label=document.createElement("h4");label.textContent=groups.length===2?(key==="stanza1"?"上阕":"下阕"):`第${key.slice(6)}阕`;block.append(label);}
+      const layout=layouts?.items?.[name]?.[String(variant?.source_id)]?.stanzas?.[key];
+      const ends=new Set(layout?.map(row=>row.sentences.at(-1).line));
+      const punctuation=new Map(layout?.flatMap(row=>row.sentences.map(x=>[x.line,x.punctuation])));
+      let row=document.createElement("div");row.className="meter-book-line";block.append(row);
+      const count=stanzas.length?stanza.lines.length:result.lines.length;
+      for(let i=0;i<count&&offset<result.lines.length;i++,offset++){
+        const sentence=document.createElement("span");sentence.className="meter-book-sentence";
+        for(const [ci,character] of (result.lines[offset].characters||[]).entries()){
+          const cell=document.createElement("span");cell.className="meter-book-char";
+          const word=document.createElement("span");word.textContent=character.char;
+          if(character.conditionalError==="affected")word.className="is-conditional-affected";
+          else if(errors.has(`${offset}:${ci}`))word.className="is-error";
+          const tone=document.createElement("span");tone.className="meter-book-tone";tone.textContent=character.missingTone||character.tones?.length===0?"缺":character.polyphonic?"多":character.tone||"·";
+          cell.append(word,tone);sentence.append(cell);
+        }
+        const mark=layout?(punctuation.get(i+1)||""):"";
+        if(mark){const cell=document.createElement("span");cell.className="meter-book-char meter-book-punctuation";const a=document.createElement("span"),b=document.createElement("span");a.textContent=b.textContent=mark;b.className="meter-book-tone";cell.append(a,b);sentence.append(cell);}
+        row.append(sentence);
+        if((!layout||ends.has(i+1))&&i<count-1){row=document.createElement("div");row.className="meter-book-line";block.append(row);}
+      }
+      target.append(block);
+    }
+  };
+  draw();
+  try{
+    const catalog=await getDatasetJson("meter","index.json");const item=catalog.find(x=>x.name===name||(x.aliases||[]).includes(name));if(!item)return;
+    const data=await getDatasetJson("meter",item.file);
+    variant=data.variants.find(v=>v.name===author)||data.variants.find(v=>v.source_id===data.default_variant_source_id)||data.variants[0];
+    // 结构不符时保留所有原文，避免重排截断或错配。
+    if(flattenMeter(variant).clauses?.length!==result.lines.length){variant=null;return;}
+    layouts=await getDatasetJson("meter","display-layouts.json");if(target.isConnected)draw();
+  }catch{}
+}
+
 function openProsodyInspector(evaluation, title = "评分详情") {
   if (!evaluation?.result) return;
   const result = evaluation.result;
@@ -1758,38 +1839,23 @@ function openProsodyInspector(evaluation, title = "评分详情") {
   ].forEach(([label, value]) => {
     const group = document.createElement("div");
     const term = document.createElement("dt"); term.textContent = label;
-    const description = document.createElement("dd"); description.textContent = scoreText(value);
+    const description = document.createElement("dd"); description.textContent = inspectorScoreText(value);
     group.append(term, description); scores.append(group);
   });
   prosodyInspectorBody.append(meta, scores);
 
   appendInspectorList(prosodyInspectorBody, "结构提示", result.issues || [], "结构符合所选诗式。");
-  appendInspectorList(prosodyInspectorBody, "平仄与押韵错误", scoreDeductionMessages(evaluation), "未发现平仄或押韵错误。");
+  const deductions=scoreDeductionMessages(evaluation);
+  const missing=[...missingToneMessages(result),...deductions.filter(message=>message.includes('当前韵书未查得'))];
+  if(missing.length)appendInspectorList(prosodyInspectorBody,'韵书缺字说明',missing,'');
+  appendInspectorList(prosodyInspectorBody, "平仄与押韵错误", deductions.filter(message=>!message.includes('当前韵书未查得')), "未发现平仄或押韵错误。");
   appendInspectorList(prosodyInspectorBody, "多音字与拗救", decisionMessages(result), "未发现需要人工复核的判定。");
 
   if (Array.isArray(result.lines) && result.lines.length) {
     const section = document.createElement("section");
     const heading = document.createElement("h3"); heading.textContent = "逐字标注";
-    const lines = document.createElement("div"); lines.className = "prosody-inspector__lines";
-    result.lines.forEach((line, index) => {
-      const row = document.createElement("div");
-      const text = document.createElement("p");
-      text.className = "prosody-inspector__line-text";
-      text.append(document.createTextNode(`${index + 1}. `));
-      const errors = new Set([...errorPositions(result)]
-        .filter((position) => Number(position.split(":")[0]) === index)
-        .map((position) => Number(position.split(":")[1])));
-      (line.characters || []).forEach((character, charIndex) => {
-        const span = document.createElement("span");
-        span.textContent = character.char;
-        if (character.conditionalError === "affected") span.className = "is-conditional-affected";
-        else if (errors.has(charIndex)) span.className = "is-error";
-        text.append(span);
-      });
-      const tones = document.createElement("p"); tones.className = "prosody-inspector__tones";
-      tones.textContent = (line.characters || []).map((item) => item.polyphonic ? "多" : (item.tone || "·")).join(" ");
-      row.append(text, tones); lines.append(row);
-    });
+    const lines = document.createElement("div"); lines.className = "prosody-inspector__annotations";
+    renderInspectorAnnotations(lines,evaluation);
     section.append(heading, lines); prosodyInspectorBody.append(section);
   }
 
@@ -1899,6 +1965,9 @@ function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evalua
   const scoreTop = document.createElement("div"); scoreTop.className = "poem-score__top";
   const inspect = document.createElement("button");
   inspect.type = "button"; inspect.className = "poem-score__inspect";
+  inspect.style.setProperty("--seal-angle", `${(Math.random() * 4 - 2).toFixed(2)}deg`);
+  inspect.style.setProperty("--seal-x", `${(Math.random() * 1.4 - .7).toFixed(2)}px`);
+  inspect.style.setProperty("--seal-y", `${(Math.random() * 1.4 - .7).toFixed(2)}px`);
   inspect.textContent = evaluation ? "格律评分" : (evaluationPending ? "评分中" : "暂无评分");
   const canEvaluate = !evaluation && Boolean(value.job_id && value.candidate_ordinal != null && value.content);
   inspect.disabled = !evaluation && !canEvaluate;
@@ -2755,8 +2824,16 @@ function renderToolActivityItem(article) {
 }
 
 function restoreToolActivity(article, records) {
-  if (!Array.isArray(records) || !records.length) return;
+  if (!Array.isArray(records)) return;
   article._toolActivityItems = new Map(records.map((item) => [item.id, item]));
+  if (!records.length) {
+    article.querySelector('.tool-activity')?.remove();
+    article.classList.remove('has-tool-activity');
+    article._toolActivityRows = new Map();
+    const paragraph = article.querySelector('.message-text');
+    if (paragraph) paragraph.hidden = !paragraph.textContent.trim();
+    return;
+  }
   renderToolActivityItem(article);
 }
 

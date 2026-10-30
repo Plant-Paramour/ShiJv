@@ -1,3 +1,4 @@
+import { renderMeterPreview, openMeterBook } from "./meter-book.js?v=18";
 import { buildLexicon, formatMeterTemplate, evaluateBestTangForm, evaluatePailv } from "./core.js?v=22";
 import { getDatasetJson, getMeterBundle } from "./dataset-cache.js?v=4";
 
@@ -114,26 +115,6 @@ function renderSelectableTemplate(value) {
   box.hidden = false;
 }
 
-function repetitionMarks(variant, stanzaNumber, stanzaLines) {
-  const chars = new Map(); const lines = new Map();
-  for (const group of variant.repetition_groups || []) for (const position of group.positions || []) {
-    if (Number(position.stanza) !== stanzaNumber) continue;
-    const startLine = Number(position.start?.[0]); const endLine = Number(position.end?.[0]);
-    const startChar = Number(position.start?.[1]); const endChar = Number(position.end?.[1]);
-    for (let line = startLine; line <= endLine; line += 1) {
-      lines.set(line, group.type || "叠字");
-      const from = line === startLine ? startChar : 1; const to = line === endLine ? endChar : ([...(stanzaLines[line - 1] || "").replace(/[、/]/g, "")].length);
-      for (let char = from; char <= to; char += 1) chars.set(line + ":" + char, group.type || "叠字");
-    }
-  }
-  return { chars, lines };
-}
-
-const rhymePalette = ["#9f3028", "#2b6e8a", "#6d4b8a", "#a45b2a", "#26745c", "#8a4d68", "#7a6425", "#35658f", "#8b3f5f", "#4c6f3b"];
-function rhymeColor(group) {
-  return rhymePalette[(Number(group) - 1) % rhymePalette.length];
-}
-
 function closeMeterDrawer() {
   const drawer = $("#meter-drawer"); drawer.classList.remove("is-open"); drawer.setAttribute("aria-hidden", "true");
   $("#drawer-backdrop")?.classList.remove("is-visible"); if ($("#drawer-backdrop")) $("#drawer-backdrop").hidden = true;
@@ -142,33 +123,19 @@ function closeMeterDrawer() {
 
 function openMeterDrawer(item) {
   const drawer = $("#meter-drawer"); const content = $("#meter-drawer-content"); $("#meter-drawer-title").textContent = item.name; content.replaceChildren();
-  const variant = item.meterData.variants.find((entry) => entry.name === item.variant) || item.meterData.variants[0];
-  const description = document.createElement("p"); description.className = "meter-drawer__description"; description.textContent = "变体：" + variant.name + "。" + (variant.variants_description || ""); content.append(description);
-  const rhymeGroups = [...new Set(Object.values(variant).filter((value) => value && typeof value === "object").flatMap((stanza) => Object.keys(stanza).filter((key) => /^rhyme_\d+_positions$/.test(key)).map((key) => Number(key.match(/\d+/)[0]))))].sort((a, b) => a - b);
-  const legend = document.createElement("p"); legend.className = "meter-drawer__legend";
-  rhymeGroups.forEach((group) => { const item = document.createElement("span"); const swatch = document.createElement("i"); swatch.className = "swatch"; swatch.style.color = rhymeColor(group); item.append(swatch, "第" + group + "组韵"); legend.append(item); });
-  const repeatLegend = document.createElement("span"); repeatLegend.innerHTML = "<u>重复范围</u>"; legend.append(repeatLegend);
-  const hitLegend = document.createElement("span"); hitLegend.innerHTML = "<mark>检索命中</mark>"; legend.append(hitLegend); content.append(legend);
-  for (const [stanzaIndex, stanza] of Object.entries(variant).filter(([key]) => /^stanza\d+$/.test(key))) {
-    const stanzaNumber = Number(stanzaIndex.replace("stanza", "")); const section = document.createElement("section"); section.className = "meter-drawer__stanza";
-    const label = document.createElement("div"); label.className = "meter-drawer__stanza-label"; label.textContent = stanzaNumber === 1 ? "上阙" : "第" + stanzaNumber + "阙"; section.append(label);
-    const rhymeByLine = new Map(Object.entries(stanza).filter(([key]) => /^rhyme_\d+_positions$/.test(key)).flatMap(([key, positions]) => positions.map((line) => [line, Number(key.match(/\d+/)[0])])));
-    const marks = repetitionMarks(variant, stanzaNumber, stanza.lines || []);
-    (stanza.lines || []).forEach((pattern, lineIndex) => {
-      const lineNumber = lineIndex + 1; const row = document.createElement("div"); row.className = "meter-drawer__line";
-      if (stanzaIndex === item.stanzaKey && lineIndex >= item.lineIndex && lineIndex < item.lineIndex + item.partCount) row.classList.add("is-hit");
-      if (marks.lines.has(lineNumber)) row.classList.add("is-repeat");
-      [...pattern.replace(/[、/]/g, "")].forEach((symbol, charIndex, chars) => {
-        const span = document.createElement("span"); span.className = "meter-drawer__char"; span.textContent = symbol;
-        if (charIndex === chars.length - 1 && rhymeByLine.has(lineNumber)) { const group = rhymeByLine.get(lineNumber); span.classList.add("rhyme-" + group); span.style.color = rhymeColor(group); span.style.backgroundColor = rhymeColor(group) + "1f"; }
-        if (marks.chars.has(lineNumber + ":" + (charIndex + 1))) span.classList.add("is-repeat");
-        row.append(span);
-      });
-      if (rhymeByLine.has(lineNumber)) { const group = rhymeByLine.get(lineNumber); const badge = document.createElement("small"); badge.className = "meter-drawer__badge rhyme-" + group; badge.style.color = rhymeColor(group); badge.textContent = "韵" + group; row.append(badge); }
-      if (marks.lines.has(lineNumber)) { const badge = document.createElement("small"); badge.className = "meter-drawer__badge is-repeat"; badge.textContent = marks.lines.get(lineNumber); row.append(badge); }
-      section.append(row);
-    }); content.append(section);
-  }
+  const variant = item.meterData.variants.find((entry) => String(entry.source_id) === String(item.variantSourceId) || (!item.variantSourceId && entry.name === item.variant)) || item.meterData.variants[0];
+  const header=drawer.querySelector(".site-drawer__header");
+  header.querySelector(".meter-drawer__actions")?.remove();
+  const actions=document.createElement("div"); actions.className="meter-drawer__actions";
+  const button=document.createElement("button"); button.type="button"; button.className="secondary-button"; button.textContent="查看词谱";
+  const preview=document.createElement("div"); preview.className="meter-book-content";
+  button.addEventListener("click",()=>{
+    const selected=preview.dataset.variantSourceId || variant.source_id;
+    closeMeterDrawer(); openMeterBook(item.name,selected);
+  });
+  actions.append(button);header.insertBefore(actions,header.querySelector("[data-meter-drawer-close]"));content.append(preview);
+  preview.textContent="正在翻阅词谱……";
+  renderMeterPreview(preview,item.meterData,variant,item).catch(()=>{preview.textContent="词谱加载失败，请重试。";});
   drawer.classList.add("is-open"); drawer.setAttribute("aria-hidden", "false"); document.body.classList.add("has-open-drawer");
   const backdrop = $("#drawer-backdrop"); if (backdrop) { backdrop.hidden = false; requestAnimationFrame(() => backdrop.classList.add("is-visible")); }
 }
@@ -211,11 +178,21 @@ function userBreakPositions(text) {
   for (const char of text) { if (char === "/") positions.push(count); else if (/\p{Script=Han}/u.test(char)) count += 1; }
   return positions;
 }
-function scoreSentence(text, expected, bookLexicon, options = {}) {
-  const inputParts = splitSentences(text); const expectedParts = expected.split(/[、\/]/u).map((part) => part.replace(/\s/g, "")).filter(Boolean);
-  const chars = [...inputParts.join("")]; const target = [...expectedParts.join("")];
+function createSentenceScorer(text, bookLexicon, options) {
+  const inputParts = splitSentences(text);
+  const chars = [...inputParts.join("")];
+  const prepared = { inputParts, chars, inputIsTemplate: isToneTemplate(chars), userBreaks: userBreakPositions(text) };
+  const cache = new Map();
+  return expected => {
+    if (!cache.has(expected)) cache.set(expected, scoreSentence(text, expected, bookLexicon, options, prepared));
+    return cache.get(expected);
+  };
+}
+function scoreSentence(text, expected, bookLexicon, options = {}, prepared = null) {
+  const inputParts = prepared?.inputParts ?? splitSentences(text); const expectedParts = expected.split(/[、\/]/u).map((part) => part.replace(/\s/g, "")).filter(Boolean);
+  const chars = prepared?.chars ?? [...inputParts.join("")]; const target = [...expectedParts.join("")];
   const compared = Math.min(chars.length, target.length); let matched = 0; const mismatches = new Set();
-  const inputIsTemplate = isToneTemplate(chars);
+  const inputIsTemplate = prepared?.inputIsTemplate ?? isToneTemplate(chars);
   for (let i = 0; i < compared; i += 1) {
     const toneMatches = inputIsTemplate
       ? templateToneMatches(chars[i], target[i])
@@ -231,7 +208,7 @@ function scoreSentence(text, expected, bookLexicon, options = {}) {
   const expectedBreaks = []; let offset = 0;
   for (const part of expectedParts) { offset += [...part].length; expectedBreaks.push(offset); }
   expectedBreaks.pop();
-  const userBreaks = userBreakPositions(text);
+  const userBreaks = prepared?.userBreaks ?? userBreakPositions(text);
   const breakErrors = options.respectBreaks === false ? 0 : userBreaks.filter((position) => !expectedBreaks.includes(position)).length;
   const baseScore = (matched / Math.max(target.length, 1)) * 0.85 + lengthScore * 0.15;
   const score = Math.max(0, baseScore - breakErrors * 0.1);
@@ -289,7 +266,7 @@ async function refreshType() {
 
 $("#sentence-check-button").addEventListener("click", async () => { const text = $("#sentence-text").value.trim(); const status = $("#sentence-check-status"); if (!splitSentences(text).length) { status.textContent = "请输入一句或两句中文"; return; } status.textContent = "判断中……"; try { const book = await lexicon($("#sentence-rhyme-book").value); let expected; if (type.value === "songci") { const data = await meter(cipai.value); const selected = data.variants.find((item) => item.name === variant.value) || data.variants[0]; expected = selected[`stanza${Number(stanza.value) + 1}`]?.lines?.[Number(line.value) || 0] || ""; } else expected = patternsFor(type.value, Number(length.value))[0]; renderVerdict(scoreSentence(text, expected, book), expected); status.textContent = ""; } catch (error) { status.textContent = error.message; } });
 
-$("#match-button").addEventListener("click", async () => { const text = $("#match-text").value.trim(); const status = $("#match-status"); const output = $("#match-results"); const inputParts = splitSentences(text); if (!inputParts.length) { status.textContent = "请输入一句或两句中文"; return; } status.textContent = "正在遍历词牌……"; output.hidden = true; try { const book = await lexicon($("#match-rhyme-book").value); const items = await catalog(); const options = { respectBreaks: $("#match-respect-breaks").checked, polyphonic: $("#match-polyphonic").value }; const inferred = $("#inferred-template"); inferred.hidden = false; inferred.querySelector("strong").textContent = inferTemplate(text, book, options.polyphonic); const results = []; for (const item of items) { const data = await meter(item.file); for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\\d+$/.test(name))) { const lines = v[key].lines || []; for (let i = 0; i < lines.length; i += 1) { const expected = lines[i]; const scored = scoreSentence(text, expected, book, options); if (!$("#match-exclude-breaks").checked || !scored.breakCount) results.push({ name: data.name, variant: v.name, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact }); if (inputParts.length === 2 && i + 1 < lines.length) { const combined = `${lines[i]}、${lines[i + 1]}`; const combinedScore = scoreSentence(text, combined, book, options); if (!$("#match-exclude-breaks").checked || !combinedScore.breakCount) results.push({ name: data.name, variant: v.name, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + 2}句`, expected: combined, score: combinedScore.score, breaks: combinedScore.breakCount, shape: combinedScore.shapeExact }); } } } } const sort = $("#match-sort").value; results.sort((a, b) => sort === "score" ? b.score - a.score : sort === "breaks" ? a.breaks - b.breaks || b.score - a.score : Number(b.shape) - Number(a.shape) || a.breaks - b.breaks || b.score - a.score); const exact = results.filter((item) => item.score >= 0.999); const shown = (exact.length ? exact : results).slice(0, 30); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${$("#match-exclude-breaks").checked ? item.expected.replace(/[、/]/g, "") : item.expected}</code>`; output.append(row); }); output.hidden = false; status.textContent = `已检索 ${results.length} 条句式`; } catch (error) { status.textContent = error.message; } });
+$("#match-button").addEventListener("click", async () => { const text = $("#match-text").value.trim(); const status = $("#match-status"); const output = $("#match-results"); const inputParts = splitSentences(text); if (!inputParts.length) { status.textContent = "请输入一句或两句中文"; return; } status.textContent = "正在遍历词牌……"; output.hidden = true; try { const book = await lexicon($("#match-rhyme-book").value); const items = await catalog(); const options = { respectBreaks: $("#match-respect-breaks").checked, polyphonic: $("#match-polyphonic").value }; const inferred = $("#inferred-template"); inferred.hidden = false; inferred.querySelector("strong").textContent = inferTemplate(text, book, options.polyphonic); const results = []; for (const item of items) { const data = await meter(item.file); for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\\d+$/.test(name))) { const lines = v[key].lines || []; for (let i = 0; i < lines.length; i += 1) { const expected = lines[i]; const scored = scoreSentence(text, expected, book, options); if (!$("#match-exclude-breaks").checked || !scored.breakCount) results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact }); if (inputParts.length === 2 && i + 1 < lines.length) { const combined = `${lines[i]}、${lines[i + 1]}`; const combinedScore = scoreSentence(text, combined, book, options); if (!$("#match-exclude-breaks").checked || !combinedScore.breakCount) results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + 2}句`, expected: combined, score: combinedScore.score, breaks: combinedScore.breakCount, shape: combinedScore.shapeExact }); } } } } const sort = $("#match-sort").value; results.sort((a, b) => sort === "score" ? b.score - a.score : sort === "breaks" ? a.breaks - b.breaks || b.score - a.score : Number(b.shape) - Number(a.shape) || a.breaks - b.breaks || b.score - a.score); const exact = results.filter((item) => item.score >= 0.999); const shown = (exact.length ? exact : results).slice(0, 30); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${$("#match-exclude-breaks").checked ? item.expected.replace(/[、/]/g, "") : item.expected}</code>`; output.append(row); }); output.hidden = false; status.textContent = `已检索 ${results.length} 条句式`; } catch (error) { status.textContent = error.message; } });
 
 document.querySelectorAll("[data-sentence-tab]").forEach((button) => button.addEventListener("click", () => { const selected = button.dataset.sentenceTab; document.querySelectorAll("[data-sentence-tab]").forEach((item) => { const active = item === button; item.classList.toggle("is-active", active); item.setAttribute("aria-selected", String(active)); }); document.querySelectorAll("[data-sentence-panel]").forEach((panel) => { panel.hidden = panel.dataset.sentencePanel !== selected; }); }));
 // 词牌匹配的候选模板统一并行加载，避免串行请求导致结果区长时间为空。
@@ -311,6 +288,7 @@ document.addEventListener("click", async (event) => {
     if (selectedTemplateSource !== text) renderSelectableTemplate(generatedTemplate);
     const queryText = selectedTemplate;
     const loaded = await loadMatchingMeters(items); const results = [];
+    const score = createSentenceScorer(queryText, book, options);
     for (const result of loaded) {
       if (result.status !== "fulfilled") continue;
       const { data } = result.value;
@@ -319,11 +297,11 @@ document.addEventListener("click", async (event) => {
         const rhymePositions = Object.keys(v[key]).filter((name) => /^rhyme_\d+_positions$/.test(name)).flatMap((name) => v[key][name] || []);
         const punctuationFor = (lineIndex) => rhymePositions.includes(lineIndex) ? "。" : "，";
         for (let i = 0; i < lines.length; i += 1) {
-          const expected = lines[i]; const scored = scoreSentence(queryText, expected, book, options);
-          if (parts.length === 1) results.push({ name: data.name, variant: v.name, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "句", expected, displayExpected: (i === 0 ? "" : punctuationFor(i)) + expected + punctuationFor(i + 1), score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: false, meterData: data, stanzaKey: key, lineIndex: i, partCount: 1 });
+          const expected = lines[i]; const scored = score(expected);
+          if (parts.length === 1) results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "句", expected, displayExpected: (i === 0 ? "" : punctuationFor(i)) + expected + punctuationFor(i + 1), score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: false, meterData: data, stanzaKey: key, lineIndex: i, partCount: 1 });
           if (parts.length === 2 && i + 1 < lines.length) {
-            const combined = lines[i] + "、" + lines[i + 1]; const combinedScore = scoreSentence(queryText, combined, book, options);
-            results.push({ name: data.name, variant: v.name, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "-" + (i + 2) + "句", expected: combined, displayExpected: (i === 0 ? "" : punctuationFor(i)) + lines[i] + punctuationFor(i + 1) + lines[i + 1] + punctuationFor(i + 2), score: combinedScore.score, breaks: combinedScore.breakCount, shape: combinedScore.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: 2 });
+            const combined = lines[i] + "、" + lines[i + 1]; const combinedScore = score(combined);
+            results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "-" + (i + 2) + "句", expected: combined, displayExpected: (i === 0 ? "" : punctuationFor(i)) + lines[i] + punctuationFor(i + 1) + lines[i + 1] + punctuationFor(i + 2), score: combinedScore.score, breaks: combinedScore.breakCount, shape: combinedScore.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: 2 });
           }
         }
       }
@@ -433,10 +411,11 @@ document.addEventListener("click", async (event) => {
   try {
     const [book, items] = await Promise.all([lexicon($("#match-rhyme-book").value), catalog()]); const options = { respectBreaks: $("#match-respect-breaks").checked, polyphonic: $("#match-polyphonic").value }; const results = [];
     const loaded = await loadMatchingMeters(items);
+    const score = createSentenceScorer(text, book, options);
     if (!query.isCurrent()) { query.fail(); return; }
     $("#inferred-template").hidden = false; $("#inferred-template strong").textContent = inferTemplate(text, book, options.polyphonic);
-    for (const result of loaded) { if (result.status !== "fulfilled") continue; const { data } = result.value; for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\d+$/.test(name))) { const lines = v[key].lines || []; const rhymePositions = Object.keys(v[key]).filter((name) => /^rhyme_\d+_positions$/.test(name)).flatMap((name) => v[key][name] || []); for (let i = 0; i + parts.length <= lines.length; i += 1) { const expected = lines.slice(i, i + parts.length).join("、"); const scored = scoreSentence(text, expected, book, options); results.push({ name: data.name, variant: v.name, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + parts.length}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: i > 0 && rhymePositions.includes(i) }); } } }
+    for (const result of loaded) { if (result.status !== "fulfilled") continue; const { data } = result.value; for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\d+$/.test(name))) { const lines = v[key].lines || []; const rhymePositions = Object.keys(v[key]).filter((name) => /^rhyme_\d+_positions$/.test(name)).flatMap((name) => v[key][name] || []); for (let i = 0; i + parts.length <= lines.length; i += 1) { const expected = lines.slice(i, i + parts.length).join("、"); const scored = score(expected); results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + parts.length}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: parts.length }); } } }
     if (!query.isCurrent()) { query.fail(); return; }
-    const { filtered, shown } = applyMatchFilters(results, filters); const exact = filtered.filter((item) => item.score >= 0.999); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${item.expected}</code>`; output.append(row); }); output.hidden = false; status.textContent = `筛选后 ${filtered.length} 条，当前显示 ${shown.length} 条`; query.complete();
+    const { filtered, shown } = applyMatchFilters(results, filters); const exact = filtered.filter((item) => item.score >= 0.999); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.tabIndex=0; row.setAttribute("role","button"); row.addEventListener("click",()=>openMeterDrawer(item)); row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openMeterDrawer(item);}}); row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${item.expected}</code>`; output.append(row); }); output.hidden = false; status.textContent = `筛选后 ${filtered.length} 条，当前显示 ${shown.length} 条`; query.complete();
   } catch (error) { if (query.isCurrent()) status.textContent = error.message; query.fail(); }
 }, true);

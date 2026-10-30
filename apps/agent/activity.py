@@ -35,14 +35,30 @@ def attach_tool_activity(database, conversation_id, messages):
     import json
     targets = {message['id']: message for message in messages}
     records = {}
+    previews = {}
     with database.connect() as connection:
-        rows = connection.execute("SELECT t.assistant_message_id,t.status,e.id,e.created_at,e.event_type,e.payload_stored,e.payload_json FROM agent_events e JOIN agent_turns t ON t.id=e.turn_id WHERE t.conversation_id=? AND e.event_type IN ('tool.started','tool.completed','tool.failed','assistant.activity') ORDER BY e.seq", (conversation_id,)).fetchall()
+        rows = connection.execute("SELECT t.assistant_message_id,t.status,e.id,e.created_at,e.event_type,e.payload_stored,e.payload_json FROM agent_events e JOIN agent_turns t ON t.id=e.turn_id WHERE t.conversation_id=? AND e.event_type IN ('tool.started','tool.completed','tool.failed','assistant.activity','assistant.preview.delta','assistant.preview.reset','assistant.delta','turn.retrying') ORDER BY e.seq", (conversation_id,)).fetchall()
     for row in rows:
         message_id = row['assistant_message_id']
         if message_id not in targets:
             continue
         payload = json.loads(row.get('payload_stored') or row.get('payload_json') or '{}')
+        preview = previews.setdefault(message_id, {'reply': '', 'text': ''})
+        if row['event_type'] == 'assistant.preview.delta':
+            preview['text'] += str(payload.get('text') or '')
+            continue
+        if row['event_type'] == 'assistant.preview.reset':
+            preview['text'] = ''
+            continue
+        if row['event_type'] == 'assistant.delta':
+            preview['reply'] += preview['text'] + str(payload.get('text') or '')
+            preview['text'] = ''
+            continue
+        if row['event_type'] == 'turn.retrying':
+            preview.update(reply='', text='')
+            continue
         if row['event_type'] == 'assistant.activity':
+            preview['text'] = ''
             item = {'id': row['id'], 'kind': 'narration', 'text': str(payload.get('text') or ''), 'state': 'completed'}
         else:
             item = tool_activity(row['event_type'], payload)
@@ -55,3 +71,7 @@ def attach_tool_activity(database, conversation_id, messages):
         records.setdefault(message_id, {})[item['id']] = item
     for message in messages:
         message['tool_activity'] = list(records.get(message['id'], {}).values())
+        preview = previews.get(message['id'], {})
+        text = preview.get('reply', '') + preview.get('text', '')
+        if message.get('status') == 'pending' and text:
+            message['tool_activity'].append({'id': 'live-preview', 'kind': 'narration', 'text': text, 'state': 'completed'})

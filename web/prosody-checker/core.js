@@ -93,7 +93,7 @@ function key(lineIndex, charIndex) {
 }
 
 function toneLabel(tones) {
-  if (tones.size === 0) return TONE_FLEX;
+  if (tones.size === 0) return "缺";
   if (tones.size === 1) return [...tones][0];
   return TONE_PING + "/" + TONE_ZE;
 }
@@ -116,7 +116,8 @@ function annotateLines(
         char,
         tone: decision?.tone ?? toneLabel(entry.tones),
         tones: [...entry.tones],
-        polyphonic: entry.polyphonic,
+        missingTone: entry.tones.size === 0,
+        polyphonic: entry.tones.size > 0 && entry.polyphonic,
         error: errors.has(key(lineIndex, charIndex)),
         expected: expectedByPosition.get(key(lineIndex, charIndex)) ?? null,
         roles,
@@ -311,7 +312,7 @@ function scoreRhymeGroups(
           ? entry.partsByTone.get(expectedTone) ?? new Set()
           : entry.parts;
       }
-      endings.push({ lineIndex, char, parts: [...parts] });
+      endings.push({ lineIndex, char, parts: [...parts], actualParts: [...entry.parts] });
       for (const part of parts) counts.set(part, (counts.get(part) ?? 0) + 1);
     }
     let dominantPart = null;
@@ -327,6 +328,7 @@ function scoreRhymeGroups(
       lineIndex: ending.lineIndex,
       charIndex: [...lines[ending.lineIndex]].length - 1,
       char: ending.char,
+      actualParts: ending.actualParts,
       rule: "押韵",
       required: dominantPart + "韵部",
     }));
@@ -336,6 +338,7 @@ function scoreRhymeGroups(
       lineIndex: ending.lineIndex,
       charIndex: [...lines[ending.lineIndex]].length - 1,
       char: ending.char,
+      actualParts: ending.actualParts,
       rule: "押韵",
       required: dominantPart + "韵部",
     }));

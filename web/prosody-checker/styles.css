@@ -87,13 +87,14 @@ body[data-han-scope] {
 .poem-version-tree__node.is-current { border-left-color: var(--site-red-dark); background: var(--site-surface); }
 .poem-version-tree__node.is-unavailable { color: var(--site-ink-soft); }
 .poem-version-tree__link[href]:hover { color: var(--site-red-dark); }
-.poem-editor-identity { display: grid; gap: 2px; margin-bottom: 0; color: var(--site-ink-soft); font-size: 11px; }
-.poem-editor-identity > strong { color: var(--site-ink); font-size: 12px; }
-.poem-editor-identity > div { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; }
+.poem-editor-header > div { min-width:0; }
+.poem-editor-identity { display:flex; align-items:center; flex-wrap:wrap; gap:2px 6px; margin:4px 0; color:var(--site-ink-soft); font-size:10px; line-height:1.4; }
+.poem-editor-identity > strong { color:var(--site-ink-soft); font-size:10px; font-weight:400; white-space:nowrap; }
+.poem-editor-identity > div { display:flex; min-width:0; align-items:center; flex-wrap:wrap; gap:2px 6px; }
 .poem-editor-identity code { overflow-wrap: anywhere; user-select: all; }
-#poem-editor-id { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; min-width: 0; }
-.poem-editor-identity button { padding: 2px 6px; font-size: 11px; }
-.poem-editor-identity > div > .poem-editor-delete { min-height: 26px; margin: 0; padding: 2px 8px; }
+#poem-editor-id { display:flex; align-items:center; flex-wrap:wrap; gap:2px 6px; min-width:0; }
+.poem-editor-identity button { min-height:20px; margin:0; padding:0 4px; font-size:10px; line-height:1.4; }
+.poem-editor-identity > div > .poem-editor-delete { min-height:20px; margin:0; padding:0 4px; }
 .poem-editor-change-row { display: grid; grid-template-columns: 60px 1fr; gap: 8px; padding: 9px 0; border-bottom: 1px dotted var(--site-line); font-size: 13px; }
 .poem-editor-change-row span { color: var(--site-ink-soft); }
 .poem-save-warning { width: min(440px, calc(100vw - 32px)); border: 1px solid var(--site-line); border-radius: 6px; padding: 24px; background: var(--site-surface); color: var(--site-ink); }
@@ -1393,9 +1394,9 @@ input[type="search"] {
   color: var(--site-ink-soft);
 }
 
-.tool-activity { color: var(--site-ink-soft); font-size: 12px; line-height: 1.5; }
+.tool-activity { color: var(--site-ink-soft); font: inherit; }
 .tool-activity__list { display: grid; align-content: start; gap: 6px; }
-.tool-activity__narration { display: block; min-height: 0; height: auto; margin: 0; padding: 0; color: var(--site-ink); font: inherit; font-size: 14px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-activity__narration { display: block; min-height: 0; height: auto; margin: 0; padding: 0; color: var(--site-ink); font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
 .tool-activity__narration, .message-text { white-space: normal; overflow-wrap: anywhere; min-width: 0; }
 .message-text .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
 .tool-activity__narration > :first-child, .message-text > :first-child { margin-top: 0; }
@@ -1411,7 +1412,7 @@ input[type="search"] {
 .chat-markdown-table :is(th,td) { padding: 4px 8px; border: 1px solid var(--site-line); text-align: left; }
 .message-text[hidden] { display: none !important; }
 .chat-message-image { display: block; max-width: min(100%, 320px); max-height: 320px; object-fit: contain; margin-top: 8px; border: 1px solid var(--site-line); border-radius: 4px; }
-.tool-activity__item { display: flex; align-items: baseline; gap: 7px; margin: 0; padding: 0; overflow-wrap: anywhere; }
+.tool-activity__item { display: flex; align-items: baseline; gap: 7px; margin: 0; padding: 0; font-size:12px; line-height:1.5; overflow-wrap: anywhere; }
 .tool-activity__icon { width: 13px; flex: 0 0 13px; text-align: center; }
 .tool-activity__item--running .tool-activity__icon { animation: tool-activity-pulse 1.2s ease-in-out infinite; }
 .tool-activity__item--failed { color: var(--site-red-dark); }
@@ -3053,6 +3054,36 @@ body.has-open-drawer { overflow: hidden; }
 .poem-handscroll__footer > time { grid-column: 1; }
 .poem-score__inspect { border: 0; background: transparent; color: var(--site-red-dark); cursor: pointer; font: inherit; font-weight: 700; }
 .poem-score__inspect:disabled { color: var(--site-ink-soft); cursor: default; }
+
+/* 朱文印边：斑驳仅作用于边框，文字保持清晰。 */
+body[data-han-scope] .poem-handscroll .poem-score__inspect {
+  position: relative;
+  isolation: isolate;
+  padding: 3px 7px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #ad352b;
+  line-height: 1.5;
+  letter-spacing: .12em;
+}
+body[data-han-scope] .poem-handscroll .poem-score__inspect::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid currentColor;
+  border-radius: 2px 3px 1px 2px;
+  pointer-events: none;
+  opacity: .85;
+  transform: translate(var(--seal-x, 0px), var(--seal-y, 0px)) rotate(var(--seal-angle, 0deg));
+  -webkit-mask-image: repeating-linear-gradient(113deg,#000 0 13px,transparent 13px 14px,#000 14px 23px), repeating-linear-gradient(7deg,#000 0 9px,transparent 9px 10px,#000 10px 19px);
+  mask-image: repeating-linear-gradient(113deg,#000 0 13px,transparent 13px 14px,#000 14px 23px), repeating-linear-gradient(7deg,#000 0 9px,transparent 9px 10px,#000 10px 19px);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+body[data-han-scope] .poem-handscroll .poem-score__inspect:hover:not(:disabled) { background: #ad352b0d; color: #8f261f; }
+body[data-han-scope] .poem-handscroll .poem-score__inspect:focus-visible { outline: 2px solid #ad352b; outline-offset: 4px; }
+body[data-han-scope] .poem-handscroll .poem-score__inspect:disabled { color: var(--site-ink-soft); opacity: .6; }
 .poem-score__flags { display: flex; grid-column: 3; justify-content: flex-end; gap: 4px; }
 .poem-score__flag { position: relative; display: grid; width: 22px; height: 22px; padding: 0; place-items: center; border: 1px solid var(--site-line-strong); border-radius: 50%; background: var(--site-paper); color: var(--site-ink); cursor: help; font-family: var(--han-font-sans, sans-serif); font-size: 12px; }
 .poem-score__flag:disabled { cursor: default; opacity: .42; }
@@ -5194,7 +5225,7 @@ body[data-han-scope] .chat-prompt-chooser__options button:focus-visible {
 .poem-sentence-heading span { font-size:12px; font-weight:400; color:var(--site-muted, #68675f); }
 .poem-stanza { display:flex; flex-wrap:wrap; align-items:flex-start; gap:4px 12px; margin:0 0 14px; padding:0 0 8px; border-bottom:1px solid var(--site-line); }
 .poem-sentence { position:relative; width:fit-content; max-width:100%; padding:3px 8px; margin:0 0 4px; border:1px solid transparent; border-radius:4px; }
-.poem-sentence.is-selected { margin-bottom:25px; }
+.poem-sentence.is-selected { margin-bottom:25px; margin-right:24px; }
 .poem-sentence.is-selected { background:#edf0e6; border-color:#7c896d; }
 .poem-sentence-text, .poem-sentence-pattern { display:flex; width:max-content; max-width:100%; align-items:baseline; border:0; background:transparent; text-align:left; font-family:inherit; font-size:15px; line-height:1.45; padding:0; }
 .poem-sentence-text { color:inherit; cursor:pointer; }
@@ -5203,7 +5234,8 @@ body[data-han-scope] .chat-prompt-chooser__options button:focus-visible {
 .poem-sentence-pattern .poem-sentence-cell { font-family:ui-monospace, Consolas, monospace; }
 .poem-sentence-pattern .poem-sentence-cell.is-neutral { color:#aaa99f; }
 .poem-sentence-punctuation { flex-basis:.6em; width:.6em; }
-.poem-sentence-pen { position:absolute; right:-24px; bottom:-2px; width:22px; height:22px; display:grid; place-items:center; background:transparent; color:#40513a; border:0; cursor:pointer; }
+.poem-sentence-pen { position:absolute; right:-24px; bottom:-2px; box-sizing:border-box; width:22px; height:22px; padding:0; margin:0; display:grid; place-items:center; background:transparent; color:#40513a; border:0; line-height:1; cursor:pointer; }
+.poem-sentence-pen svg { display:block; pointer-events:none; }
 .poem-editor-writing textarea.poem-sentence-input { width:100%; box-sizing:border-box; min-height:70px; font:inherit; padding:8px; }
 .poem-sentence-variation { display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; border:0; border-bottom:1px solid #deddd2; background:transparent; color:var(--site-ink); text-align:left; font:inherit; line-height:1.8; overflow-wrap:anywhere; cursor:pointer; }
 .poem-sentence-variation-text { min-width:0; flex:1; transform:translateX(0); transition:transform 160ms ease; }
@@ -5227,3 +5259,29 @@ body[data-han-scope] .chat-prompt-chooser__options button:focus-visible {
 }
 #poem-editor-content[hidden], .poem-sentence-text[hidden], .poem-sentence-pen[hidden] { display:none; }
 .poem-review-drawer-toggle[hidden] { display:none; }
+
+/* 欢迎寄语：以文字为中心的卷首题记。 */
+body[data-han-scope] .chat-welcome{display:flex;justify-content:center;align-items:flex-start;width:100%;max-width:none;min-height:0;box-sizing:border-box;margin:clamp(48px,12vh,120px) auto 40px;padding:24px 20px;border:0;border-radius:0;background:none;box-shadow:none;text-align:left;overflow:visible}
+body[data-han-scope] .chat-welcome[hidden]{display:none}
+body[data-han-scope] .chat-welcome::before,body[data-han-scope] .chat-welcome::after{content:none}
+.chat-welcome__epigraph{width:fit-content;max-width:100%;margin:0}
+.chat-welcome__epigraph blockquote{margin:0;padding:0;border:0;background:none;color:var(--site-ink);font:400 clamp(21px,2.2vw,26px)/1.8 "汇文仿宋","FangSong",serif;text-align:left}
+.chat-welcome__epigraph blockquote span{display:inline-block}
+.chat-welcome__epigraph figcaption{margin:12px 0 0;text-align:right;color:var(--site-ink-soft);font:400 14px/1.7 "汇文仿宋","FangSong",serif}
+@media(max-width:600px){body[data-han-scope] .chat-welcome{margin-top:clamp(32px,8vh,64px);padding:20px 8px}.chat-welcome__epigraph blockquote span{display:block}.chat-welcome__epigraph figcaption{font-size:13px}}
+
+/* 横线红笺，容纳寄语、落款与说明。 */
+.chat-welcome__note{width:fit-content;max-width:100%}
+.chat-welcome__epigraph{position:relative;isolation:isolate;box-sizing:border-box;width:100%;padding:46px 42px 38px;border:0;border-radius:0;background:repeating-linear-gradient(23deg,#8b786006 0 1px,transparent 1px 3px),repeating-linear-gradient(113deg,#fff8 0 1px,transparent 1px 4px),#f7f4ec;box-shadow:0 4px 16px #443c2810}
+.chat-welcome__epigraph::before{content:"";position:absolute;inset:18px;border:3px solid #ac5d52;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(36px - 1px),#b6675c55 calc(36px - 1px),#b6675c55 36px);z-index:-1;pointer-events:none;filter:url("#letterpress-ink")}
+.chat-welcome__epigraph figcaption{color:#776b60}
+.chat-welcome__abilities{margin:20px 4px 0;padding:0;border:0;color:var(--site-ink-soft);font-family:"汇文仿宋","FangSong","仿宋",serif;font-size:14px;font-weight:400;line-height:1.9;text-align:left}
+@media(max-width:600px){.chat-welcome__epigraph{padding:32px 26px 28px}.chat-welcome__epigraph::before{inset:12px;background-size:auto}.chat-welcome__abilities{font-size:13px;margin-top:16px}.chat-welcome__epigraph blockquote span{display:inline}}
+
+/* 信笺整体放大一档，窄屏保持自适应。 */
+.chat-welcome__note{width:min(700px,100%)}
+.chat-welcome__epigraph{padding:54px 48px 46px}
+.chat-welcome__epigraph blockquote{font-size:clamp(23px,2.4vw,29px)}
+.chat-welcome__epigraph figcaption{font-size:15px;margin-top:16px}
+.chat-welcome__abilities{font-size:15px;margin-top:26px;line-height:2}
+@media(max-width:600px){.chat-welcome__epigraph{padding:38px 28px 32px}.chat-welcome__epigraph blockquote{font-size:23px}.chat-welcome__epigraph figcaption{font-size:14px}.chat-welcome__abilities{font-size:14px;margin-top:22px}}

@@ -33,6 +33,7 @@ FILES = {
 }
 EXCLUDED = {'Songci_Meter/display-layout-report.json', 'web/prosody-checker/index.intent.json'}
 PUBLIC_HOSTS = {
+    'ojs.aaai.org', 'aclanthology.org', 'doi.org',
     'www.apache.org', 'mozilla.org', 'developer.mozilla.org', 'w3c.github.io',
     'html.spec.whatwg.org', 'stackoverflow.com', 'url.spec.whatwg.org',
     'datatracker.ietf.org', 'tex.stackexchange.com', 'en.wikibooks.org',

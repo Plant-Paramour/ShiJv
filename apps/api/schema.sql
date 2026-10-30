@@ -293,4 +293,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_one_active_branch
 ON conversation_branches(conversation_id)
 WHERE is_active = 1;
 
+-- 仅记录自动保存的排除键，不保留已删除作品的标题或正文。
+CREATE TABLE IF NOT EXISTS deleted_poem_candidates (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    job_id TEXT NOT NULL,
+    candidate_ordinal INTEGER NOT NULL,
+    PRIMARY KEY(user_id, job_id, candidate_ordinal)
+);
+
 PRAGMA user_version = 100;

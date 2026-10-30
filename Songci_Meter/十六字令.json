@@ -1,6 +1,9 @@
 {
   "name": "十六字令",
-  "aliases": [],
+  "aliases": [
+    "苍梧谣",
+    "归字谣"
+  ],
   "description": "蔡伸词名《苍梧谣》，周玉晨词名《十六字令》，袁去华词亦名《归字谣》。有刻《归 梧谣》者误。",
   "default_variant": "张孝祥",
   "default_variant_source_id": 2291,

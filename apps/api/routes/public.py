@@ -131,6 +131,14 @@ def _meter_catalog(request: Request):
 def list_meters(request: Request):
     return _meter_catalog(request)
 
+@router.get('/local-meter-bundle')
+def local_meter_bundle(request: Request):
+    from fastapi.responses import JSONResponse
+    directory = request.app.state.meter_directory
+    catalog = json.loads((directory / 'index.json').read_text(encoding='utf-8'))
+    items = [{'file': item['file'], 'data': json.loads((directory / item['file']).read_text(encoding='utf-8'))} for item in catalog]
+    return JSONResponse({'items': items}, headers={'Cache-Control': 'no-store'})
+
 @router.get('/rhyme-options', deprecated=True)
 @router.get('/rhyme-part', deprecated=True)
 @router.post('/validate-fixed-lines', deprecated=True)

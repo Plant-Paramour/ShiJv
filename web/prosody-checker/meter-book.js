@@ -2,7 +2,7 @@ import { getDatasetJson } from './dataset-cache.js?v=4';
 
 const palette = ['#D52B3F','#0064D8','#00834A','#A33AD1','#F4C400','#00BED0'];
 const rhymeInk = ['#fff','#fff','#fff','#fff','#25231f','#25231f'];
-function paintRhyme(el,group){const index=(group-1)%palette.length;el.style.background=palette[index];el.style.setProperty('color',rhymeInk[index],'important');}
+export function paintRhyme(el,group,{avoidWarning=false}={}){const index=avoidWarning?1+(group-1)%(palette.length-1):(group-1)%palette.length;el.style.background=palette[index];el.style.setProperty('--rhyme-group-color',palette[index]);el.style.setProperty('color',rhymeInk[index],'important');}
 const launcher = document.createElement('button');
 launcher.className = 'meter-book-launch'; launcher.textContent = '词谱'; launcher.title = '点击查询词谱，拖动调整位置'; launcher.setAttribute('aria-label','打开词谱查询，可拖动调整位置');
 const launcherLabel=document.createElement('span');launcherLabel.textContent='词谱';launcher.replaceChildren(launcherLabel);
@@ -106,15 +106,17 @@ function chineseNumber(value) {
   if(value<100)return (value<20?'':digits[Math.floor(value/10)])+'十'+(value%10?digits[value%10]:'');
   return String(value);
 }
-function render(data, examples, variant) {
-  selectedVariant=variant.source_id;
+function render(data, examples, variant, preview=null) {
+  const content=preview?.target || $(".meter-book-content");
+  if(!preview)selectedVariant=variant.source_id;
+  content.dataset.variantSourceId=variant.source_id;
   content.replaceChildren(); content.append(node('h3',data.name),node('p',data.description,'meter-book-intro'));
   const variants=node('div',null,'meter-book-variants');
   variants.setAttribute('role','group'); variants.setAttribute('aria-label','选择词谱体式');
   data.variants.forEach((v,i)=>{
     const button=node('button',v.name+(v.source_id===data.default_variant_source_id?' · 默认体':''));
     button.type='button'; button.setAttribute('aria-pressed',String(v===variant));
-    button.onclick=()=>{render(data,examples,v);$('.meter-book-variants').children[i].focus({preventScroll:true});savePage();};
+    button.onclick=()=>{render(data,examples,v,preview);content.querySelector('.meter-book-variants').children[i].focus({preventScroll:true});if(!preview)savePage();};
     variants.append(button);
   });
   content.append(variants);
@@ -137,6 +139,7 @@ function render(data, examples, variant) {
     s.lines.forEach((raw,li)=>{
       const tones=chars(raw), words=chars(example?.[key]?.lines?.[li]);const aligned=words.length===tones.length;
       const sentence=node('span',null,'meter-book-sentence');
+      if(preview?.hit?.stanzaKey===key&&li>=preview.hit.lineIndex&&li<preview.hit.lineIndex+preview.hit.partCount)sentence.classList.add('is-search-hit');
       if(words.length&&!aligned)section.append(node('p',words.map(x=>x.text).join('')+'（例文与词谱字数不同，分开展示）','meter-book-note'));
       tones.forEach((tone,ci)=>{
         const cell=node('span',null,'meter-book-char'); if(tone.read)cell.classList.add('is-read');
@@ -154,6 +157,26 @@ function render(data, examples, variant) {
     });content.append(section);
   }
   if(variant.variants_description){const description=node('section',null,'meter-book-description');description.append(node('h4','体式说明'),node('p',variant.variants_description));content.append(description);}
+}
+// 抽屉与完整词谱共用字体、例词对齐、原谱分行、韵色和重叠标记。
+export async function renderMeterPreview(target, data, variant, hit) {
+  const token={}; target.previewToken=token;
+  const [layouts, examples]=await Promise.all([
+    getDatasetJson('meter','display-layouts.json').catch(()=>null),
+    getDatasetJson('meter',`examples/${data.name}-例文.json`).catch(()=>null),
+  ]);
+  if(target.previewToken!==token)return;
+  if(layouts)displayLayouts=layouts;
+  render(data,examples,variant,{target,hit});
+}
+export async function openMeterBook(name, sourceId) {
+  if(!dialog.open)dialog.showModal();
+  try {
+    if(!loaded){catalog=await getDatasetJson('meter','index.json');loaded=true;}
+    const item=catalog.find(item=>item.name===name||(item.aliases||[]).includes(name));
+    if(!item)throw new Error('词牌不存在');
+    await load(item,{variant:sourceId});
+  }catch(e){status.textContent='词谱加载失败，请重新选择词牌重试。';}
 }
 async function load(item,restore=null) {
   const run=++serial; current=item.file;page='detail';backButton.hidden=false;list();$('.meter-book-directory').hidden=true;$('.meter-book-main').hidden=false;status.textContent='正在翻阅词谱……';content.replaceChildren();

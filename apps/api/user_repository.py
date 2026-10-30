@@ -400,6 +400,8 @@ class UserRepository:
 
     @staticmethod
     def _save_candidate_poem(connection, user_id, job_id, ordinal, job_request, candidate, evaluation) -> None:
+        if connection.execute('SELECT 1 FROM deleted_poem_candidates WHERE user_id=? AND job_id=? AND candidate_ordinal=?', (user_id, job_id, ordinal)).fetchone():
+            return
         content = str(candidate.get('content') or candidate.get('text') or candidate.get('full_text') or candidate.get('display_text') or '').strip()
         if not content:
             return
@@ -622,7 +624,24 @@ class UserRepository:
 
     def delete_poem(self, poem_id: str, user_id: str) -> bool:
         with self.database.connect() as connection:
-            result = connection.execute('UPDATE poems SET deleted_at=? WHERE id=? AND user_id=? AND deleted_at IS NULL', (time.time(), poem_id, user_id))
+            connection.execute('BEGIN IMMEDIATE')
+            poem = connection.execute('SELECT * FROM poems WHERE id=? AND user_id=?', (poem_id, user_id)).fetchone()
+            if poem is None:
+                return False
+            # 与物理删除同事务提交，阻止候选回调、任务完成或重试重新入库。
+            if poem['job_id'] and poem['candidate_ordinal'] is not None:
+                connection.execute('INSERT OR IGNORE INTO deleted_poem_candidates(user_id,job_id,candidate_ordinal) VALUES (?,?,?)', (user_id, poem['job_id'], poem['candidate_ordinal']))
+            # 正文复用不能随来源版本一起删除；先将正文保存到保留的版本。
+            body = resolve_contents(None, [poem], connection)[0]['content']
+            connection.execute('UPDATE poems SET content=NULL,content_stored=?,content_reference_id=NULL WHERE content_reference_id=?', (body, poem_id))
+            # 根版本删除后，让其余版本继续属于同一棵修改树。
+            replacement = connection.execute('SELECT id FROM poems WHERE root_poem_id=? AND id<>? ORDER BY created_at,id LIMIT 1', (poem_id, poem_id)).fetchone()
+            if replacement:
+                connection.execute('UPDATE poems SET forest_id=COALESCE(forest_id,?) WHERE id=? OR root_poem_id=?', (poem_id, poem_id, poem_id))
+                connection.execute('UPDATE poems SET root_poem_id=? WHERE root_poem_id=?', (replacement['id'], poem_id))
+                connection.execute('UPDATE poems SET root_poem_id=NULL WHERE id=?', (replacement['id'],))
+            connection.execute("DELETE FROM user_collection_items WHERE item_type='poem' AND item_id=?", (poem_id,))
+            result = connection.execute('DELETE FROM poems WHERE id=? AND user_id=?', (poem_id, user_id))
         return result.rowcount == 1
 
     def list_favorite_poems(self, user_id: str) -> list[dict[str, Any]]:

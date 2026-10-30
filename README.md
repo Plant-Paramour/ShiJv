@@ -1,46 +1,97 @@
-# 诗矩 · 单机版
+# 诗矩
 
-诗矩是一款在本机浏览器中使用的诗词创作工具，提供 AI 对话、格律检测、约束生成、局部改写、作品管理和对话归档。
+*不必等到精通格律，才开始创作自己的诗词。*
 
-应用使用本地 SQLite 保存数据，首次运行自动建立本地档案，无需注册或登录。可连接用户自行配置的对话模型服务；本地诗词生成需要另外准备兼容的模型和推理环境。
+## 背景
 
-## 快速开始
+### 通用大模型难稳定遵守格律
 
-1. [下载源码 ZIP](https://github.com/Plant-Paramour/ShiJv/archive/refs/heads/main.zip)，右键选择“全部解压”。不要直接在压缩包里运行。
-2. **需要本地模型创作**：双击根目录的 `诗矩环境部署.bat`，按窗口提示检测电脑、下载或选择模型、创建新环境。完成后进入诗矩。详细步骤见[环境部署说明](docs/environment-tool-user.md)。此路线不需要预装 Python 或 Conda；工具按硬件与模型选择 CPU FP32、GPU FP16 或 GPU BNB 4bit 依赖组合，也可手动选择。没有 NVIDIA 显卡时可自动部署 CPU 环境，建议使用 Qwen3.5-2B 或 Qwen3.5-0.8B。下载支持国内镜像、官方回退和本地依赖包导入，失败后可以恢复部署；最终以本机真实生成验收为准，CPU 通常明显慢于 GPU。
-3. **只使用格律检测或连接已有对话服务**：安装 Python 3.10+，在解压目录打开终端，执行 `python -m pip install -e ".[api]"`；然后双击 `诗矩单机版.bat`，选择该环境的 `python.exe`，点击“检查并启动”。
-4. 浏览器打开后，在“模型与运行设置”填写你自己的模型服务地址、模型名称和密钥。使用本地生成时，按设置页提示检查推理环境和模型。
+让 AI 写一首七律、填一阕词，很快就能得到一篇文字。但字数是否正确、平仄是否合适、韵脚是否一致，仍不能只凭它读起来像诗来判断。
 
+这也是研究中观察到的问题。Qu 等人发表于 **AAAI 2026** 的 **PoeTone**[1]，对 18 个大语言模型在不同提示策略下的宋词生成表现进行了系统评测，发现受测模型在遵循结构、平仄和押韵规则方面仍有不足。
 
-启动器默认使用 `127.0.0.1:18763`，端口占用时自动选择空闲端口。应用目前以 Windows 启动器为主要使用入口。
+### 从字数控制到格式与押韵，已有研究逐步推进
 
-## 功能与模型
+Yu 等人发表于 **ACL 2024 系统演示论文集**的 **CharPoet**[2]，通过调整分词与输出方式，并继续训练，改善诗词的字数控制。
 
-- **格律检测**：支持唐诗、宋词、排律、俳句、汉俳及多种韵书。
-- **AI 对话**：支持 OpenAI-like 和 Anthropic 协议，可配置本机服务或远程服务。
-- **本地生成**：通过独立推理环境运行 Qwen3 / Qwen3.5 原始浮点权重，支持格律约束和局部改写。
-- **本地资料**：管理作品、收藏、对话、头像，并通过设置页备份和恢复。
+Li 等人发表于 **ACL 2020 主会论文集**的《**Rigid Formats Controlled Text Generation**》提出了 **SongNet**[3]，通过专门的格式符号、注意力机制设计及训练，改善格式与押韵表现。
 
-本地模型的兼容性取决于模型、依赖版本和硬件。CPU 可使用 FP32 推理，建议选择较小的 Qwen3.5-2B 或 Qwen3.5-0.8B；NVIDIA GPU 路线可按显存使用 FP16 或 4bit。当前不支持 GGUF、预量化权重或任意自定义模型代码；扫描到模型不代表已通过运行验证。自动环境部署工具可直接下载并验收的推荐模型和硬件范围见[推荐配置](推荐配置.md)。
+### 从自动生成到人机协作，让用户参与推敲
 
-## 文档
+Ma 等人发表于 **EACL 2023 系统演示论文集**的 **Yu Sheng**[4]，将诗歌生成与局部润色结合起来，让用户参与作品的打磨。这种人机协作方式，也是我们所期待的创作体验。
 
-- [使用说明](使用说明.md)：安装、启动、模型配置、数据和常见问题。
-- [推荐配置](推荐配置.md)：硬件档位、模型与运行方式、实测资源占用和生成速度。
-- [环境部署工具](docs/environment-tool-user.md)：自动准备本地推理环境及其适配限制。
-- [启动器详细说明](docs/single-player-launcher.html)。
+### 无需额外训练，在生成过程中引入约束
 
-## 数据与网络
+Zou 发表于 **ACL 2025 长文论文集**的 **BIPro**[5]，探索了无需额外训练、利用块生成模型进行唐诗生成与修订的方法。这启发我们尝试自回归模型的格律诗词生成。
 
-默认数据保存在 `%LOCALAPPDATA%\ShiJu`，数据库、备份和模型配置均以明文保存。选择远程模型服务时，对话、附件及 API 密钥会发送给用户配置的服务端点。模型和依赖下载也需要网络。
+## 诗矩：无需额外训练，按指定诗体、词牌和韵书生成
 
-程序仅面向本机使用。请保管好数据目录、备份和模型密钥，避免将其提交到公共仓库。
+诗矩将字数、句读、平仄和押韵规则用于生成过程，**希望更多的通用自回归模型无需额外训练，就能按指定诗体、宋词词牌和韵书进行创作。**
 
-## 开发
+你可以选择想写的形式和主题，让本地模型起稿；如果佳句“妙手偶得之”，也可以让AI补完其余部分，创作出完整作品；对某些句子的表达不满意，还可以指定改写，继续推敲。
 
-安装开发依赖：`python -m pip install -e ".[api,dev]"`。
-本地测试目录不纳入 GitHub 仓库和源码导出包。真实模型加载、CUDA 和生成效果需在目标机器上通过启动器另行检测。
+## 不懂格律，也能边创作、边学习
 
-主要目录：`apps/` 为本地 API、Agent、启动器和 Worker，`shiju/` 为格律与生成引擎，`web/prosody-checker/` 为前端，`Rhyme/` 和 `Songci_Meter/` 为韵书与词谱。
+你可以先和 Agent 聊想写什么，一起斟酌情绪、意象和用韵。它会调用工具查词谱、查韵书，把讨论整理成可编辑的创作方案；你检查并提交后，由本地模型按格律生成正文。
 
-源码导出：`python tools/build_single_player_source.py --output dist/single-player-source.zip`。导出包不含本地测试、安装材料、用户数据、模型权重、运行日志、本地归档和 Git 历史。
+成稿后，还可以请 Agent 核对格律、讨论修改方向，再让本地模型改写或补完。你决定留下什么、调整什么，在创作中逐渐了解诗词的规矩。
+
+**不配置 API，也能使用。** 准备好本地模型后，你可以自行填写要求，进行生成、改写和补完；格律检测无需配置模型。
+
+**接了 API，为什么还要运行本地模型？** 诗矩需要在模型每一步选字时，直接排除不符合格律的候选。普通对话 API 不开放这一层控制，因此仍需在本地运行模型。
+
+## 从这里开始
+
+安装和启动都有图形界面，无需提前安装 Python 或 Conda，也不用输入命令。
+
+### 第一次使用：跟着安装向导走
+
+1. [下载源码 ZIP](https://github.com/Plant-Paramour/ShiJv/archive/refs/heads/main.zip)，右键选择“全部解压”。请保留完整目录，不要在压缩包里运行。
+2. 双击 **`诗矩环境部署.bat`**，点击“检测电脑”，查看推荐的模型和运行方案。不确定怎么选时，可以先看[推荐配置](推荐配置.md)。
+3. 确认模型和保存位置，点击“检查安装方案”，查看下载量和磁盘空间，再点击“开始安装”。工具会自动准备环境、下载或核验模型，并测试实际生成。
+4. 验证通过后，点击 **“打开诗矩”**。
+
+首次安装需要下载模型和运行组件，请耐心等待。中途失败可重试，重新打开工具后也可以“恢复上次部署”，已下载的完整文件会复用。详细操作见[环境部署说明](docs/environment-tool-user.md)。
+
+### 以后使用：打开启动器
+
+双击 **`诗矩单机版.bat`**，选择已记住的环境与模型配对，点击“直接启动”。浏览器会打开诗矩；若需手动访问，请使用启动器显示的地址。
+
+### 想让 Agent 一起参与创作
+
+打开“模型与运行设置”，填写你使用的 API 服务地址、模型名称和密钥，即可与 Agent 讨论创作、查阅资料和准备方案。**这一步可跳过，不影响本地模型生成和格律检测。**
+
+## 接下来可以看
+
+- [使用说明](使用说明.md)：启动、配置模型、改写补完，以及备份和常见问题。
+- [推荐配置](推荐配置.md)：按电脑配置选模型，了解资源占用和等待速度。
+- [环境部署说明](docs/environment-tool-user.md)：自动安装、恢复下载及高级选项。
+- [启动器详细说明](docs/single-player-launcher.html)：启动器的具体操作。
+
+## 数据保存在哪里
+
+诗矩在本机浏览器中使用，无需注册或登录，不会自动向开发者上传你的作品和使用数据。作品和对话默认保存在本机的 `%LOCALAPPDATA%\ShiJu`。数据、备份和模型配置没有应用层加密，请妥善保存，尤其不要把含密钥的配置上传到公共仓库。
+
+使用远程对话服务时，对话、附件及 API 密钥会发送到你填写的服务地址；下载模型和运行组件也需要联网。
+
+## 开发与源码导出
+
+开发依赖安装命令：`python -m pip install -e ".[api,dev]"`。
+
+主要代码在 `apps/`（本地 API、Agent、启动器和 Worker）、`shiju/`（格律与生成引擎）和 `web/prosody-checker/`（前端）；韵书和词谱在 `Rhyme/`、`Songci_Meter/`。
+
+导出源码：`python tools/build_single_player_source.py --output dist/single-player-source.zip`，输出路径须尚不存在。导出包不含本地测试、安装材料、用户数据、模型权重、运行日志、本地归档或 Git 历史。发布源码时请使用导出包，避免直接上传开发工作区。
+
+本地测试不随仓库和源码包发布。模型能否加载、CUDA 是否可用及实际生成效果，仍需在目标电脑上检查。
+
+## 参考文献
+
+[1] Qu, Z., Yuan, S., & Färber, M. (2026). [PoeTone: A Framework for Constrained Generation of Structured Chinese Songci with LLMs](https://ojs.aaai.org/index.php/AAAI/article/view/40555). *Proceedings of the AAAI Conference on Artificial Intelligence, 40*(39), 32764–32772. DOI: [10.1609/aaai.v40i39.40555](https://doi.org/10.1609/aaai.v40i39.40555).
+
+[2] Yu, C., Zang, L., Wang, J., Zhuang, C., & Gu, J. (2024). [CharPoet: A Chinese Classical Poetry Generation System Based on Token-free LLM](https://aclanthology.org/2024.acl-demos.30/). In *Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)* (pp. 315–325). Association for Computational Linguistics. DOI: [10.18653/v1/2024.acl-demos.30](https://doi.org/10.18653/v1/2024.acl-demos.30).
+
+[3] Li, P., Zhang, H., Liu, X., & Shi, S. (2020). [Rigid Formats Controlled Text Generation](https://aclanthology.org/2020.acl-main.68/). In *Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics* (pp. 742–751). Association for Computational Linguistics. DOI: [10.18653/v1/2020.acl-main.68](https://doi.org/10.18653/v1/2020.acl-main.68).
+
+[4] Ma, J., Zhan, R., & Wong, D. F. (2023). [Yu Sheng: Human-in-Loop Classical Chinese Poetry Generation System](https://aclanthology.org/2023.eacl-demo.8/). In *Proceedings of the 17th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations* (pp. 57–66). Association for Computational Linguistics. DOI: [10.18653/v1/2023.eacl-demo.8](https://doi.org/10.18653/v1/2023.eacl-demo.8).
+
+[5] Zou, X. (2025). [BIPro: Zero-shot Chinese Poem Generation via Block Inverse Prompting Constrained Generation Framework](https://aclanthology.org/2025.acl-long.56/). In *Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)* (pp. 1116–1134). Association for Computational Linguistics. DOI: [10.18653/v1/2025.acl-long.56](https://doi.org/10.18653/v1/2025.acl-long.56).

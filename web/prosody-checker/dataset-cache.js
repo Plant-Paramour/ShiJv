@@ -11,8 +11,12 @@ export async function getDatasetJson(kind, file) {
 }
 
 export async function getMeterBundle(files) {
-  return Promise.all(files.map(async (file) => ({
-    file,
-    data: await getDatasetJson("meter", file),
-  })));
+  const response = await fetch('/v1/poetry/jobs/local-meter-bundle', { cache: "no-store" });
+  if (!response.ok) throw new Error("数据加载失败：" + response.status);
+  const payload = await response.json();
+  const items = new Map(payload.items.map(item => [item.file, item]));
+  return files.map(file => {
+    if (!items.has(file)) throw new Error("词谱不存在：" + file);
+    return items.get(file);
+  });
 }

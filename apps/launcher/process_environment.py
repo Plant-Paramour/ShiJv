@@ -33,7 +33,7 @@ def python_environment(python):
         if state.get('state') == 'verified' and state.get('ok'):
             cache = Path(os.getenv('LOCALAPPDATA') or tempfile.gettempdir()) / 'ShiJu/runtime-cache'
             env = isolated_environment(prefix, cache / 'runtime.json')
-            env.update(CUDA_VISIBLE_DEVICES=state.get('gpu_uuid') or '-1', CUDA_DEVICE_ORDER='PCI_BUS_ID')
+            env.update(CUDA_VISIBLE_DEVICES=state.get('gpu_visible') or state.get('gpu_uuid') or '-1', CUDA_DEVICE_ORDER='PCI_BUS_ID')
             backend = prefix / 'Lib/site-packages/triton/backends/nvidia'
             env.update(CC=str(prefix / 'Lib/site-packages/triton/runtime/tcc/tcc.exe'),
                        CUDA_PATH=str(backend), TRITON_PTXAS_PATH=str(backend / 'bin/ptxas.exe'))

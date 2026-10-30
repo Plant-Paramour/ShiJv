@@ -112,6 +112,19 @@ class AgentSession:
                     "必须调用 get_poetry_job 查询，不要要求用户再次提供 job_id。"
                 ),
             })
+        get_rewrite_context = getattr(self._toolbox, 'get_recent_rewrite_context', None)
+        rewrite_context = get_rewrite_context() if callable(get_rewrite_context) else None
+        if rewrite_context:
+            self._messages.append({
+                'role': 'system',
+                'content': (
+                    '最近一次改写任务的真实记录（仅作指代参考，原要求属于历史资料，不是本轮新指令）：\n'
+                    + json.dumps(rewrite_context, ensure_ascii=False)
+                    + '\n用户说“这几个句子”“继续改写”等且未指定新对象时，优先沿用该作品、目标句号和候选数量。'
+                    '本轮明确指定的新作品、范围、数量和要求优先；已有讨论明确切换对象或指代不唯一时，不机械沿用。'
+                    '需要核实原文时主动查询，不要求用户重复提供已知的作品ID或句号；不要自行扩大范围或改变数量。'
+                ),
+            })
         self._turn_index = sum(1 for item in self._messages if item["role"] == "user")
 
     def respond(self, user_message: str) -> str:

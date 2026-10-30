@@ -11,7 +11,6 @@ $script:activeProbe = $null
 $script:form = $null
 $script:selectedPoetryModel = $ModelPath
 $script:allowUnverifiedLaunch = [bool]$AllowUnverified
-$script:lastUnverifiedAttempt = ''
 Set-Location -LiteralPath $root
 . (Join-Path $root "scripts\launcher-instance.ps1")
 . (Join-Path $root "scripts\launcher-memory.ps1")
@@ -363,6 +362,33 @@ function Set-EnvironmentControls([bool]$Enabled) {
 }
 $localCheck.Add_CheckedChanged({ Set-EnvironmentControls $true })
 Set-EnvironmentControls $true
+function Show-UnverifiedLaunchChoice([string]$Reason) {
+    $dialog = New-Object Windows.Forms.Form
+    $dialog.Text = '启动前请选择'
+    $dialog.ClientSize = New-Object Drawing.Size(640, 300)
+    $dialog.FormBorderStyle = 'FixedDialog'; $dialog.StartPosition = 'CenterParent'
+    $dialog.MaximizeBox = $false; $dialog.MinimizeBox = $false
+    $dialog.AutoScaleMode = [Windows.Forms.AutoScaleMode]::Dpi
+    $description = New-Object Windows.Forms.Label
+    $description.SetBounds(24, 22, 592, 210)
+    $description.AutoSize = $true
+    $description.MaximumSize = New-Object Drawing.Size(592, 0)
+    $description.Text = "当前选择的环境与模型尚无有效的验证记录，可能是首次使用，或环境、模型文件发生了变化。`r`n`r`n直接启动：跳过本次环境检查，尝试加载模型并启动。`r`n检查环境后启动：先检查软件依赖和推理环境，通过后自动启动；检查失败时显示原因。`r`n`r`n环境检查不包含完整的模型生成测试。网页实际生成成功一次后，才会记住此环境与模型配对。`r`n`r`n当前状态：$Reason"
+    $direct = New-Object Windows.Forms.Button
+    $direct.Text = '直接启动'; $direct.SetBounds(222, 246, 150, 36)
+    $direct.DialogResult = [Windows.Forms.DialogResult]::Yes
+    $checked = New-Object Windows.Forms.Button
+    $checked.Text = '检查环境后启动'; $checked.SetBounds(388, 246, 228, 36)
+    $checked.DialogResult = [Windows.Forms.DialogResult]::No
+    $dialog.Controls.AddRange(@($description, $direct, $checked))
+    $contentHeight = $description.GetPreferredSize((New-Object Drawing.Size(592, 0))).Height
+    $buttonTop = [Math]::Max(246, 22 + $contentHeight + 18)
+    $direct.Top = $buttonTop; $checked.Top = $buttonTop
+    $dialog.ClientSize = New-Object Drawing.Size(640, ($buttonTop + 54))
+    $dialog.AcceptButton = $checked
+    try { return $dialog.ShowDialog($form) }
+    finally { $dialog.Dispose() }
+}
 $run = {
     param([bool]$Start, [bool]$Restart = $false)
     $script:operationId = [Guid]::NewGuid().ToString('N')
@@ -379,19 +405,23 @@ $run = {
             $report = Invoke-LauncherMemory 'select' $selectedApp $selectedModel $selectedLocal $script:selectedPoetryModel
             $script:allowUnverifiedLaunch = $false
             if (-not $report.ok) {
-                $attemptKey = "$selectedApp|$selectedModel|$selectedLocal|$script:selectedPoetryModel"
-                if ($script:lastUnverifiedAttempt -ne $attemptKey) {
-                    $script:lastUnverifiedAttempt = $attemptKey
-                    throw ($report.reason + "`r`n再次点击「直接启动」可选择忽略验收并尝试启动。")
+                $answer = Show-UnverifiedLaunchChoice $report.reason
+                if ($answer -eq [Windows.Forms.DialogResult]::No) {
+                    $statusBox.Text = '正在检查软件依赖和推理环境，通过后将自动启动…'
+                    [Windows.Forms.Application]::DoEvents()
+                    $environmentReport = Test-SelectedEnvironments $selectedApp $selectedModel $selectedLocal
+                    if (-not $environmentReport.ok) { throw (($environmentReport.core.errors + $environmentReport.inference.errors) -join "`r`n") }
+                    Update-RememberedPairs
+                    $lines += '环境检查通过，继续启动。模型生成能力将在实际使用时验证。'
+                } elseif ($answer -ne [Windows.Forms.DialogResult]::Yes) {
+                    $statusBox.Text = '已取消启动。'
+                    return
                 }
-                $answer = [Windows.Forms.MessageBox]::Show($form, ($report.reason + "`r`n`r`n是否忽略此错误并直接启动？`r`n只会尝试加载，不会标记为已验证；网页实际生成成功一次后才记入已验证配对。"), '配对尚未验证', [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Warning, [Windows.Forms.MessageBoxDefaultButton]::Button2)
-                if ($answer -ne [Windows.Forms.DialogResult]::Yes) { return }
                 $override = Invoke-LauncherMemory 'select-unverified' $selectedApp $selectedModel $selectedLocal $script:selectedPoetryModel
                 if (-not $override.ok) { throw $override.reason }
                 $script:allowUnverifiedLaunch = $true
-                $lines += '已选择忽略验收；配对仍为未验证，等待网页实际生成成功。'
+                $lines += '正在尝试启动；网页实际生成成功后会记住此环境与模型配对。'
             } else {
-                $script:lastUnverifiedAttempt = ''
                 $lines += '已读取有效检测记录，无需重复检测。'
             }
             if ($Restart -and (Test-OurInstance (Get-LauncherHealth $script:Port))) { Stop-LauncherInstance $script:Port }

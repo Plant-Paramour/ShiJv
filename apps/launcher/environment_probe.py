@@ -59,6 +59,10 @@ def probe(mode="core"):
             import torch
             result["cuda"] = torch.cuda.is_available()
             if not result["cuda"]:
+                try:
+                    torch.cuda.init()
+                except Exception as exc:
+                    result['cuda_error'] = exception_chain(exc)
                 with torch.inference_mode():
                     operand = torch.ones((32, 32), device="cpu", dtype=torch.float32)
                     product = operand @ operand

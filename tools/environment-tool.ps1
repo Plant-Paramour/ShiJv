@@ -236,13 +236,46 @@ function Show-SelectionAdvice {
         $resourceAdvice.ForeColor=switch($script:currentAdvice.state){'recommended' {[Drawing.Color]::DarkGreen} 'risk' {[Drawing.Color]::DarkRed} default {[Drawing.Color]::FromArgb(100,65,10)}}
     } else { $resourceAdvice.Text=$script:advisory.summary }
 }
+function Show-ResourceConfirmation($message) {
+    $dialog=New-Object Windows.Forms.Form
+    $dialog.Text='确认安装当前方案'; $dialog.ClientSize=New-Object Drawing.Size(560,240)
+    $dialog.StartPosition='CenterParent'; $dialog.FormBorderStyle='FixedDialog'
+    $dialog.MaximizeBox=$false; $dialog.MinimizeBox=$false
+    $label=New-Object Windows.Forms.Label
+    $label.SetBounds(20,16,520,160); $label.Text=$message; $label.AutoSize=$false
+    $dialog.Controls.Add($label)
+    $continue=New-Object Windows.Forms.Button
+    $continue.Text='继续安装当前方案'; $continue.SetBounds(190,190,170,34)
+    $continue.DialogResult=[Windows.Forms.DialogResult]::OK; $dialog.Controls.Add($continue)
+    $back=New-Object Windows.Forms.Button
+    $back.Text='返回调整方案'; $back.SetBounds(372,190,168,34)
+    $back.DialogResult=[Windows.Forms.DialogResult]::Cancel; $dialog.Controls.Add($back)
+    $dialog.AcceptButton=$back; $dialog.CancelButton=$back
+    try { return ($dialog.ShowDialog($form) -eq [Windows.Forms.DialogResult]::OK) }
+    finally { $dialog.Dispose() }
+}
+function Return-ToInstallationPlan {
+    $script:wizardAuto=$false; $script:wizardPrepareOnly=$false
+    $script:wizardFailed=$false
+    $script:wizardPlanNotice='尚未开始创建环境。你可以调整方案，也可以继续安装当前方案。'
+    $status.Text=$script:wizardPlanNotice
+    if($wizardMain) { $script:wizardPage=1; Update-Wizard }
+}
 function Confirm-ResourceAdvice {
     if(-not $script:currentAdvice) { throw '请先检测电脑并查看配置建议。' }
     if(-not $script:currentAdvice.requires_confirmation) { return $true }
     $message=$script:currentAdvice.notice
     if(-not $message) { $message=$script:currentAdvice.title }
-    $answer=[Windows.Forms.MessageBox]::Show($form,$message,'配置提示',[Windows.Forms.MessageBoxButtons]::YesNo,[Windows.Forms.MessageBoxIcon]::Information,[Windows.Forms.MessageBoxDefaultButton]::Button2)
-    return ($answer -eq [Windows.Forms.DialogResult]::Yes)
+    # Ignore normal free-memory fluctuations; changed risk, model or execution
+    # profile must be reviewed again. Path/selection edits clear this approval.
+    $key=@($script:currentAdvice.model_id,$script:currentAdvice.profile,$script:currentAdvice.state,$message) -join '|'
+    if($script:acceptedResourceAdvice -eq $key) { return $true }
+    if(Show-ResourceConfirmation ($message+"`r`n`r`n继续后将安装当前方案，并通过实际加载和生成检查。")) {
+        $script:acceptedResourceAdvice=$key
+        return $true
+    }
+    Return-ToInstallationPlan
+    return $false
 }
 $script:controls=@($detect,$deployRoute,$localRoute,$route,$browseModel,$browseTarget,$model,$target,$officialButton,$existingButton,$planButton,$import,$export,$create,$diagnostics,$runtimeProfile,$source,$resume,$importWheels,$openCache)
 function Busy([bool]$value) {
@@ -641,7 +674,7 @@ $timer.Add_Tick({
                         $proceed=($answer -eq [Windows.Forms.DialogResult]::Yes)
                         $script:continueExisting=$proceed
                     }
-                    if($proceed) { Begin-Action 'install' } else { $status.Text='已取消创建环境。请调整配置或释放资源后重试。'; if($wizardMain){$script:wizardPage=1} }
+                    if($proceed) { Begin-Action 'install' } else { Return-ToInstallationPlan }
                 }
                 if($wizardMain -and -not $script:closing) { Complete-WizardAction $state $code $completedAction }
                 if($script:closing) { $form.Close() }
@@ -743,7 +776,10 @@ $pathWarning.ForeColor=[Drawing.Color]::Firebrick
 $null=Wizard-Label $wizardPages[1] '模型与运行环境路径不能包含中文；下载缓存使用系统盘。' 8 280 535 36
 $wizardAdvancedButton=New-Object Windows.Forms.Button; $wizardAdvancedButton.Text='高级设置 / 离线工具'
 Place-WizardControl $wizardPages[1] $wizardAdvancedButton 8 318 220 34
-$wizardSummary=Wizard-Label $wizardPages[1] '确认模型和位置后，点击“检查安装方案”。' 575 8 320 344
+$wizardSummary=New-Object Windows.Forms.TextBox
+$wizardSummary.Multiline=$true; $wizardSummary.ReadOnly=$true; $wizardSummary.ScrollBars='Vertical'
+Place-WizardControl $wizardPages[1] $wizardSummary 575 8 320 344
+$wizardSummary.Text='确认模型和位置后，点击“检查安装方案”。'
 $wizardSummary.BorderStyle='FixedSingle'; $wizardSummary.Padding=New-Object Windows.Forms.Padding(14)
 $wizardStage=Wizard-Label $wizardPages[2] '' 8 8 870 52
 $wizardStage.Font=New-Object Drawing.Font('Microsoft YaHei UI',12,[Drawing.FontStyle]::Bold)
@@ -752,6 +788,19 @@ $status.Anchor='Top,Left,Right'
 Place-WizardControl $wizardPages[2] $progress 8 297 870 10
 $wizardChecks=Wizard-Label $wizardPages[2] '' 8 316 870 70
 $wizardChecks.Font=New-Object Drawing.Font('Microsoft YaHei UI',9)
+$wizardCpu=New-Object Windows.Forms.Button
+$wizardCpu.Text='改用 CPU 方案'
+Place-WizardControl $wizardPages[2] $wizardCpu 8 390 200 34
+$wizardCpu.Visible=$false
+$wizardCpu.Add_Click({
+    $runtimeProfile.SelectedIndex=[Array]::IndexOf($script:profileIds,'cpu')
+    # Keep the failed GPU environment intact; CPU wheels need their own target.
+    if($target.Text -notlike '*-cpu') { $target.Text=$target.Text+'-cpu' }
+    $script:activePlan=$null; $script:planReady=$false
+    $script:wizardPage=1; Invalidate-WizardPlan
+    $script:wizardPlanNotice='已切换 CPU。模型文件保留复用；请重新检查方案与内存预算。CPU 环境将使用独立目录。'
+    Update-Wizard
+})
 $null=Wizard-Label $wizardPages[3] "运行环境与模型已通过本机生成测试。`r`n`r`n点击下方按钮打开诗矩。以后可从原解压目录的诗矩启动入口打开。`r`n请保留完整解压目录，以及当前模型和运行环境目录。" 8 20 870 150
 $wizardSuccess=Wizard-Label $wizardPages[3] '' 8 190 870 150
 # Advanced settings retain all maintenance capabilities without crowding first use.
@@ -794,6 +843,7 @@ foreach($entry in @(@('操作日志',$details),@('资源依据',$resourceAdvice)
 $detailForm.Add_FormClosing({param($sender,$event) if(-not $script:closingDetails) { $event.Cancel=$true; $detailForm.Hide() }})
 $wizardDetails.Add_Click({ $detailForm.Show($form); $detailForm.BringToFront() })
 function Invalidate-WizardPlan {
+    $script:acceptedResourceAdvice=$null; $script:wizardPlanNotice=''
     $script:wizardPreview=$null; $script:wizardFailed=$false
     if($script:wizardPage -eq 3) { $script:wizardPage=1 }
     Update-Wizard
@@ -801,6 +851,7 @@ function Invalidate-WizardPlan {
 function Update-Wizard {
     if($script:wizardPage -eq 3 -and ($script:wizardBusy -or -not $script:verified)) { $script:wizardPage=2 }
     $page=$script:wizardPage
+    $wizardCpu.Visible=($page -eq 2 -and $script:wizardFailed -and $status.Text -like '*当前 GPU 不可用*')
     foreach($n in 0..4) { $wizardPages[$n].Visible=($page -eq $n) }
     $wizardPages[$page].BringToFront()
     $step=if($page -eq 4){1}else{$page}
@@ -826,8 +877,10 @@ function Update-Wizard {
         $wizardSummary.Text="安装前确认`r`n`r`n模型：$($p.model.model_id)`r`n方案：$profileLabel`r`n$($script:currentAdvice.title)`r`n`r`n下载预算：约 $([Math]::Round(($p.download_bytes+$modelDownload)/1GB,1)) GiB`r`n（已有文件会复用）`r`n环境预留：约 $([Math]::Round($p.environment_required_bytes/1GB,1)) GiB`r`n`r`n相关磁盘空间检查已通过。"
     } else {
         $advice=if($script:currentAdvice){$script:currentAdvice.title}else{'请先检测电脑'}
-        $wizardSummary.Text="配置建议`r`n`r`n$advice`r`n`r`n点击下方按钮检查安装方案，计算下载量并检查模型、缓存和环境所在磁盘。`r`n`r`n详细硬件数据可在技术详情的资源依据中查看。"
+        $wizardSummary.Text="配置建议`r`n`r`n$advice`r`n`r`n点击下方按钮检查安装方案，计算下载量并检查模型、缓存和环境所在磁盘。"
     }
+    if($script:currentAdvice.notice) { $wizardSummary.Text+="`r`n`r`n"+$script:currentAdvice.notice }
+    if($script:wizardPlanNotice) { $wizardHint.Text=$script:wizardPlanNotice }
     $wizardSuccess.Text="模型：$($model.Text)`r`n环境：$($target.Text)"
 }
 function Start-WizardAction($action) {
@@ -973,6 +1026,19 @@ if($UiSmokeTest) {
     $failure=[pscustomobject]@{ok=$false;error='failed';log_path='D:\reports\empty.log';log_content='';verification_error='当前可用 0.88 GiB，估算需要 5.73 GiB'}
     $formatted=Format-FailureDetails $failure
     if(-not $formatted.StartsWith("验证失败的具体原因：`r`n当前可用 0.88 GiB") -or -not $formatted.Contains('进程日志为空')) { throw '空日志情况下未突出显示验证报告原因' }
+    # Review risk only once; returning must leave an actionable plan page.
+    $script:confirmationCalls=0
+    function Show-ResourceConfirmation($message) { $script:confirmationCalls++; return $script:confirmationResult }
+    $script:confirmationResult=$true
+    $script:currentAdvice=[pscustomobject]@{requires_confirmation=$true;model_id='test';profile='cpu';state='tight';notice='资源偏紧'}
+    $script:acceptedResourceAdvice=$null
+    if(-not (Confirm-ResourceAdvice) -or -not (Confirm-ResourceAdvice) -or $script:confirmationCalls -ne 1) { throw '同一风险重复确认' }
+    $script:currentAdvice.state='risk'; $script:confirmationResult=$false
+    $script:wizardBusy=$false
+    if(Confirm-ResourceAdvice) { throw '返回操作仍继续安装' }
+    if($script:wizardPage -ne 1 -or -not $wizardMain.Enabled -or -not $wizardHint.Text.Contains('尚未开始创建环境')) { throw '返回后缺少继续安装入口或说明' }
+    Invalidate-WizardPlan
+    if($script:acceptedResourceAdvice) { throw '方案变更未清除确认记录' }
     # Exercise the automatic chain with a fake backend; never download or install.
     function Begin-Action([string]$action) { $script:action=$action; $script:recordedAction=$action; Busy $true }
     $script:wizardAuto=$true; $script:wizardPrepareOnly=$false

@@ -771,6 +771,15 @@ def install(plan, model, target, cache, operation, data_directory, continue_exis
                 checkpoints['dependencies'] = True
                 save(checkpoint_path, checkpoints)
                 save(target / 'actual-lock.json', dict(plan_id=plan_id, packages=dependency_versions(python, operation, env), wheels=items))
+            if gpu:
+                from .gpu_health import validate, save_health
+                operation.update('检查 GPU 初始化与实际运算')
+                health = validate(python, env, gpu, inspect_host(target))
+                save_health(data_directory, inspect_host(target), health)
+                save(operation.report.parent / 'gpu-health.json', health)
+                if not health['ok']:
+                    raise DeploymentFailure('当前 GPU 不可用，请改用 CPU 方案。具体原因：\n' + health['error'], gpu_unavailable=True)
+                env['CUDA_VISIBLE_DEVICES'] = health['visible']
             operation.update('验证 CPU / GPU 与真实约束生成')
             # Reuse the genuine CUDA/BNB/JIT/model/poetry checks. Copy source,
             # never an existing inference environment or its installed packages.
@@ -846,7 +855,7 @@ def install(plan, model, target, cache, operation, data_directory, continue_exis
             settings = read(runtime) if runtime.exists() else {}
             save(runtime, settings | dict(model_path=str(model), quantization=plan['inference']['precision'], allow_unverified=False))
             save(state_path, dict(plan_id=plan_id, state='verified', ok=True, python=str(python), model=str(model),
-                                 precision=plan['inference']['precision'], gpu_uuid=gpu.uuid if gpu else None, engine_sha256=engine_digest(),
+                                 precision=plan['inference']['precision'], gpu_uuid=gpu.uuid if gpu else None, gpu_visible=env['CUDA_VISIBLE_DEVICES'], engine_sha256=engine_digest(),
                                  verification=str(verification)))
             return dict(python=str(python), model=str(model), verification=str(verification),
                         installed_bytes=sum(p.stat().st_size for p in target.rglob('*') if p.is_file()))
@@ -888,7 +897,8 @@ def main():
         if args.action == 'inspect':
             from .resource_advice import snapshot
             host = inspect_host(args.target or args.data_dir)
-            advisory = snapshot(host)
+            from .gpu_health import advice as gpu_advice
+            advisory = gpu_advice(host, args.data_dir)
             result = dict(host=asdict(host), models=discover_models(args.data_dir),
                           vc_runtime=check_vc_runtime(operation, required=False), **discover_environments())
         elif args.action == 'verify-model':
@@ -905,7 +915,8 @@ def main():
                 if Path(path).exists() and not Path(path).is_dir():
                     raise ValueError(f'{label}位置是文件，请选择目录：{path}')
             host = inspect_host(args.target or args.data_dir)
-            advisory = snapshot(host)
+            from .gpu_health import advice as gpu_advice
+            advisory = gpu_advice(host, args.data_dir)
             spec = official_model(args.model_id) if args.route == 'official' else inspect_selected_model(args.model)['model']
             profile = choose_profile(host, spec, args.profile, advisory['resources'])
             result = plan_policy(spec, args.route, profile)
@@ -916,7 +927,8 @@ def main():
             operation.update('核验模型并生成清单')
             from .resource_advice import snapshot
             host = inspect_host(args.target or args.data_dir)
-            advisory = snapshot(host)
+            from .gpu_health import advice as gpu_advice
+            advisory = gpu_advice(host, args.data_dir)
             result = make_plan(args.model, args.route, args.model_id, profile=args.profile,
                                host=host, resources=advisory['resources'])
             compatibility(inspect_host(args.target or args.data_dir), result['hardware'])
@@ -957,11 +969,16 @@ def main():
         if args.action in {'preview', 'plan', 'import', 'resume', 'inspect-target'}:
             from .resource_advice import snapshot, assess_selection, MODEL_IDS
             if advisory is None:
-                advisory = snapshot(inspect_host(args.target or args.data_dir))
+                from .gpu_health import advice as gpu_advice
+                advisory = gpu_advice(inspect_host(args.target or args.data_dir), args.data_dir)
             selected_plan = result['plan'] if args.action == 'resume' else (read(args.plan) if args.action == 'inspect-target' else result)
             advisory['selection'] = assess_selection(advisory['resources'], selected_plan['model']['model_id'],
                                                      selected_plan['profile'], known=selected_plan['route'] == 'official' or selected_plan['model']['model_id'] in MODEL_IDS,
                                                      weight_bytes=model_bytes(selected_plan['model']))
+            if advisory.get('gpu_failure') and selected_plan['hardware']['device'] == 'cuda':
+                advisory['selection'].update(notice='当前 GPU 不可用（此前验证失败）。继续将重新检测 GPU。具体原因：' + advisory['gpu_failure']['error'], requires_confirmation=True)
+            elif advisory.get('gpu_failure'):
+                advisory['selection']['notice'] = '此前 GPU 验证失败，已推荐 CPU。具体原因：' + advisory['gpu_failure']['error'] + '\n' + advisory['selection']['notice']
         operation.diagnostic.event('completed', ok=True)
         operation.diagnostic.save(dict(completed=True, ok=True, diagnostics=operation.diagnostic.metadata))
         save(args.report, dict(ok=True, state='completed', stage=operation.stage, result=result,

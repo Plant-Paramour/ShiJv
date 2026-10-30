@@ -307,3 +307,75 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
 .settings-view #local-model-unsupported li { margin-block: 10px; overflow-wrap: anywhere; }
 .settings-view #local-model-unsupported summary { cursor: pointer; }
 @media(max-width: 620px) { .settings-environments { grid-template-columns: 1fr; gap: 4px; } .settings-environments dd { margin-bottom: 12px; } }
+
+/* 输入页仅换字体；结果页沿用词谱阅读参数，保留检测与编辑结构。 */
+#prosody-input-page,#prosody-input-page :is(input,textarea,select,button){font-family:var(--meter-reading-font)}
+#workspace #prosody-input-page #poem-text{font-family:var(--meter-reading-font)}
+#workspace #result-panel{font-family:var(--meter-reading-font);background:#faf7ef}
+#workspace #result-panel :is(h2,h3,h4){font-family:var(--meter-heading-font)}
+#workspace #line-results{gap:10px 24px;padding:12px 0 18px;align-items:start}
+#workspace #line-results .result-line{min-width:0;padding:4px 0;border:0;background:transparent;box-shadow:none;overflow:visible}
+#workspace #line-results :is(.poem-line,.tone-line){grid-template-columns:repeat(var(--line-length,7),var(--meter-reading-cell));width:max-content;max-width:none;gap:0;margin:0;padding:0;font-family:var(--meter-reading-font);font-size:var(--meter-reading-size);line-height:var(--meter-reading-leading);letter-spacing:0}
+#workspace #line-results :is(.char,.tone,.tone.multi-label){box-sizing:border-box;display:block;width:var(--meter-reading-cell);min-width:0;padding:0;text-align:center;font-family:inherit;font-size:inherit;line-height:inherit}
+#workspace #line-results .char:not(.error):not(.ao):not(.rescue):not(.polyphonic):not(mark){color:var(--meter-poem-ink)}
+#workspace #line-results .tone:not(.error):not(.ao):not(.rescue):not(.polyphonic):not(mark){color:var(--meter-tone-ink)}
+#workspace #line-results .line-editor input{font-family:var(--meter-reading-font)}
+#workspace #line-results .is-editing>:is(.poem-line,.tone-line,.pending-note){display:none}
+@media(max-width:600px){#workspace #line-results{grid-template-columns:minmax(0,1fr);gap:8px}}
+
+/* 依体裁组织紧凑句组，字句与平仄保持一一对应。 */
+#workspace #line-results{justify-content:start;gap:7px 18px}
+#workspace #line-results .result-line{padding:2px 0}
+#workspace #line-results[data-poem-type="tang"],#workspace #line-results[data-poem-type="pailv"]{grid-template-columns:repeat(2,max-content);column-gap:1.5em}
+#workspace #line-results[data-poem-type="haiku"]{grid-template-columns:max-content}
+@media(max-width:600px){#workspace #line-results[data-poem-type="tang"],#workspace #line-results[data-poem-type="pailv"]{column-gap:.7em;overflow-x:auto;max-width:100%}}
+
+/* 每个原谱显示行独立收拢，避免全局网格被最长句撑开。 */
+#workspace #line-results{width:max-content;max-width:100%;margin-inline:auto;justify-content:center;row-gap:5px}
+#workspace #line-results .result-line{flex:0 0 auto;padding:0}
+#workspace #line-results :is(.poem-line,.tone-line){grid-auto-flow:row;grid-auto-columns:auto;line-height:1.55}
+#workspace #line-results :is(.char,.tone,.tone.multi-label){line-height:1.55}
+
+/* 检测状态用背景标记，字与平仄均保持清晰可辨。 */
+#workspace #line-results mark{border-radius:3px;color:#302e28!important;text-decoration:none;font-weight:inherit}
+#workspace #line-results :is(.polyphonic,.conditional-affected){background:#d8d8d5;color:#242424!important;text-decoration:none}
+#workspace #line-results :is(.ao,.rescue){background:#f1dfae;color:#302e28!important;text-decoration:none}
+#workspace #line-results :is(.error,.conditional-error,.conditional-trigger){background:#d52b3f!important;color:#fff!important;text-decoration:none}
+#workspace #line-results .meter-book-repeat{border-width:0 0 2px;border-color:#6b6455}
+
+/* 检测标记跨原字与模板两行；韵组背景仍只留在模板字位。 */
+#workspace #line-results .poem-line{position:relative;overflow:visible;z-index:1}
+#workspace #line-results .poem-line :is(.char.error,.char.polyphonic,.char.conditional-affected,.char.conditional-trigger,.char.conditional-error){position:relative;border-radius:3px 3px 0 0}
+#workspace #line-results .poem-line :is(.char.error,.char.polyphonic,.char.conditional-affected,.char.conditional-trigger,.char.conditional-error)::after{content:"";position:absolute;inset:0 0 auto;height:calc(2em * var(--meter-reading-leading));box-sizing:border-box;border:1px solid #858580;border-radius:3px;pointer-events:none}
+#workspace #line-results .poem-line :is(.char.error,.char.conditional-trigger,.char.conditional-error)::after{border:2px solid #d52b3f}
+#workspace #line-results .tone-line :is(.error,.polyphonic,.conditional-affected,.conditional-trigger,.conditional-error){border-radius:0 0 3px 3px}
+.prosody-rhyme-legend .prosody-legend-error{padding:0 5px;border:2px solid #d52b3f;border-radius:3px;background:#d52b3f;color:#fff}
+.prosody-rhyme-legend .prosody-legend-polyphonic{padding:0 5px;border:1px solid #858580;border-radius:3px;background:#d8d8d5;color:#242424}
+.prosody-rhyme-legend .prosody-legend-pair{display:inline-flex;align-items:stretch;gap:0;white-space:nowrap;border:1px solid #858580;border-radius:3px;overflow:hidden}
+.prosody-rhyme-legend .prosody-legend-pair--error{border:2px solid #d52b3f}
+.prosody-rhyme-legend .prosody-legend-pair>mark{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;margin:0;border:0;border-radius:0;padding:2px 6px;font:inherit;line-height:1.6;text-align:center}
+.prosody-rhyme-legend .prosody-legend-outline{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;margin:0;padding:2px 6px;border:0;border-radius:0;background:transparent;color:#302e28;font:inherit;line-height:1.6;text-align:center}
+#workspace #line-results .meter-book-rhyme,.prosody-rhyme-legend .meter-book-rhyme{position:relative;overflow:visible}
+/* 原句与模板共享层叠空间，使模板角标可以盖过上一行的 mark。 */
+#workspace #line-results .poem-line{z-index:auto}
+#workspace #line-results .meter-book-rhyme-number{z-index:5;pointer-events:none}
+#workspace #line-results .result-line{position:relative;isolation:isolate}
+#workspace #line-results :is(.poem-line,.tone-line),#workspace #line-results :is(.char,.tone){z-index:auto}
+#workspace #line-results .meter-book-rhyme-number{position:absolute;z-index:10}
+
+/* 句子不建立独立滚动容器，保留完整字谱与跨行标记。 */
+#workspace #line-results .result-line{overflow:visible;max-height:none;height:auto}
+
+/* 去掉滚动容器，不改变宋词原谱句组的换行。 */
+#workspace #line-results,#workspace #line-results[data-poem-type]{overflow:visible;height:auto;max-height:none}
+#workspace #line-results[data-poem-type="tang"],#workspace #line-results[data-poem-type="pailv"]{display:grid;grid-template-columns:repeat(2,max-content)}
+@media(max-width:380px){
+  #workspace #line-results[data-poem-type="tang"],#workspace #line-results[data-poem-type="pailv"]{column-gap:.25em;font-size:16px;--meter-reading-size:16px}
+}
+
+/* 恢复宋词原谱句组：整体居中，句组独立收拢，窄屏允许组内换行。 */
+
+/* 宋词布局的唯一规则：每个原谱显示行独立收拢，整体居中。 */
+#workspace #line-results[data-poem-type="songci"]{display:flex;flex-direction:column;align-items:flex-start;width:max-content;max-width:100%;margin-inline:auto;gap:5px;overflow:visible}
+#workspace #line-results[data-poem-type="songci"] .prosody-sentence-group{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;flex:0 0 auto;width:auto;max-width:100%;gap:0 .5em}
+#workspace #line-results[data-poem-type="songci"] .result-line{flex:0 0 auto;width:auto;min-width:0;padding:0}
