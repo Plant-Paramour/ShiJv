@@ -65,3 +65,5 @@ node_modules/
 /Songci_Meter/display-layout-report.json
 /scripts/audit_diancang_page.py
 /web/prosody-checker/index.intent.json
+/web/prosody-checker/card-assets-dev/
+/reverse/

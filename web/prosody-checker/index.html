@@ -97,6 +97,7 @@
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
   <link rel="stylesheet" href="./styles.css?v=115">
   <link rel="stylesheet" href="./prosody-workbook.css?v=33">
+  <link rel="stylesheet" href="./card-studio.css?v=2">
 </head>
 <body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
   <a class="han-skip-link" href="#main-content">跳到主要内容</a>
@@ -116,6 +117,7 @@
           <li class="han-navbar__item"><a href="#chat" data-route-link="chat">AI 对话</a></li>
           <li class="han-navbar__item"><a href="#prosody" data-route-link="prosody">格律检测</a></li>
           <li class="han-navbar__item"><a href="#sentence-search" data-route-link="sentence-search">句式格律</a></li>
+          <li class="han-navbar__item"><a href="#card-studio" data-route-link="card-studio">诗词卡片</a></li>
         </ul>
       </nav>
 
@@ -138,6 +140,7 @@
       <a href="#chat" data-drawer-route="chat"><span class="drawer-menu__icon" aria-hidden="true">谈</span><span>AI 对话</span></a>
       <a href="#prosody" data-drawer-route="prosody"><span class="drawer-menu__icon" aria-hidden="true">律</span><span>格律检测</span></a>
       <a href="#sentence-search" data-drawer-route="sentence-search"><span class="drawer-menu__icon" aria-hidden="true">句</span><span>句式格律</span></a>
+      <a href="#card-studio" data-drawer-route="card-studio"><span class="drawer-menu__icon" aria-hidden="true">卡</span><span>诗词卡片</span></a>
     </nav>
     <div class="site-drawer__hint">在这里开始创作、校验与交流。</div>
   </aside>
@@ -217,7 +220,7 @@
             <div class="chat-composer__toolbar">
               <label class="chat-model-picker" title="选择模型"><select id="chat-model" aria-label="选择模型"><option value="">请先配置模型</option></select></label>
               <div class="chat-composer__actions">
-                <button class="chat-prompt-button" type="button" id="chat-prompt-button" title="打开创作提示词" aria-label="打开创作提示词"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5z"></path><path d="M8.5 8h7M8.5 12h7M8.5 16h4"></path></svg></button>
+                <button class="chat-prompt-button" type="button" id="chat-prompt-button" title="打开创作面板" aria-label="打开创作面板"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5z"></path><path d="M8.5 8h7M8.5 12h7M8.5 16h4"></path></svg></button>
                 <label class="chat-attach-button" for="chat-attachment" title="添加图片" aria-label="添加图片"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 4.2-4.2 3.2-2.2 5.4 5.2"></path></svg></label>
                 <input id="chat-attachment" type="file" accept="image/jpeg,image/png,image/webp" hidden>
                 <button class="chat-cancel-button" type="button" id="chat-cancel" title="取消发送" aria-label="取消发送" hidden>取消</button>
@@ -466,55 +469,104 @@
       </div>
     </section>
 
+    <section class="app-view card-studio-view" data-view="card-studio" aria-labelledby="card-studio-title" hidden>
+      <div class="card-studio-shell">
+        <header class="card-studio-heading">
+          <div><p class="eyebrow">诗矩 · 视觉创作</p><h1 id="card-studio-title">诗词卡片</h1><p>把一首诗整理成一张可以分享的画面。</p></div>
+          <div class="card-studio-heading__mark" aria-hidden="true">卡</div>
+        </header>
+        <div class="card-studio-layout">
+          <form class="card-studio-controls" id="card-studio-form">
+            <section class="card-control-group">
+              <div class="card-control-group__title"><h2>内容</h2><span>实时预览</span></div>
+              <label class="field"><span>标题</span><input id="card-title-input" type="text" maxlength="80" placeholder="例如：春日偶成"></label>
+              <label class="field"><span>正文</span><textarea id="card-body-input" rows="8" maxlength="4000" placeholder="写下诗句，每行一句即可"></textarea></label>
+              <label class="field"><span>落款</span><input id="card-author-input" type="text" maxlength="40" placeholder="用户名或署名（可选）"></label>
+            </section>
+            <section class="card-control-group">
+              <div class="card-control-group__title"><h2>布局</h2><span id="card-size-hint">1080 × 1440</span></div>
+              <div class="card-layout-picker" role="radiogroup" aria-label="选择卡片布局">
+                <label class="card-layout-option is-selected"><input type="radio" name="card-layout" value="classic-frame" checked><span><strong>框间留白</strong><small>竖幅 · 居中</small></span></label>
+                <label class="card-layout-option"><input type="radio" name="card-layout" value="vertical-note"><span><strong>一笺竖意</strong><small>竖排 · 落款</small></span></label>
+                <label class="card-layout-option"><input type="radio" name="card-layout" value="horizontal-verse"><span><strong>横向成章</strong><small>横幅 · 分隔线</small></span></label>
+                <label class="card-layout-option"><input type="radio" name="card-layout" value="image-accent"><span><strong>映景成诗</strong><small>配图 · 遮罩</small></span></label>
+              </div>
+            </section>
+            <section class="card-control-group">
+              <div class="card-control-group__title"><h2>字形</h2><span>清晰优先</span></div>
+              <div class="card-font-grid"><label class="field"><span>标题字体</span><select id="card-title-font-input"><option value="ancient">古体仿宋</option><option value="song">汇文仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label><label class="field"><span>正文字体</span><select id="card-font-input"><option value="song">汇文仿宋</option><option value="ancient">古体仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label><label class="field"><span>作者字体</span><select id="card-author-font-input"><option value="song">汇文仿宋</option><option value="ancient">古体仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label></div>
+              <div class="card-range-row"><label class="field"><span>正文字号</span><input id="card-size-input" type="range" min="24" max="72" step="1" value="42"><output id="card-size-output">42</output></label><label class="field"><span>行距</span><input id="card-leading-input" type="range" min="1.35" max="2.4" step="0.05" value="1.8"><output id="card-leading-output">1.80</output></label></div>
+              <div class="card-range-row"><label class="field"><span>标题字号</span><input id="card-title-size-input" type="range" min="24" max="64" step="1" value="34"><output id="card-title-size-output">34</output></label><label class="field"><span>字间距</span><input id="card-letter-spacing-input" type="range" min="0" max="12" step="1" value="1"><output id="card-letter-spacing-output">1</output></label></div>
+              <fieldset class="card-align-fieldset"><legend>正文对齐</legend><label><input type="radio" name="card-align" value="start"><span>左</span></label><label><input type="radio" name="card-align" value="middle" checked><span>中</span></label><label><input type="radio" name="card-align" value="end"><span>右</span></label></fieldset>
+              <fieldset class="card-align-fieldset"><legend>显示信息</legend><label><input id="card-show-author-input" type="checkbox"><span>落款</span></label><label><input id="card-show-seal-input" type="checkbox" checked><span>印记</span></label></fieldset>
+            </section>
+            <section class="card-control-group">
+              <div class="card-control-group__title"><h2>背景</h2><span>本地处理</span></div>
+              <label class="field card-color-field"><span>底色</span><input id="card-color-input" type="color" value="#eee6d7"><output id="card-color-output">#EEE6D7</output></label>
+              <label class="card-upload-row" for="card-image-input"><span class="quiet-button">选择配图</span><input id="card-image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden><small id="card-image-name">未选择图片</small></label>
+              <div class="card-range-row"><label class="field"><span>透明度</span><input id="card-image-opacity-input" type="range" min="0" max="1" step="0.05" value="0.55"><output id="card-image-opacity-output">55%</output></label><label class="field"><span>裁剪</span><select id="card-image-fit-input"><option value="cover">铺满</option><option value="contain">完整</option></select></label></div>
+              <div class="card-range-row"><label class="field"><span>水平位置</span><input id="card-image-x-input" type="range" min="0" max="100" step="1" value="50"><output id="card-image-x-output">50%</output></label><label class="field"><span>垂直位置</span><input id="card-image-y-input" type="range" min="0" max="100" step="1" value="50"><output id="card-image-y-output">50%</output></label></div>
+              <label class="field"><span>图片缩放</span><input id="card-image-scale-input" type="range" min="1" max="2.5" step="0.05" value="1"><output id="card-image-scale-output">1.00×</output></label>
+              <label class="field"><span>图片滤镜</span><select id="card-image-filter-input"><option value="none">原图</option><option value="warm">暖纸</option><option value="mono">墨版</option><option value="soft">柔和</option></select></label>
+              <label class="field"><span>视觉主题</span><select id="card-theme-input"><option value="paper">素纸</option><option value="vermilion">朱砂</option><option value="ink">墨色</option><option value="night">夜青</option></select></label>
+            </section>
+            <div class="card-studio-actions"><button class="quiet-button" id="card-undo-button" type="button" disabled>撤销</button><button class="quiet-button" id="card-redo-button" type="button" disabled>重做</button><label class="card-export-size"><span>导出比例</span><select id="card-export-aspect-input"><option value="auto">按布局</option><option value="portrait">竖幅 3:4</option><option value="landscape">横幅 4:3</option><option value="story">长图 9:16</option><option value="social">社交 4:5</option><option value="square">方形 1:1</option></select></label><button class="primary-button" id="card-export-button" type="button">下载 PNG</button><span id="card-export-status" role="status"></span></div>
+          </form>
+          <section class="card-preview-panel" aria-label="诗卡预览"><div class="card-preview-toolbar"><span>预览</span><span id="card-preview-dimensions">1080 × 1440</span></div><div class="card-preview-frame"><div id="card-scene-preview" class="card-scene-preview"></div></div><p class="card-preview-note">图片只在本地浏览器中处理，导出默认使用 2 倍尺寸。</p></section>
+        </div>
+      </div>
+    </section>
+
 
     <section class="app-view settings-view" data-view="settings" aria-labelledby="settings-title" hidden>
       <div class="tool-shell">
         <header class="tool-heading"><div><a class="settings-back" href="#profile">个人中心 / 创作设置</a><h1 id="settings-title">模型与运行环境</h1><p class="settings-subtitle">为你的创作，备好笔墨。</p></div><p>模型、环境与密钥<br>只保存在这台电脑上</p></header>
         <section class="profile-panel" aria-label="使用准备">
-          <p class="eyebrow">配置指引</p><h2>从对话，到成诗</h2>
-          <ol class="settings-steps"><li><span>一</span><div><strong>连接对话模型（可选）</strong><small>若需要对话辅助，可以配置模型服务</small></div></li><li><span>二</span><div><strong>检查推理环境</strong><small>确认依赖、硬件与本地模型兼容</small></div></li><li><span>三</span><div><strong>启动本地生成器</strong><small>加载诗词生成模型，准备生成诗稿</small></div></li></ol>
-          <p>设计有搜韵、搜词牌、格律检查等功能，用于交流、推敲创作思路；而本地生成器用于按格律生成诗稿，独立使用。即使未配置对话模型或连接 API，也可以打开创作面板，手动填写创作要求和生成参数；提交生成前，需先在下方配置并启动本地生成器。</p>
+          <p class="eyebrow">开始创作</p><h2>不接 API，也能写诗</h2>
+          <p>本地模型负责按格律生成、改写和补完。你可以直接填写创作要求，不必先配置 API。连接 API 后，Agent 还可以和你讨论构思、推荐用韵、查词谱和韵书，并整理创作方案。</p>
+          <p><button id="settings-open-creation" class="primary-button" type="button">打开创作面板（无需 API）</button></p>
+          <p class="field-hint">先在下方选择并加载本地模型，再提交生成任务。也可以先打开面板，了解有哪些创作选项。</p>
           <figure class="settings-chat-guide" aria-labelledby="settings-chat-caption">
             <div class="settings-chat-demo" role="img" aria-label="对话输入框示意：底部右侧依次为创作提示词、添加图片和发送图标。创作提示词按钮以朱色方框标出。">
               <div class="settings-chat-demo__input">写下你的想法……</div>
-              <div class="settings-chat-demo__toolbar"><span class="settings-chat-demo__model">请先配置模型 <span aria-hidden="true">⌄</span></span><div class="settings-chat-demo__actions" aria-hidden="true">
+              <div class="settings-chat-demo__toolbar"><span class="settings-chat-demo__model">Agent 未配置（不影响创作） <span aria-hidden="true">⌄</span></span><div class="settings-chat-demo__actions" aria-hidden="true">
                 <span class="chat-prompt-button settings-chat-demo__target"><svg viewBox="0 0 24 24"><path d="M5 4.5h14v15H5z"></path><path d="M8.5 8h7M8.5 12h7M8.5 16h4"></path></svg></span>
                 <span class="settings-chat-demo__icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 4.2-4.2 3.2-2.2 5.4 5.2"></path></svg></span>
                 <span class="settings-chat-demo__icon settings-chat-demo__send"><svg viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"></path></svg></span>
               </div></div>
             </div>
-            <figcaption id="settings-chat-caption"><strong>方框处：创作面板入口</strong><span>在「<a href="#chat">AI 对话</a>」输入框的右下角，点击图片按钮左侧的纸页图标（悬停提示为“打开创作提示词”），即可打开创作面板。上图为位置示意。</span></figcaption>
+            <figcaption id="settings-chat-caption"><strong>以后从哪里打开？认准红框里的纸页按钮</strong><span>进入「<a href="#chat">AI 对话</a>」，在输入框右下角找到三个按钮：纸页、图片、发送。点击最左边的<strong>纸页按钮</strong>（图片按钮左侧，悬停显示“打开创作面板”）。即使没有配置 API，也可以点击。上图为位置示意。</span></figcaption>
           </figure>
-          <p>如需对话辅助，可在下方添加模型服务端点。使用 Ollama、LM Studio 等本机对话服务时，填写服务地址并选择模型；是否需要密钥，以该服务的认证设置为准。</p>
+          <p>Agent 是可选助手，下面的 API 配置可以跳过。</p>
           <p id="local-readiness" role="status">正在检查配置……</p>
         </section>
         <form id="model-config-form" class="profile-panel">
-          <div class="profile-panel__heading"><div><p class="eyebrow">服务端点</p><h2>可用模型</h2></div><button id="model-endpoint-add" class="quiet-button" type="button">添加端点</button></div>
+          <div class="profile-panel__heading"><div><p class="eyebrow">可选</p><h2>创作助手 · API Agent</h2></div><button id="model-endpoint-add" class="quiet-button" type="button">添加模型服务</button></div>
           <div id="model-endpoint-list"></div>
-          <p class="field-hint">填写服务地址，并按服务要求填写 API 密钥，即可尝试获取可访问的模型列表；也可直接输入模型 ID。模型列表不代表对话或工具调用能力，请选择后测试连接。OpenAI-like 使用 Chat Completions API；Anthropic 使用 Messages API。</p>
+          <p class="field-hint">按服务商提供的信息填写 API 地址、模型名称和密钥。可以获取模型列表后选择，也可以直接填写模型名称；填好后点击“测试连接”。Agent 需要模型支持工具调用。</p><details><summary>目前支持哪些 API？</summary><p>目前支持 OpenAI 兼容的 Chat Completions API 和 Anthropic Messages API，可连接远程服务或本机服务。用于 Agent 的模型还需支持工具调用。</p></details>
           <div class="form-actions"><button class="primary-button" type="submit">保存模型配置</button><span id="model-config-status" role="status"></span></div>
         </form>
         <section class="profile-panel" aria-label="运行环境">
-          <p class="eyebrow">启动器管理</p><h2>运行环境</h2>
-          <p class="field-hint">软件环境与推理环境可分别选择。需要更换时，请重新打开“诗矩单机版.bat”，在启动器中停止服务、选择环境并重新启动。</p>
+          <p class="eyebrow">排查与更换环境</p><h2>运行环境</h2>
+          <p class="field-hint">通过部署工具安装成功后，通常无需调整这里。需要更换运行环境时，打开“诗矩单机版.bat”，在启动器中停止服务、选择环境并重新启动。</p>
           <dl class="settings-environments"><dt>软件环境</dt><dd id="application-python-path">读取中……</dd><dt>本地推理环境</dt><dd id="inference-python-path">读取中……</dd></dl>
           <button id="local-environment-check" class="quiet-button" type="button">重新检查推理环境</button>
           <p id="local-environment-status" role="status"></p>
         </section>
         <form id="local-generator-form" class="profile-panel">
-          <h2>本地诗词生成模型</h2>
-          <p class="field-hint">本地生成支持 Qwen3 / Qwen3.5 原始浮点权重。可用 CPU FP32 推理，建议使用较小模型；也可使用 NVIDIA CUDA，按显存采用 FP16 或 4bit。暂不支持预量化或 GGUF。扫描会列出发现的模型及不可用原因；权重加载、有效输出及约束生成全部通过后才会就绪。</p>
+          <h2>本地诗词生成</h2>
+          <p class="field-hint">选择用于生成诗词的本地模型。通过部署工具安装的模型通常已填好；需要换模型时，可以扫描或直接填写目录。</p><details><summary>支持哪些模型？</summary><p>支持 Qwen3 / Qwen3.5 原始浮点权重，暂不支持预量化权重或 GGUF。CPU 和 NVIDIA GPU 的运行方式取决于已安装环境；实际能否使用，以本机加载和生成测试为准。</p></details>
           <label class="field"><span>扫描目录（留空扫描项目和常用模型缓存）</span><input id="local-model-scan-root" placeholder="例如 D:\Models"></label>
           <button id="local-model-scan" class="quiet-button" type="button">扫描本地模型</button>
           <label class="field"><span>已发现的本地模型</span><select id="local-model-choice"><option value="">请扫描或直接填写目录</option></select></label>
           <label class="field"><span>模型目录</span><input id="local-model-path" placeholder="例如 D:\Models\Qwen3-4B"></label>
           <p class="field-hint" id="local-model-plan">运行方式由环境、模型与硬件检测自动决定，不需要手动选择精度。CPU 推理速度较慢；通过真实调用与约束生成验收后才会标记为就绪。</p>
-          <label for="local-model-idle">任务结束后的模型驻留时间</label>
+          <label for="local-model-idle">空闲多久后释放模型</label>
           <select id="local-model-idle"><option value="60">1 分钟</option><option value="300">5 分钟（推荐）</option><option value="600">10 分钟</option><option value="1800">30 分钟</option><option value="0">始终保留，直到停止软件</option></select>
-          <p class="field-hint">空闲超时才释放权重；驻留期间复用模型，释放后新任务会自动重新加载。运行中的任务不会被中断。</p>
+          <p class="field-hint">释放模型可腾出内存和显存，下次生成时会重新加载。正在生成的任务不受影响。</p>
           <ul id="local-model-check-results" class="field-hint" aria-live="polite"></ul>
           <label><input id="local-model-auto" type="checkbox"> 下次打开软件时自动加载此模型</label>
-          <div class="form-actions"><button class="primary-button" type="submit">保存生成器配置</button><button id="local-worker-start" class="quiet-button" type="button">保存并启动生成器</button><button id="local-worker-stop" class="quiet-button" type="button">停止生成器</button></div>
+          <div class="form-actions"><button class="primary-button" type="submit">保存配置</button><button id="local-worker-start" class="quiet-button" type="button">保存并加载模型</button><button id="local-worker-stop" class="quiet-button" type="button">停止本地生成</button></div>
           <p id="local-worker-status" role="status">尚未启动</p>
           <p id="local-worker-action-status" role="status"></p>
           <p id="local-model-scan-status" role="status"></p><details id="local-model-unsupported" hidden><summary>不可用模型及原因</summary><ul></ul></details>
@@ -581,5 +633,6 @@
   <link rel="stylesheet" href="./meter-book.css?v=27">
   <link rel="stylesheet" href="./poem-editor.css?v=5">
   <script type="module" src="./meter-book.js?v=18"></script>
+  <script type="module" src="./card-studio.js?v=2"></script>
 </body>
 </html>

@@ -45,6 +45,9 @@ def build(output):
     subprocess.run([str(compiler), '/nologo', '/target:winexe', '/codepage:65001',
                     '/reference:System.Windows.Forms.dll', '/out:' + str(output / '诗矩环境部署.exe'),
                     str(ROOT / 'tools/EnvironmentDeployer.cs')], check=True)
+    subprocess.run([str(compiler), '/nologo', '/target:winexe', '/codepage:65001',
+                    '/reference:System.Windows.Forms.dll', '/out:' + str(output / '诗矩单机版.exe'),
+                    str(ROOT / 'tools/SinglePlayerLauncher.cs')], check=True)
     shutil.copy2(ROOT / 'docs/environment-tool-user.md', output / '使用说明.md')
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))

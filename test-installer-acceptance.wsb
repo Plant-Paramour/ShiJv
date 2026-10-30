@@ -1,0 +1,20 @@
+<Configuration>
+  <MemoryInMB>10240</MemoryInMB>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>D:\code\ShiJv</HostFolder>
+      <GuestFolder>C:\ShiJuHost</GuestFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>C:\Users\26051\.cache\modelscope\hub\models\Qwen\Qwen3.5-0.8B</HostFolder>
+      <GuestFolder>C:\ShiJuModel</GuestFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>C:\Users\26051\AppData\Local\ShiJu\deployment\environments\qwen35</HostFolder>
+      <GuestFolder>C:\ShiJuEnv</GuestFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+</Configuration>

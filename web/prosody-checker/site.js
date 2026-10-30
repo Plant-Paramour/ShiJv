@@ -20,6 +20,7 @@ const routeTitles = {
   chat: "AI 对话 · 诗矩",
   prosody: "格律检测 · 诗矩",
   "sentence-search": "句式格律 · 诗矩",
+  "card-studio": "诗词卡片 · 诗矩",
   profile: "个人中心 · 诗矩",
   poem: "诗作修改 · 诗矩",
   settings: "模型设置 · 诗矩",
@@ -394,6 +395,7 @@ function openChatPromptChooser() {
   else dialog.setAttribute("open", "");
 }
 chatPromptButton?.addEventListener("click", openChatPromptChooser);
+document.querySelector("#settings-open-creation")?.addEventListener("click", () => { window.location.hash = "chat"; openChatPromptChooser(); });
 
 async function openDirectGenerationEditor(mode) {
   const isPartial = mode === "partial" || mode === "rewrite";
@@ -2409,7 +2411,7 @@ async function loadCurrentUser({ restore = true } = {}) {
 function addModelEndpoint(endpoint = {}) {
   const row = document.createElement("fieldset");
   row.className = "model-endpoint profile-panel";
-  row.innerHTML = `<legend>模型端点</legend><div class="model-endpoint__grid"><label class="field"><span>协议</span><select data-model-provider><option value="openai-compatible">OpenAI-like</option><option value="anthropic">Anthropic</option></select></label><label class="field"><span>端点名称</span><input data-model-id maxlength="64" required placeholder="例如 primary"></label><label class="field"><span>服务地址</span><input data-model-url type="url" required placeholder="https://api.example.com/v1"></label><label class="field"><span>模型名称</span><input data-model-name required placeholder="填写服务提供的模型 ID"></label><label class="field"><span>API 密钥</span><input data-model-key type="password" autocomplete="new-password" placeholder=""></label></div><div class="model-endpoint__actions"><button type="button" class="quiet-button" data-model-test>测试连接</button><button type="button" class="quiet-button" data-model-remove>移除</button><span role="status" data-model-status></span></div>`;
+  row.innerHTML = `<legend>模型服务</legend><div class="model-endpoint__grid"><label class="field"><span>协议</span><select data-model-provider><option value="openai-compatible">OpenAI-like</option><option value="anthropic">Anthropic</option></select></label><label class="field"><span>名称</span><input data-model-id maxlength="64" required placeholder="例如 primary"></label><label class="field"><span>API 地址</span><input data-model-url type="url" required placeholder="https://api.example.com/v1"></label><label class="field"><span>模型名称</span><input data-model-name required placeholder="填写服务提供的模型 ID"></label><label class="field"><span>API 密钥</span><input data-model-key type="password" autocomplete="new-password" placeholder=""></label></div><div class="model-endpoint__actions"><button type="button" class="quiet-button" data-model-test>测试连接</button><button type="button" class="quiet-button" data-model-remove>移除</button><span role="status" data-model-status></span></div>`;
   row.querySelector("[data-model-provider]").value = endpoint.provider || "openai-compatible";
   row.querySelector("[data-model-id]").value = endpoint.provider_id || `endpoint-${document.querySelectorAll(".model-endpoint").length + 1}`;
   row.querySelector("[data-model-url]").value = endpoint.base_url || "";
@@ -2467,7 +2469,7 @@ function modelEndpointPayload(row, { requireModel = true } = {}) {
   const value = (selector) => row.querySelector(selector).value.trim();
   const result = { provider_id: value("[data-model-id]"), provider: value("[data-model-provider]"), base_url: value("[data-model-url]"), model: value("[data-model-name]"), api_key: value("[data-model-key]") };
   if (!result.provider_id || !result.base_url || (requireModel && !result.model)) {
-    row.querySelector("[data-model-status]").textContent = requireModel ? "请填写端点名称、服务地址和模型名称。" : "请先填写端点名称、服务地址和 API 密钥（已保存的密钥可留空）。";
+    row.querySelector("[data-model-status]").textContent = requireModel ? "请填写名称、服务地址和模型名称。" : "请先填写名称、服务地址和 API 密钥（已保存的密钥可留空）。";
     return null;
   }
   return result;
@@ -4931,9 +4933,9 @@ function enableDiagnosticCopy(target) {
 }
 let runtimeRequestActive = false;
 function renderWorkerStatus(data) {
-  const labels = { released: '权重已释放；提交新任务时自动重新加载', stopped: '生成器未启动；保存模型目录后，提交任务会自动启动', loading: '正在加载模型；可提交任务排队，加载完成后自动生成', ready: '本地生成器已就绪，可以提交诗词生成', failed: '模型加载或运行失败，请查看下方错误并检查依赖、模型和显存' };
+  const labels = { released: '模型已释放；下次生成时会自动加载', stopped: '生成器未启动；保存模型目录后，提交任务会自动启动', loading: '正在加载模型；可提交任务排队，加载完成后自动生成', ready: '本地模型已可用，可以开始创作', failed: '模型加载或运行失败，请查看下方错误并检查依赖、模型和显存' };
   const pendingVerification = (data.worker.checks || []).some(c => c.state === 'pending');
-  const text = data.worker.ready ? (pendingVerification ? '模型已加载；配对未验证，实际生成成功后自动记住' : labels.ready) : data.worker.state === 'loading' ? (data.worker.message || labels.loading) : data.worker.external_worker ? '已连接独立运行的诗词生成器' : labels[data.worker.state];
+  const text = data.worker.ready ? (pendingVerification ? '模型已加载；配对未验证，实际生成成功后自动记住' : labels.ready) : data.worker.state === 'loading' ? (data.worker.message || labels.loading) : data.worker.external_worker ? '已连接本地生成服务' : labels[data.worker.state];
   document.querySelector('#local-worker-status').textContent = text;
   document.querySelector('#local-model-check-results').replaceChildren(...(data.worker.checks || []).map(c => { const li = document.createElement('li'); li.textContent = `${c.name}：${({passed:'通过',running:'进行中',failed:'失败',pending:'待实际生成验证'})[c.state] || '未测试'} · ${c.detail}`; return li; }));
   const diagnosticText = data.worker.diagnostics?.log_path ? `日志：${data.worker.diagnostics.log_path}\n诊断编号：${data.worker.diagnostics.diagnostic_id}` : '';
