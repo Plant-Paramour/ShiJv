@@ -535,13 +535,15 @@ def versions_match(actual, items):
     return all(actual.get(name) == version for name, version in expected.items()) and not (set(actual) - set(expected) - {'pip', 'setuptools', 'wheel'})
 
 
-def check_vc_runtime(operation, installer=None, digest=None, required=True):
+def check_vc_runtime(operation, installer=None, digest=None, required=True, interactive=False):
     report = operation.report.parent / 'vc-runtime.json'
     powershell = Path(os.environ.get('SystemRoot', 'C:/Windows')) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
     command = [powershell, '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File',
                ROOT / 'apps/launcher/export_templates/ensure-vc-runtime.ps1', '-ReportPath', report]
     if installer:
         command += ['-Mode', 'Install', '-InstallerPath', installer, '-ExpectedSha256', digest]
+    if interactive:
+        command += ['-Interactive']
     operation.run(command, timeout=900 if installer else 60)
     result = read(report)
     if required and (not result.get('ok') or result.get('restart_required')):
@@ -560,13 +562,13 @@ def check_vc_runtime(operation, installer=None, digest=None, required=True):
     return result
 
 
-def install_vc_runtime(cache, operation):
+def install_vc_runtime(cache, operation, interactive=False):
     spec = read(POLICY / 'vc-runtime.json')
     operation.update('下载 Microsoft Visual C++ x64 运行库')
     installer = Path(cache) / spec['filename']
     operation.download(spec['source_url'], installer, spec['sha256'], spec['bytes'])
     operation.update('核验微软签名并安装 VC++ 运行库（可能出现系统权限提示）')
-    return check_vc_runtime(operation, installer, spec['sha256'])
+    return check_vc_runtime(operation, installer, spec['sha256'], interactive=interactive)
 
 
 def ensure_vc_runtime(cache, operation):
@@ -678,7 +680,11 @@ def install(plan, model, target, cache, operation, data_directory, continue_exis
     check_install_space(target, cache, plan['environment_required_bytes'], plan['download_bytes'])
     plan_id = hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()
     target.parent.mkdir(parents=True, exist_ok=True)
-    lock_path = target.with_name(target.name + '.shiju-install.lock')
+    lock_directory = ROOT / 'var' / 'locks'
+    lock_directory.mkdir(parents=True, exist_ok=True)
+    # Normalize Windows casing so aliases of the same environment share a lock.
+    lock_key = hashlib.sha256(os.path.normcase(str(target)).encode('utf-8')).hexdigest()
+    lock_path = lock_directory / (lock_key + '.shiju-install.lock')
     # Windows OS lock is released by the kernel even after a process crash.
     lock_handle = lock_path.open('a+b')
     try:
@@ -868,7 +874,7 @@ def install(plan, model, target, cache, operation, data_directory, continue_exis
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['inspect', 'preview', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'install-vc-runtime', 'resume', 'import-wheels', 'inspect-target', 'diagnostics'])
+    parser.add_argument('action', choices=['inspect', 'preview', 'verify-model', 'download', 'plan', 'import', 'export', 'install', 'install-vc-runtime', 'repair-vc-runtime', 'resume', 'import-wheels', 'inspect-target', 'diagnostics'])
     parser.add_argument('--profile', choices=['auto', *PROFILES], default='auto')
     parser.add_argument('--source', choices=['auto', 'mirror', 'official'], default='auto')
     parser.add_argument('--continue-existing', action='store_true')
@@ -896,11 +902,15 @@ def main():
                     raise ValueError(f'{label}不能包含中文，请选择或输入不含中文的完整路径。')
         if args.action == 'inspect':
             from .resource_advice import snapshot
+            # First-step prerequisite barrier: wait for download, installation
+            # and DLL recheck before exposing any later deployment action.
+            vc_runtime = ensure_vc_runtime(args.cache, operation)
+            operation.update('检测电脑配置')
             host = inspect_host(args.target or args.data_dir)
             from .gpu_health import advice as gpu_advice
             advisory = gpu_advice(host, args.data_dir)
             result = dict(host=asdict(host), models=discover_models(args.data_dir),
-                          vc_runtime=check_vc_runtime(operation, required=False), **discover_environments())
+                          vc_runtime=vc_runtime, **discover_environments())
         elif args.action == 'verify-model':
             operation.update('检查已有模型文件，请稍候')
             result = inspect_selected_model(args.model)
@@ -953,8 +963,8 @@ def main():
             result = inspect_existing_target(read(args.plan), args.target, operation)
         elif args.action == 'install':
             result = install(read(args.plan), args.model, args.target, args.cache, operation, args.data_dir, args.continue_existing)
-        elif args.action == 'install-vc-runtime':
-            result = install_vc_runtime(args.cache, operation)
+        elif args.action in {'install-vc-runtime', 'repair-vc-runtime'}:
+            result = install_vc_runtime(args.cache, operation, interactive=args.action == 'repair-vc-runtime')
         else:
             # Whitelist diagnostics; never zip arbitrary runtime logs/configs.
             result = dict(schema_version=1, host=asdict(inspect_host(args.data_dir)),

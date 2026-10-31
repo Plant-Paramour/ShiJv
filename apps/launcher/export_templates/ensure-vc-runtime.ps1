@@ -3,6 +3,7 @@
     [string]$ReportPath='',
     [string]$InstallerPath='',
     [string]$ExpectedSha256='',
+    [switch]$Interactive,
     [switch]$ExitOnFailure
 )
 $ErrorActionPreference='Stop'
@@ -28,6 +29,8 @@ function Test-VCRuntime {
     }
     return @{ok=($problems.Count -eq 0); version=$version; problems=@($problems); restart_required=$false}
 }
+$code=$null
+$installerLog=if($ReportPath){$ReportPath+'.installer.log'}else{Join-Path $env:TEMP 'shiju-vc-runtime.log'}
 try {
     $result=Test-VCRuntime
     if($Mode -eq 'Install') {
@@ -48,7 +51,9 @@ try {
         if((Get-FileHash -LiteralPath $InstallerPath -Algorithm SHA256).Hash -ne $ExpectedSha256) { throw 'VC++ installer SHA256 mismatch' }
         $signature=Get-AuthenticodeSignature -LiteralPath $InstallerPath
         if($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch '(?:^|,\s*)CN=Microsoft Corporation(?:,|$)') { throw 'VC++ installer must have a valid Microsoft Corporation signature' }
-        $process=Start-Process -FilePath $InstallerPath -ArgumentList '/install /passive /norestart' -Verb RunAs -WindowStyle Hidden -Wait -PassThru
+        $installArguments='/install /norestart /log "'+$installerLog+'"'
+        if(-not $Interactive) { $installArguments+=' /passive' }
+        $process=Start-Process -FilePath $InstallerPath -ArgumentList $installArguments -Verb RunAs -WindowStyle Hidden -Wait -PassThru
         $code=$process.ExitCode
         if($code -notin @(0,1638,3010)) { throw "VC++ installer failed: exit code $code" }
         $result=Test-VCRuntime
@@ -56,6 +61,9 @@ try {
         $result.installer_exit_code=$code
     }
 } catch { $result=@{ok=$false;problems=@($_.Exception.Message);restart_required=$false} }
+$result.installer_exit_code=$code
+$result.installer_log=$installerLog
+$result.installer_path=$InstallerPath
 $json=$result | ConvertTo-Json -Depth 5
 if($ReportPath) { [IO.File]::WriteAllText($ReportPath,$json,(New-Object Text.UTF8Encoding($false))) }
 Write-Output $json

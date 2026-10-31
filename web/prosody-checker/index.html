@@ -95,7 +95,7 @@
   <title>诗矩 · 中文诗词创作空间</title>
   <link rel="stylesheet" href="./han/han-scoped.css">
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="./styles.css?v=115">
+  <link rel="stylesheet" href="./styles.css?v=126">
   <link rel="stylesheet" href="./prosody-workbook.css?v=33">
   <link rel="stylesheet" href="./card-studio.css?v=2">
 </head>
@@ -118,6 +118,7 @@
           <li class="han-navbar__item"><a href="#prosody" data-route-link="prosody">格律检测</a></li>
           <li class="han-navbar__item"><a href="#sentence-search" data-route-link="sentence-search">句式格律</a></li>
           <li class="han-navbar__item"><a href="#card-studio" data-route-link="card-studio">诗词卡片</a></li>
+          <li class="han-navbar__item desktop-profile-nav"><a href="#profile" data-route-link="profile">个人中心</a></li>
         </ul>
       </nav>
 
@@ -202,13 +203,12 @@
           <div class="chat-thread-scroll" id="chat-thread-scroll">
             <div class="chat-thread" id="chat-thread" aria-live="polite">
               <section class="chat-welcome" id="chat-welcome" aria-labelledby="chat-welcome-title">
-                <svg class="letterpress-filter" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none"><defs><filter id="letterpress-ink" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.17 0.61" numOctaves="4" seed="83" result="grain"/><feColorMatrix in="grain" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.7 0 0 0 -0.08" result="inkWear"/><feComposite in="SourceGraphic" in2="inkWear" operator="in"/></filter></defs></svg>
-                <div class="chat-welcome__note">
+                <div class="chat-welcome__note" style="visibility: hidden">
                 <figure class="chat-welcome__epigraph">
-                  <blockquote id="chat-welcome-title"><span>不必等到精通格律</span> <wbr><span>才开始创作自己的诗词</span></blockquote>
+                  <blockquote id="chat-welcome-title"><span>「不必等到精通格律</span><span>才开始创作自己的诗词 」</span></blockquote>
                   <figcaption>——卡利弗斯</figcaption>
-                  <p class="chat-welcome__abilities">想写什么，直接告诉我；已经写了几句，也可以贴过来。<br>我可以帮你改字句、查平仄，也会说明为什么这样改。</p>
                 </figure>
+                <p class="chat-welcome__message" id="chat-welcome-message">读过许多人的诗，也写一首<strong>自己的</strong>。</p>
                 </div>
               </section>
             </div>
@@ -481,6 +481,7 @@
               <div class="card-control-group__title"><h2>内容</h2><span>实时预览</span></div>
               <label class="field"><span>标题</span><input id="card-title-input" type="text" maxlength="80" placeholder="例如：春日偶成"></label>
               <label class="field"><span>正文</span><textarea id="card-body-input" rows="8" maxlength="4000" placeholder="写下诗句，每行一句即可"></textarea></label>
+              <label class="field"><span>题序</span><textarea id="card-sequence-input" rows="3" maxlength="2000" placeholder="选填，排在正文前"></textarea></label>
               <label class="field"><span>落款</span><input id="card-author-input" type="text" maxlength="40" placeholder="用户名或署名（可选）"></label>
             </section>
             <section class="card-control-group">
@@ -495,8 +496,8 @@
             <section class="card-control-group">
               <div class="card-control-group__title"><h2>字形</h2><span>清晰优先</span></div>
               <div class="card-font-grid"><label class="field"><span>标题字体</span><select id="card-title-font-input"><option value="ancient">古体仿宋</option><option value="song">汇文仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label><label class="field"><span>正文字体</span><select id="card-font-input"><option value="song">汇文仿宋</option><option value="ancient">古体仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label><label class="field"><span>作者字体</span><select id="card-author-font-input"><option value="song">汇文仿宋</option><option value="ancient">古体仿宋</option><option value="idea">意宋</option><option value="sans">简洁黑体</option></select></label></div>
-              <div class="card-range-row"><label class="field"><span>正文字号</span><input id="card-size-input" type="range" min="24" max="72" step="1" value="42"><output id="card-size-output">42</output></label><label class="field"><span>行距</span><input id="card-leading-input" type="range" min="1.35" max="2.4" step="0.05" value="1.8"><output id="card-leading-output">1.80</output></label></div>
-              <div class="card-range-row"><label class="field"><span>标题字号</span><input id="card-title-size-input" type="range" min="24" max="64" step="1" value="34"><output id="card-title-size-output">34</output></label><label class="field"><span>字间距</span><input id="card-letter-spacing-input" type="range" min="0" max="12" step="1" value="1"><output id="card-letter-spacing-output">1</output></label></div>
+              <div class="card-range-row"><label class="field"><span>正文字号</span><input id="card-size-input" type="range" min="24" max="50" step="1" value="42"><output id="card-size-output">42</output></label><label class="field"><span>行距</span><input id="card-leading-input" type="range" min="1.35" max="2.4" step="0.05" value="1.8"><output id="card-leading-output">1.80</output></label></div>
+              <div class="card-range-row"><label class="field"><span>标题字号</span><input id="card-title-size-input" type="range" min="24" max="72" step="1" value="34"><output id="card-title-size-output">34</output></label><label class="field"><span>字间距</span><input id="card-letter-spacing-input" type="range" min="0" max="12" step="1" value="1"><output id="card-letter-spacing-output">1</output></label></div>
               <fieldset class="card-align-fieldset"><legend>正文对齐</legend><label><input type="radio" name="card-align" value="start"><span>左</span></label><label><input type="radio" name="card-align" value="middle" checked><span>中</span></label><label><input type="radio" name="card-align" value="end"><span>右</span></label></fieldset>
               <fieldset class="card-align-fieldset"><legend>显示信息</legend><label><input id="card-show-author-input" type="checkbox"><span>落款</span></label><label><input id="card-show-seal-input" type="checkbox" checked><span>印记</span></label></fieldset>
             </section>
@@ -627,7 +628,7 @@
   </dialog>
 
   <div id="site-status" class="site-status" role="status" aria-live="polite"></div>
-  <script type="module" src="./site.js?v=159"></script>
+  <script type="module" src="./site.js?v=168"></script>
   <script type="module" src="./app.js?v=39"></script>
   <script type="module" src="./sentence-search.js?v=20"></script>
   <link rel="stylesheet" href="./meter-book.css?v=27">

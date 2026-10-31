@@ -12,6 +12,10 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (max-width: 760px) {
+  .site-nav .desktop-profile-nav { display: none; }
+}
+
 body[data-han-scope] {
   --site-paper: var(--han-color-bg, #f4efe2);
   --site-paper-deep: var(--han-color-paper-200, #e9e0ce);
@@ -5264,24 +5268,35 @@ body[data-han-scope] .chat-prompt-chooser__options button:focus-visible {
 body[data-han-scope] .chat-welcome{display:flex;justify-content:center;align-items:flex-start;width:100%;max-width:none;min-height:0;box-sizing:border-box;margin:clamp(48px,12vh,120px) auto 40px;padding:24px 20px;border:0;border-radius:0;background:none;box-shadow:none;text-align:left;overflow:visible}
 body[data-han-scope] .chat-welcome[hidden]{display:none}
 body[data-han-scope] .chat-welcome::before,body[data-han-scope] .chat-welcome::after{content:none}
-.chat-welcome__epigraph{width:fit-content;max-width:100%;margin:0}
-.chat-welcome__epigraph blockquote{margin:0;padding:0;border:0;background:none;color:var(--site-ink);font:400 clamp(21px,2.2vw,26px)/1.8 "汇文仿宋","FangSong",serif;text-align:left}
-.chat-welcome__epigraph blockquote span{display:inline-block}
-.chat-welcome__epigraph figcaption{margin:12px 0 0;text-align:right;color:var(--site-ink-soft);font:400 14px/1.7 "汇文仿宋","FangSong",serif}
-@media(max-width:600px){body[data-han-scope] .chat-welcome{margin-top:clamp(32px,8vh,64px);padding:20px 8px}.chat-welcome__epigraph blockquote span{display:block}.chat-welcome__epigraph figcaption{font-size:13px}}
-
-/* 横线红笺，容纳寄语、落款与说明。 */
-.chat-welcome__note{width:fit-content;max-width:100%}
-.chat-welcome__epigraph{position:relative;isolation:isolate;box-sizing:border-box;width:100%;padding:46px 42px 38px;border:0;border-radius:0;background:repeating-linear-gradient(23deg,#8b786006 0 1px,transparent 1px 3px),repeating-linear-gradient(113deg,#fff8 0 1px,transparent 1px 4px),#f7f4ec;box-shadow:0 4px 16px #443c2810}
-.chat-welcome__epigraph::before{content:"";position:absolute;inset:18px;border:3px solid #ac5d52;background:repeating-linear-gradient(180deg,transparent 0,transparent calc(36px - 1px),#b6675c55 calc(36px - 1px),#b6675c55 36px);z-index:-1;pointer-events:none;filter:url("#letterpress-ink")}
-.chat-welcome__epigraph figcaption{color:#776b60}
-.chat-welcome__abilities{margin:20px 4px 0;padding:0;border:0;color:var(--site-ink-soft);font-family:"汇文仿宋","FangSong","仿宋",serif;font-size:14px;font-weight:400;line-height:1.9;text-align:left}
-@media(max-width:600px){.chat-welcome__epigraph{padding:32px 26px 28px}.chat-welcome__epigraph::before{inset:12px;background-size:auto}.chat-welcome__abilities{font-size:13px;margin-top:16px}.chat-welcome__epigraph blockquote span{display:inline}}
-
-/* 信笺整体放大一档，窄屏保持自适应。 */
-.chat-welcome__note{width:min(700px,100%)}
-.chat-welcome__epigraph{padding:54px 48px 46px}
-.chat-welcome__epigraph blockquote{font-size:clamp(23px,2.4vw,29px)}
-.chat-welcome__epigraph figcaption{font-size:15px;margin-top:16px}
-.chat-welcome__abilities{font-size:15px;margin-top:26px;line-height:2}
-@media(max-width:600px){.chat-welcome__epigraph{padding:38px 28px 32px}.chat-welcome__epigraph blockquote{font-size:23px}.chat-welcome__epigraph figcaption{font-size:14px}.chat-welcome__abilities{font-size:14px;margin-top:22px}}
+/* 寄语只保留正文；空间不足时以整句换行。 */
+.chat-welcome__note { width: min(700px, 100%); }
+.chat-welcome__epigraph { width: 100%; max-width: 100%; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+.chat-welcome__epigraph blockquote { display: flex; flex-wrap: wrap; column-gap: .5em; margin: 0; padding: 0; border: 0; background: none; color: var(--site-ink); font: 400 clamp(23px, 2.4vw, 29px)/1.8 "汇文仿宋", "FangSong", serif; text-align: left; }
+.chat-welcome__epigraph blockquote span { flex: 0 0 auto; white-space: nowrap; }
+.chat-welcome__epigraph--classic blockquote span { flex: 0 1 auto; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.chat-welcome__epigraph--classic figcaption { overflow-wrap: anywhere; }
+.chat-welcome__epigraph figcaption { margin: 16px 0 0; color: var(--site-ink-soft); font: 400 15px/1.7 "汇文仿宋", "FangSong", serif; text-align: right; }
+.chat-welcome__message { margin: 28px 0 0; color: var(--site-ink-soft); font: 400 clamp(17px, calc(2.4vw - 6px), 23px)/1.9 "汇文仿宋", "FangSong", serif; overflow-wrap: anywhere; }
+.chat-welcome__message strong { font-size: calc(1em + 8px); font-weight: 600; white-space: nowrap; }
+@media (max-width: 600px) {
+  body[data-han-scope] .chat-welcome { margin-top: clamp(32px, 8vh, 64px); padding: 20px 8px; }
+  .chat-welcome__epigraph blockquote { font-size: 23px; }
+}
+.scroll-export-dialog { width: min(480px, calc(100vw - 32px)); max-height: calc(100svh - 32px); box-sizing: border-box; padding: 9px; overflow: auto; border: 1px solid var(--site-line-strong); border-radius: 3px; background: var(--site-paper); color: var(--site-ink); box-shadow: 0 16px 48px rgba(43, 39, 31, .2); }
+.scroll-export-dialog::backdrop { background: rgba(35, 32, 27, .46); backdrop-filter: blur(3px); }
+.scroll-export-dialog__shell { padding: clamp(18px, 4vw, 30px); border: 1px solid var(--site-line); }
+.scroll-export-dialog h2 { margin: 10px 0 14px; font-family: var(--han-font-kai, serif); font-size: clamp(23px, 5vw, 28px); font-weight: 500; }
+.scroll-export-dialog #scroll-export-description { margin: 0; color: var(--site-ink-soft); font-size: 14px; line-height: 1.8; }
+.scroll-export-dialog__choices { display: grid; gap: 12px; margin-top: 24px; }
+.scroll-export-dialog__choices button { display: grid; gap: 7px; min-height: 86px; padding: 16px 18px; border: 1px solid var(--site-line-strong); border-radius: 2px; background: var(--site-surface); color: var(--site-ink); text-align: left; cursor: pointer; font: inherit; }
+.scroll-export-dialog__choices button:first-child { border-color: var(--site-red); }
+.scroll-export-dialog__choices strong { color: var(--site-red-dark); font-size: 17px; font-weight: 600; }
+.scroll-export-dialog__choices span { color: var(--site-ink-soft); font-size: 12px; line-height: 1.6; }
+.scroll-export-dialog__choices button:hover { background: var(--site-paper-deep); }
+.scroll-export-dialog button:focus-visible { outline: 2px solid var(--site-red-dark); outline-offset: 3px; }
+.scroll-export-dialog__choices button:disabled { opacity: .6; cursor: wait; }
+.scroll-export-dialog__status { margin: 12px 0; color: var(--site-red-dark); font-size: 13px; line-height: 1.6; }
+.scroll-export-dialog form { display: flex; justify-content: flex-end; margin-top: 18px; }
+.poem-handscroll.poem-handscroll--ci-display .poem-handscroll__line { text-indent: 0; text-align: center; }
+.poem-handscroll--ci-display .poem-handscroll__stanza + .poem-handscroll__stanza { margin-top: .8em; }
+body[data-han-scope] .poem-handscroll .poem-score__inspect[aria-pressed="true"] { background: #ad352b12; }

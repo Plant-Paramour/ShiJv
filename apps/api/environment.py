@@ -103,7 +103,7 @@ def selected_environment(directory):
             "local_enabled": config.get("local_enabled", True)}
 
 
-def check_managed_runtime(python):
+def check_managed_runtime(python, *, cache_directory=None):
     """Check deployment runtime inputs; a model is validated as a separate pair."""
     python = Path(python)
     prefix = python.parent.parent if python.parent.name.lower() == 'scripts' else python.parent
@@ -130,6 +130,16 @@ def check_managed_runtime(python):
     if old_prefix.name.lower() == 'scripts':
         old_prefix = old_prefix.parent
     original_model = path_type(state['model']) if state.get('model') else None
+    cache_path = None
+    cached = {}
+    if cache_directory:
+        import hashlib
+        cache_path = Path(cache_directory) / ('runtime-integrity-' + hashlib.sha256(str(prefix.resolve()).encode()).hexdigest()[:24] + '.json')
+        try:
+            cached = json.loads(cache_path.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            pass
+    verified = {}
     for filename, digest in files.items():
         recorded = path_type(filename)
         # A deployment's original model may have been replaced by another fully
@@ -147,8 +157,24 @@ def check_managed_runtime(python):
                 raise ValueError('部署校验记录包含环境目录之外的文件，请通过部署工具重新验证') from exc
         if not path.resolve().is_relative_to(prefix.resolve()):
             raise ValueError('部署校验文件超出所选环境目录，请通过部署工具重新验证')
-        if not path.is_file() or sha256_file(path) != digest:
+        if not path.is_file():
+            raise ValueError('部署环境文件缺失：' + str(path))
+        stat = path.stat()
+        signature = [digest, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns]
+        key = str(path.resolve())
+        if cached.get(key) != signature and sha256_file(path) != digest:
             raise ValueError('部署环境文件缺失或已变化：' + str(path) + '。请通过部署工具修复；本次模型验收未通过。')
+        verified[key] = signature
+    if cache_path:
+        try:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=cache_path.parent, delete=False) as stream:
+                json.dump(verified, stream)
+                temporary = Path(stream.name)
+            temporary.replace(cache_path)
+        except OSError:
+            pass  # Cache is optional; successful verification remains valid.
 
 
 def inspect_environment(directory, *, refresh=False, cancel=None):

@@ -19,6 +19,7 @@ var/
 *.incomplete
 
 # Generated reports, screenshots, logs, and exports
+/artifacts/
 /output/
 /exports/
 /*.png

@@ -21,6 +21,12 @@
 .card-layout-option strong { font-size: 13px; font-weight: 600; }
 .card-layout-option small { color: var(--site-muted); font-size: 11px; }
 .card-layout-option.is-selected { border-color: var(--site-red); background: color-mix(in srgb, var(--site-paper-deep) 62%, var(--site-paper)); box-shadow: inset 3px 0 var(--site-red); }
+.card-layout-option { position:relative; display:grid; grid-template-columns:1fr; padding:10px; gap:10px; }
+.card-layout-option input { position:absolute; top:14px; left:14px; z-index:1; }
+.card-template-thumbnail { display:grid!important; place-items:center; height:150px; background:#e3dfd5; padding:12px; }
+.card-template-thumbnail svg { width:100%; height:100%; max-height:150px; filter:drop-shadow(0 3px 4px #342a2420); }
+.card-layout-option small { line-height:1.6; }
+.card-studio-actions { flex-wrap:wrap; position:sticky; bottom:0; padding:14px 0; background:var(--site-paper); z-index:2; border-top:1px solid var(--site-line); }
 .card-range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .card-range-row .field { grid-template-columns: 1fr auto; align-items: center; }
 .card-range-row .field > span { grid-column: 1 / -1; }
@@ -46,15 +52,15 @@
 .card-studio-actions [role="status"] { color: var(--site-ink-soft); font-size: 12px; }
 .card-preview-panel { position: sticky; top: 88px; min-width: 0; }
 .card-preview-toolbar { display: flex; justify-content: space-between; margin: 0 0 10px; color: var(--site-ink-soft); font-size: 12px; letter-spacing: .08em; }
-.card-preview-frame { display: grid; place-items: center; min-height: 520px; padding: clamp(18px, 4vw, 44px); border: 1px solid color-mix(in srgb, var(--site-line) 86%, transparent); background: repeating-linear-gradient(135deg, rgba(108, 83, 54, .025) 0 1px, transparent 1px 6px), #e5dccb; box-shadow: inset 0 0 0 10px rgba(255, 252, 243, .28), 0 10px 28px rgba(64, 48, 33, .08); }
-.card-scene-preview { width: min(100%, 620px); max-height: 76vh; }
-.card-scene-preview svg { display: block; width: 100%; height: auto; max-height: 76vh; filter: drop-shadow(0 10px 15px rgba(55, 39, 24, .16)); }
+.card-preview-frame { display: grid; place-items: center; min-height: 0; height: max(160px, calc(100dvh - 190px)); padding: clamp(12px, 2vw, 24px); overflow: visible; border: 1px solid color-mix(in srgb, var(--site-line) 86%, transparent); background: repeating-linear-gradient(135deg, rgba(108, 83, 54, .025) 0 1px, transparent 1px 6px), #e5dccb; box-shadow: inset 0 0 0 10px rgba(255, 252, 243, .28), 0 10px 28px rgba(64, 48, 33, .08); }
+.card-scene-preview { width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: visible; }
+.card-scene-preview svg { display: block; width: 100%; height: 100%; max-height: none; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(55, 39, 24, .16)); }
 .card-preview-note { margin: 10px 0 0; color: var(--site-muted); font-size: 12px; text-align: center; }
 @media (max-width: 900px) {
   .card-studio-layout { grid-template-columns: 1fr; }
   .card-preview-panel { position: static; order: -1; }
-  .card-preview-frame { min-height: 0; }
-  .card-scene-preview { width: min(100%, 480px); }
+  .card-preview-frame { height: clamp(200px, 55dvh, 520px); }
+  .card-scene-preview { width: 100%; }
 }
 @media (max-width: 520px) {
   .card-studio-view { padding: 24px 12px 42px; }
@@ -70,3 +76,88 @@
 @font-face { font-family: "ShijuSong"; src: url("./assets/fonts/汇文仿宋.ttf") format("truetype"); font-display: swap; }
 @font-face { font-family: "ShijuAncient"; src: url("./assets/fonts/文悦古体仿宋.otf") format("opentype"); font-display: swap; }
 @font-face { font-family: "ShijuIdea"; src: url("./assets/fonts/又又意宋.ttf") format("truetype"); font-display: swap; }
+
+/* 卡片页由文档承载滚动，编辑栏和画布不创建嵌套滚动容器。 */
+body[data-current-view="card-studio"] { height: auto; max-height: none; overflow: visible; }
+body[data-current-view="card-studio"] > main,
+.card-studio-view,
+.card-studio-shell,
+.card-studio-layout,
+.card-studio-controls,
+.card-preview-panel { height: auto; max-height: none; overflow: visible; min-width: 0; }
+.card-studio-view { box-sizing: border-box; }
+.card-panel-tabs,.card-text-tabs { display:flex; gap:4px; padding:6px; background:var(--site-paper-deep); }
+.card-panel-tabs button,.card-text-tabs button { flex:1; padding:10px 8px; border:0; background:transparent; color:var(--site-ink-soft); font:inherit; cursor:pointer; }
+.card-panel-tabs [aria-selected="true"],.card-text-tabs [aria-pressed="true"] { background:var(--site-surface); color:var(--site-red-dark); box-shadow:0 1px 4px #302a2512; }
+.card-panel-tabs button:focus-visible,.card-text-tabs button:focus-visible { outline:2px solid var(--site-red); outline-offset:-2px; }
+.card-text-tabs { margin-bottom:18px; }
+.card-panel-scroll { min-height:0; min-width:0; }
+.card-panel-scroll .card-control-group { box-shadow:none; }
+.card-panel-scroll details { margin-top:18px; padding-top:12px; border-top:1px solid var(--site-line); }
+.card-panel-scroll summary { cursor:pointer; color:var(--site-ink-soft); font-size:13px; }
+.card-panel-scroll input[type="range"] { width:100%; accent-color:var(--site-red); }
+.card-panel-scroll output { color:var(--site-ink-soft); font-size:12px; }
+.card-panel-scroll .field { min-width:0; }
+.card-color-presets { border:0; padding:0; margin:18px 0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.card-color-presets legend { margin-bottom:8px; color:var(--site-ink-soft); font-size:12px; }
+.card-color-preset { display:grid; justify-items:center; gap:5px; padding:8px 4px; border:1px solid var(--site-line); border-radius:3px; color:var(--site-ink); background:var(--site-paper); font:inherit; font-size:12px; cursor:pointer; }
+.card-color-preset > span { width:28px; height:28px; border-radius:50%; border:1px solid #0002; }
+.card-color-preset[aria-pressed="true"] { border-color:var(--site-red); box-shadow:inset 0 0 0 1px var(--site-red); }
+.card-color-preset:focus-visible { outline:2px solid var(--site-red); outline-offset:2px; }
+.card-texture-presets { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card-texture-preset > .card-texture-sample { display:block; width:100%; height:48px; border-radius:3px; overflow:hidden; }
+.card-texture-sample svg { display:block; width:100%; height:100%; }
+.card-stamp-add { width:100%; margin-bottom:16px; }
+.card-stamp-card { padding:18px; margin-bottom:16px; border:1px solid var(--site-line); background:var(--site-surface); }
+.card-stamp-card__header { display:flex; align-items:center; gap:12px; padding-bottom:12px; border-bottom:1px solid var(--site-line); }
+.card-stamp-card__header h3 { font:500 18px/1.5 var(--han-font-song,serif); margin:0; }
+.card-stamp-card__header small { font-size:12px; color:var(--site-muted); }
+.card-stamp-card__preview { width:64px; height:64px; background:var(--site-paper); flex:none; }
+.card-stamp-card__preview svg { width:100%; height:100%; }
+.card-stamp-upload { display:inline-flex; align-items:center; margin-top:14px; padding:6px 12px; cursor:pointer; }
+.card-stamp-upload-input { position:absolute; width:1px; height:1px; opacity:0; }
+.card-stamp-upload:has(+ input:focus-visible) { outline:2px solid var(--site-red); }
+.card-stamp-copy { display:flex; align-items:center; gap:12px; padding:12px 0; border-top:1px solid var(--site-line); }
+.card-stamp-copy label { display:grid; grid-template-columns:48px minmax(0,1fr); align-items:center; gap:10px; flex:1; color:var(--site-ink-soft); font-size:12px; }
+.card-stamp-remove { border:0; background:none; color:var(--site-ink-soft); font-size:22px; cursor:pointer; padding:4px 8px; }
+.card-stamp-card > button { margin:8px 8px 0 0; }
+#card-scene-preview .card-draggable-stamp { cursor:grab; touch-action:none; pointer-events:all; }
+#card-scene-preview .card-draggable-stamp:hover > rect:first-child { stroke:#b94332; stroke-dasharray:4 3; stroke-width:1; vector-effect:non-scaling-stroke; }
+.card-panel-scroll .field select {
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  min-height:44px;
+  height:auto;
+  padding:10px 40px 10px 12px;
+  line-height:1.5;
+  font-size:14px;
+  text-indent:0;
+  box-sizing:border-box;
+  background-position:right 12px center;
+}
+.card-panel-scroll .card-export-size { display:grid; margin-bottom:18px; gap:6px; }
+
+/* 桌面创作界面：画布与操作栏固定在视口内，仅表单承担滚动。 */
+body[data-current-view="card-studio"] .card-studio-heading { display: none; }
+@media (min-width: 901px) {
+  body[data-current-view="card-studio"] { height: 100dvh; min-height: 0; overflow: hidden; }
+  body[data-current-view="card-studio"] > .site-header { flex: 0 0 auto; }
+  body[data-current-view="card-studio"] > main { height: auto; min-height: 0; flex: 1 1 0; overflow: hidden; }
+  body[data-current-view="card-studio"] .card-studio-view { height: 100%; min-height: 0; padding: 20px; overflow: hidden; }
+  body[data-current-view="card-studio"] .card-studio-shell,
+  body[data-current-view="card-studio"] .card-studio-layout { height: 100%; min-height: 0; }
+  body[data-current-view="card-studio"] .card-studio-layout { grid-template-columns: minmax(300px, 390px) minmax(0, 1fr); gap: 24px; }
+  body[data-current-view="card-studio"] .card-studio-controls { height:100%; min-height:0; overflow:hidden; display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:12px; }
+  .card-panel-scroll { overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; scrollbar-gutter:stable; }
+  .card-studio-actions { position:static; margin:0; }
+  body[data-current-view="card-studio"] .card-preview-panel { position: static; height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+  body[data-current-view="card-studio"] .card-preview-frame { height: 100%; min-height: 0; }
+}
+@media (max-width: 900px) {
+  body[data-current-view="card-studio"] .card-studio-view { padding: 12px; min-height: 100dvh; }
+  body[data-current-view="card-studio"] .card-preview-frame { height: clamp(180px, 42dvh, 420px); }
+  body[data-current-view="card-studio"] .card-studio-controls { overflow: visible; height: auto; }
+  body[data-current-view="card-studio"] .card-studio-layout { gap: 18px; }
+}

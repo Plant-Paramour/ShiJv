@@ -12,9 +12,66 @@ import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, vali
 import { getDatasetJson } from "./dataset-cache.js?v=4";
 import { renderChatMarkdown } from "./chat-markdown.js?v=3";
 import { createStreamingText } from "./stream-text.js?v=2";
+import { resolveCardDisplay } from "./card-display-layout.js";
+import { openScrollExportDialog } from "./scroll-export.js?v=3";
 import renderMathInElement from "./vendor/katex/auto-render.mjs";
 
 window.ShijuStartup?.mark("入口模块及静态依赖执行成功");
+
+const welcomeMessages = [
+  "读过许多人的诗，也写一首**自己的**。",
+  "你心里的话，也可以成为**诗词**。",
+  "让诗词不止留在书里，也写进自己的**生活**。",
+  "古人的**格律**，写你此刻的**心事**。",
+  "循古人之律，写自己之诗。",
+  "从欣赏别人的诗，到写下**自己的**诗。",
+  "格律成全**表达**，创作始于**此刻**。",
+];
+const welcomeMessage = document.querySelector('#chat-welcome-message');
+const welcomeClassics = [
+  ['我手写我口，古岂能拘牵。', '黄遵宪《杂感》'],
+  ['苔花如米小，也学牡丹开。', '袁枚《苔》'],
+  ['江山代有才人出，各领风骚数百年。', '赵翼《论诗五首·其二》'],
+  ['文章本天成，妙手偶得之。', '陆游《文章》'],
+  ['清水出芙蓉，天然去雕饰。', '李白《经乱离后天恩流夜郎忆旧游书怀赠江夏韦太守良宰》'],
+  ['诗文随世运，无日不趋新。', '赵翼《论诗》'],
+  ['笔落惊风雨，诗成泣鬼神。', '杜甫《寄李十二白二十韵》'],
+  ['为人性僻耽佳句，语不惊人死不休。', '杜甫《江上值水如海势聊短述》'],
+  ['吟安一个字，捻断数茎须。', '卢延让《苦吟》'],
+  ['别裁伪体亲风雅，转益多师是汝师。', '杜甫《戏为六绝句·其六》'],
+];
+const welcomeEpigraph = document.querySelector('.chat-welcome__epigraph');
+// 先决定版本，再在版本内部均匀选择；避免 A 版小句数量影响版本权重。
+const useWelcomeA = Math.random() < 0.3;
+if (welcomeMessage && useWelcomeA) {
+  const message = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+  welcomeMessage.replaceChildren(...message.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map(part => {
+    if (!part.startsWith('**')) return document.createTextNode(part);
+    const emphasis = document.createElement('strong');
+    emphasis.textContent = part.slice(2, -2);
+    return emphasis;
+  }));
+} else if (welcomeMessage && welcomeEpigraph) {
+  const [quote, attribution] = welcomeClassics[Math.floor(Math.random() * welcomeClassics.length)];
+  welcomeEpigraph.classList.add('chat-welcome__epigraph--classic');
+  welcomeEpigraph.querySelector('blockquote').replaceChildren(...`「${quote}」`.split(/(?<=，)/u).map(text => {
+    const phrase = document.createElement('span');
+    phrase.textContent = text;
+    return phrase;
+  }));
+  welcomeEpigraph.querySelector('figcaption').textContent = `——${attribution}`;
+  welcomeMessage.hidden = true;
+}
+
+// 首屏保留布局但隐藏默认文案，选定最终版本并等待字体就绪后一次显示。
+const welcomeNote = document.querySelector('.chat-welcome__note');
+if (welcomeNote) {
+  // 触发布局，让本次选定文案所用的字体进入加载队列。
+  welcomeNote.getBoundingClientRect();
+  Promise.resolve(document.fonts?.ready).then(() => {
+    requestAnimationFrame(() => welcomeNote.style.removeProperty('visibility'));
+  });
+}
 
 const routeTitles = {
   chat: "AI 对话 · 诗矩",
@@ -1714,6 +1771,9 @@ function appendMarkedPoemText(container, content, result, cursor) {
 }
 
 function renderMarkedPoemVerses(verses, stanzas, result) {
+  if (verses.dataset.songciDisplay) {
+    stanzas = verses.dataset.songciDisplay.split(/\n\s*\n/).map(section => section.split('\n').filter(Boolean));
+  }
   verses.replaceChildren();
   const cursor = { index: 0 };
   (stanzas.length ? stanzas : [["正文尚未生成"]]).forEach((lines) => {
@@ -1921,13 +1981,58 @@ function poemVariantName(poem) {
   return "";
 }
 
+function createSongCiLayoutButton(article, verses, poem, render) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'poem-score__inspect';
+  button.textContent = '排版';
+  const sync = () => {
+    const active = Boolean(verses.dataset.songciDisplay);
+    article.classList.toggle('poem-handscroll--ci-display', active);
+    button.setAttribute('aria-pressed', String(active));
+    button.title = active ? '当前：宋词排版；点击切换为自由排版' : '当前：自由排版；点击切换为宋词排版';
+    button.setAttribute('aria-label', `排版，${button.title}`);
+  };
+  sync();
+  let display = null;
+  button.addEventListener('click', async () => {
+    if (button.disabled) return;
+    if (verses.dataset.songciDisplay) {
+      delete verses.dataset.songciDisplay;
+      sync();
+      render();
+      updatePoemLayout(article);
+      return;
+    }
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    try {
+      display ||= await resolveCardDisplay(poem.content, poem.title, poem.form_name || '', poemVariantName(poem));
+      if (!display) {
+        announce('未找到与当前词体及正文字数匹配的宋词排版，已保留自由排版。');
+        return;
+      }
+      verses.dataset.songciDisplay = display;
+      sync();
+      render();
+      updatePoemLayout(article);
+    } catch (error) {
+      announce(`宋词排版加载失败：${error.message}，请重试。`);
+    } finally {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+    }
+  });
+  return button;
+}
+
 function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evaluationPending = false, shareable = true, editable = true, favoritable = false } = {}) {
   const value = parsePoemFields(poem);
   const article = document.createElement("article");
   const songCi = isSongCi(value);
   const sourceStanzas = songCi ? songCiStanzas(value.content) : poemStanzas(value.content);
   const stanzaEnds = value.evaluation?.result?.meter?.stanzaEnds;
-  const stanzas = songCi && stanzaEnds?.length
+  let stanzas = songCi && stanzaEnds?.length
     ? groupSongCiStanzas(sourceStanzas, stanzaEnds)
     : sourceStanzas;
   article.className = `poem-handscroll${songCi ? " poem-handscroll--ci" : isTangPoem(value) ? " poem-handscroll--tang" : " poem-handscroll--single-column"}`;
@@ -2015,8 +2120,8 @@ function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evalua
       variant_name: poemVariantName(value),
     }).then((ends) => {
       if (!ends.length || !article.isConnected) return;
-      const grouped = groupSongCiStanzas(sourceStanzas, ends);
-      renderMarkedPoemVerses(verses, grouped, evaluation?.result);
+      stanzas = groupSongCiStanzas(sourceStanzas, ends);
+      renderMarkedPoemVerses(verses, stanzas, value.evaluation?.result);
       updatePoemLayout(article);
     }).catch(() => {});
   }
@@ -2028,6 +2133,39 @@ function createPoemHandscroll(poem, { resultLabel = "", showTime = false, evalua
   scoreFooter.className = "poem-handscroll__footer poem-handscroll__footer--score";
   const footerActions = document.createElement("div");
   footerActions.className = "poem-handscroll__footer-actions";
+  const cardExport = document.createElement('button');
+  cardExport.type = 'button';
+  cardExport.className = 'poem-score__inspect';
+  cardExport.textContent = '导出';
+  cardExport.title = '导出卷轴图片或前往诗词卡片';
+  cardExport.addEventListener('click', () => openScrollExportDialog(article, value.title, () => {
+    const cardEvaluation=value.evaluation;
+    window.dispatchEvent(new CustomEvent('shiju:card-content', {detail: {
+      title: String(value.title || ''),
+      body: String(value.content || ''),
+      sequence: String(value.sequence || ''),
+      author: String(originalAuthor || ''),
+      diagnostic: cardEvaluation ? {
+        body: String(value.content || ''),
+        evaluation: {
+          rhyme_book_name: cardEvaluation.rhyme_book_name,
+          rhyme_book_id: cardEvaluation.rhyme_book_id,
+          structure_score: cardEvaluation.structure_score,
+          tonal_score: cardEvaluation.tonal_score,
+          rhyme_score: cardEvaluation.rhyme_score,
+        },
+      } : null,
+      formName: value.form_name || '',
+      variantName: poemVariantName(value) || '',
+    }}));
+    window.location.hash = 'card-studio';
+  }));
+  footerActions.append(cardExport);
+  if (songCi) {
+    footerActions.append(createSongCiLayoutButton(article, verses, value, () => {
+      renderMarkedPoemVerses(verses, stanzas, value.evaluation?.result);
+    }));
+  }
   const flags = document.createElement("div");
   flags.className = "poem-score__flags";
   const violations = evaluation ? [...violationMessages(evaluation.result), ...rhymeViolationMessages(evaluation.result)] : [];

@@ -21,7 +21,8 @@ WEIGHT_BYTES = {'0.8B': 1746942600, '2B': 4548221488, '4B': 9319828096}
 # None means unmeasured, never a zero-resource requirement.
 BUDGETS = {
     '0.8B': {
-        'cpu': (None, 5.18, 0, 5.18, 12),
+        # User-verified Windows Sandbox baseline: 10240 MiB, CPU FP32.
+        'cpu': (None, 5.18, 0, 5.18, 10),
         'cpu-bf16': (None, 1.78, 0, 1.78, 8),
         'cuda-fp16': (None, None, 0, 0, 12),
         'cuda-bnb': (None, None, 0, 0, 12),
@@ -146,7 +147,7 @@ def fits(resources, size, profile):
 def recommended(resources):
     capacity = (resources.get('gpu_total') or 0) / GIB
     # Product tiers are based on installed capacity. Current usage only adds warnings.
-    for size, profile, minimum in [('4B', 'cuda-bnb8', 7.8), ('4B', 'cuda-bnb', 5.8),
+    for size, profile, minimum in [('4B', 'cuda-bnb', 11.8),
                                     ('2B', 'cuda-bnb', 3.8), ('0.8B', 'cuda-fp16', 3.2)]:
         if capacity >= minimum and fits(resources, size, profile):
             return dict(model_id='Qwen/Qwen3.5-' + size, profile=profile)
@@ -261,6 +262,10 @@ def assess_selection(resources, model_id, profile, *, known=True, weight_bytes=N
         notice = '未检测到当前方案所需的受支持显卡，建议改用 CPU 运行。'
     if not known:
         notice = '自带模型的兼容性尚未确认，安装后将通过实际加载和生成检查。'
+    if size in ('2B', '4B') and chosen in ('cpu', 'cpu-bf16'):
+        state = 'risk'
+        title = '不推荐：CPU 仅推荐 0.8B'
+        notice = 'CPU 运行 2B、4B 生成过慢，请选择 0.8B。仍可手动继续安装，但需要接受较长等待。'
     return dict(state=state, title=title, notice=notice, model_id=model_id, profile=chosen, requested_profile=profile,
                 text=title + '\n' + '\n'.join(lines), budget=budget,
                 requires_confirmation=state in ('tight', 'risk', 'unknown'))

@@ -112,16 +112,20 @@ def main():
         write()
     try:
         if args.application_python and not args.scan:
-            report('application', '软件环境与部署文件', 'running', '检查所选软件环境和推理环境文件')
-            check_managed_runtime(sys.executable)
+            report('runtime-files', '部署文件校验', 'running', '首次完整校验；已校验且未变化的文件快速检查')
+            check_managed_runtime(sys.executable, cache_directory=Path(args.data_dir) / 'verification-cache')
+            report('runtime-files', '部署文件校验', 'passed', '部署文件检查通过')
+            report('application', '软件环境依赖检查', 'running', '正在启动所选 Python 并检查软件依赖，首次启动可能较慢')
             core = check_application_environment(args.application_python)
             result['application_environment'] = core
             if not core.get('ok'):
                 raise ValueError('软件环境检查失败：' + '; '.join(core.get('errors', [])))
+            report('application', '软件环境依赖检查', 'passed', '软件依赖检查通过')
+            report('fingerprints', '环境变更检查', 'running', '正在检查依赖元数据和程序文件')
             from apps.api.launcher_memory import environment_stamp
             result['application_stamp'] = environment_stamp(args.application_python)
             result['inference_stamp'] = environment_stamp(sys.executable)
-            report('application', '软件环境与部署文件', 'passed', '软件环境和推理环境文件可用')
+            report('fingerprints', '环境变更检查', 'passed', '环境变更检查完成')
         report('environment', '依赖、CUDA 与模型架构', 'running', '检查当前所选环境')
         environment = probe('inference')
         result['environment'] = environment
