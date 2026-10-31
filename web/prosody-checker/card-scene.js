@@ -81,7 +81,7 @@ export function normalizeVerseCardSpec(input = {}) {
     stamps: Array.isArray(input.stamps)?input.stamps:null,
     sealStyle: ['solid','outline','round'].includes(input.sealStyle)?input.sealStyle:'solid',
     sealText: cleanText(input.sealText??'印',8),
-    sealImage: /^data:image\/(png|jpeg|webp);base64,/.test(input.sealImage||'')?input.sealImage:'',
+    sealImage: /^data:image\/(png|jpeg|webp|gif);base64,/.test(input.sealImage||'')?input.sealImage:'',
     texture: ['none','fine','bark','laid','silk','cotton','aged','gold'].includes(input.texture)?input.texture:({fiber:'fine',grain:'cotton',ripple:'laid'}[input.texture]||'none'),
     textureOpacity: clamp(Number.isFinite(Number(input.textureOpacity))?Number(input.textureOpacity):0.15,0,0.5),
     titleSize: clamp(Number(input.titleSize) || 34, 24, 72),

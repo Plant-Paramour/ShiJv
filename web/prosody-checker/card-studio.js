@@ -47,7 +47,7 @@ function initCardStudio() {
   document.querySelector('#card-seal-file').addEventListener('change',async event=>{
     const file=event.target.files?.[0];if(!file)return;
     const status=document.querySelector('#card-seal-status');
-    if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024){status.textContent='请选择 5MB 以内的 PNG、JPG 或 WebP 图片。';return;}
+    if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)||file.size>5*1024*1024){status.textContent='请选择 5MB 以内的 PNG、JPG、WebP 或 GIF 图片。';return;}
     try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});updateState('sealImage',data);status.textContent=`已导入：${file.name}`;}catch{status.textContent='图案读取失败，请重试。';}
   });
   installCardGuides((key,box)=>{const regions=structuredClone(state.regions||{});regions[state.layout]??={};if(box)regions[state.layout][key]=box;else delete regions[state.layout][key];updateState('regions',regions);});
