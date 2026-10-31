@@ -1,4 +1,4 @@
-import { buildLexicon, flattenMeter, scoreTangTones } from "./core.js?v=22";
+import { buildLexicon, flattenMeter, scoreTangTones } from "./core.js?v=23";
 import { getDatasetJson, getMeterBundle } from "./dataset-cache.js?v=4";
 
 const books = new Set(["Xinyun", "Pinshui", "Cilin", "Tongyun"]);

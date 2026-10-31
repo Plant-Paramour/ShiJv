@@ -26,6 +26,25 @@ from .runtime_manifest import relative_path, sha256_file, version_tuple
 from .model_catalog import validate_model
 
 ROOT = Path(__file__).resolve().parents[2]
+SELF_INTEGRITY_FILES = (
+    'apps/__init__.py', 'apps/launcher/__init__.py', 'apps/launcher/deployer.py',
+    'apps/launcher/gpu_health.py', 'apps/launcher/runtime_manager.py',
+    'apps/launcher/resource_advice.py', 'apps/launcher/deployment_profiles.py',
+    'apps/launcher/download_transport.py', 'apps/launcher/model_catalog.py',
+    'deploy/environment-tool/recommended-plan.json',
+    'deploy/environment-tool/model.json',
+)
+
+
+def check_self_integrity():
+    """Check the files required to run the deployment engine before downloads."""
+    missing = [name for name in SELF_INTEGRITY_FILES if not (ROOT / name).is_file()]
+    if missing:
+        raise ValueError(
+            '部署工具自身文件不完整，无法安全开始下载。请从同一版本安装包中补齐以下文件后重试：\n' +
+            '\n'.join(' - ' + name for name in missing) +
+            '\n建议：重新下载并完整解压 ShiJu 安装包，不要只替换单个 exe。')
+    return dict(ok=True, checked=len(SELF_INTEGRITY_FILES))
 POLICY = ROOT / 'deploy/environment-tool'
 PYTHON_SHA256 = '0eb85c2dfccccf1b17352de4c397f69194035b7d37149eacc16f1147d93de3b8'
 PYTHON_URL = 'https://api.nuget.org/v3-flatcontainer/python/3.12.10/python.3.12.10.nupkg'
@@ -626,7 +645,12 @@ def restore_session(target, data_directory, latest=False):
 
 def inspect_existing_target(plan, target, operation):
     target = Path(target).resolve()
-    if not target.exists() or (target.is_dir() and next(target.iterdir(), None) is None):
+    harmless = {'desktop.ini', 'thumbs.db', '.ds_store'}
+    if target.exists() and not target.is_dir():
+        raise ValueError('目标路径是文件而不是目录，请选择目录：' + str(target))
+    entries = [] if not target.exists() else [item for item in target.iterdir()
+                                               if item.name.lower() not in harmless]
+    if not target.exists() or (target.is_dir() and not entries):
         return dict(kind='empty', missing=[])
     plan_id = hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()
     state = target / 'shiju-install.json'
@@ -647,7 +671,16 @@ def inspect_existing_target(plan, target, operation):
     if not python.is_file():
         python = target / 'Scripts/python.exe'
     if not python.is_file() or not (owned or (target / 'conda-meta').is_dir() or (target / 'pyvenv.cfg').is_file()):
-        raise ValueError('目标目录非空，且不是可识别的虚拟环境；请选择空目录创建环境')
+        partial_markers = {'deployment-session.json', 'deployment-checkpoints.json',
+                           'requirements.lock', 'actual-lock.json', 'python.exe',
+                           'probe_candidate.py', 'app'}
+        if any(item.name.lower() in {name.lower() for name in partial_markers} for item in entries):
+            return dict(kind='partial', missing=[], external=False,
+                        partial_files=sorted(item.name for item in entries))
+        names = ', '.join(sorted(item.name for item in entries)[:12])
+        suffix = '等' if len(entries) > 12 else ''
+        raise ValueError('目标目录包含现有文件，且不是可识别的虚拟环境：' + names + suffix +
+                         '。请选择空目录、清理这些文件，或选择已有虚拟环境。')
     if not owned and any((target / name).exists() for name in ('app', 'probe_candidate.py', 'requirements.lock', 'verified-inputs.json', 'deployment-session.json')):
         raise ValueError('已有环境包含部署同名文件，无法安全继续；请选择空目录创建环境')
     output = operation.report.parent / 'existing-environment.json'
@@ -901,15 +934,15 @@ def main():
                 if path and any('\u3400' <= char <= '\u9fff' or '\uf900' <= char <= '\ufaff' for char in path):
                     raise ValueError(f'{label}不能包含中文，请选择或输入不含中文的完整路径。')
         if args.action == 'inspect':
-            from .resource_advice import snapshot
             # First-step prerequisite barrier: wait for download, installation
             # and DLL recheck before exposing any later deployment action.
+            integrity = check_self_integrity()
             vc_runtime = ensure_vc_runtime(args.cache, operation)
             operation.update('检测电脑配置')
             host = inspect_host(args.target or args.data_dir)
             from .gpu_health import advice as gpu_advice
             advisory = gpu_advice(host, args.data_dir)
-            result = dict(host=asdict(host), models=discover_models(args.data_dir),
+            result = dict(integrity=integrity, host=asdict(host), models=discover_models(args.data_dir),
                           vc_runtime=vc_runtime, **discover_environments())
         elif args.action == 'verify-model':
             operation.update('检查已有模型文件，请稍候')

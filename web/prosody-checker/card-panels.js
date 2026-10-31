@@ -75,7 +75,7 @@ export function organizeCardPanels() {
   const imageSettings=document.createElement('details');imageSettings.className='card-image-settings';const imageSummary=document.createElement('summary');imageSummary.textContent='精细调整';imageSettings.append(imageSummary);
   ['#card-image-opacity-input','#card-image-fit-input','#card-image-x-input','#card-image-y-input','#card-image-scale-input','#card-image-filter-input'].forEach(id=>imageSettings.append(label(id)));
   background.append(imageSettings);background.querySelectorAll('.card-range-row').forEach(el=>el.remove());
-  const syncImage=()=>{const id=document.querySelector('input[name="card-layout"]:checked')?.value;const supported=['image-accent','moon-window','side-landscape'].includes(id);document.querySelector('.card-upload-row').hidden=!supported;imageSettings.hidden=!supported||!document.querySelector('#card-scene-preview image');imageHint.hidden=supported;};
+  const syncImage=()=>{const id=document.querySelector('input[name="card-layout"]:checked')?.value;const supported=['image-accent','moon-window','side-landscape'].includes(id);document.querySelector('.card-upload-row').hidden=!supported;imageSettings.hidden=!supported||!document.querySelector('#card-scene-preview image');};
   new MutationObserver(syncImage).observe(document.querySelector('#card-scene-preview'),{childList:true});syncImage();
   document.querySelector('#card-export-button').textContent='导出图片';
 }

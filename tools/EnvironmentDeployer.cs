@@ -6,7 +6,7 @@ using System.Windows.Forms;
 internal static class EnvironmentDeployer {
     [STAThread] private static int Main(string[] args) {
         string root = AppDomain.CurrentDomain.BaseDirectory;
-        string script = Path.Combine(root, "tools", "environment-tool.ps1");
+        string script = Path.Combine(root, "tools", "environment-tool-v2.ps1");
         if (!File.Exists(script)) { MessageBox.Show("工具文件不完整，请完整解压后启动。", "诗矩环境部署"); return 1; }
         if (args.Length == 1 && args[0] == "--self-test") return 0;
         var info = new ProcessStartInfo();
@@ -34,3 +34,4 @@ internal static class EnvironmentDeployer {
         catch (Exception ex) { MessageBox.Show(ex.Message, "诗矩环境部署启动失败"); return 1; }
     }
 }
+

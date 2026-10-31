@@ -5,7 +5,7 @@ import {
   evaluatePailv,
   evaluateSongci,
   flattenMeter,
-} from "./core.js?v=22";
+} from "./core.js?v=23";
 import { getDatasetJson } from "./dataset-cache.js?v=4";
 
 export const RHYME_BOOKS = {

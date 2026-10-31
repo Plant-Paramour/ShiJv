@@ -28,10 +28,34 @@ def sha256_file(path):
 
 
 class DownloadTransport:
+    def _rank_sources(self, urls):
+        """在自动模式下用小范围断点请求测吞吐，失败源仍保留在队列末尾。"""
+        if getattr(self, 'source_preference', 'auto') != 'auto' or len(urls) < 2:
+            return urls
+        ranked = []
+        for index, url in enumerate(urls):
+            host = urlsplit(url).hostname or ''
+            if host not in {'download.pytorch.org', 'download-r2.pytorch.org',
+                            'mirror.sjtu.edu.cn', 'mirrors.aliyun.com',
+                            'files.pythonhosted.org', 'mirrors.tuna.tsinghua.edu.cn'}:
+                ranked.append((0, -index, url))
+                continue
+            try:
+                started = time.monotonic()
+                request = urllib.request.Request(url, headers={'Range': 'bytes=0-262143'})
+                with urllib.request.urlopen(request, timeout=8) as response:
+                    received = len(response.read(262144))
+                speed = received / max(time.monotonic() - started, 0.001)
+                ranked.append((speed, -index, url))
+            except Exception:
+                ranked.append((0, -index, url))
+        return [item[2] for item in sorted(ranked, reverse=True)]
+
     def download_item(self, item, directory):
         failures = []
         last_failure = None
-        for url in download_sources(item, self.source_preference):
+        sources = self._rank_sources(download_sources(item, self.source_preference))
+        for url in sources:
             self.check()
             self.context['source'] = urlsplit(url).hostname
             self.update(self.stage, file=item['filename'], source=urlsplit(url).hostname)

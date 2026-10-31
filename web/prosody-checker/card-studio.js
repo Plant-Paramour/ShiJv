@@ -1,7 +1,7 @@
 import { createDefaultVerseCardSpec, normalizeVerseCardSpec, renderCardScene, getCardFormat } from "./card-scene.js";
 import { downloadCardPng } from "./card-export.js";
 import { CARD_TEMPLATE_CATALOG } from './card-schema.js';
-import { organizeCardPanels } from './card-panels.js';
+import { organizeCardPanels } from './card-panels.js?v=2';
 import { installCardGuides } from './card-guides.js';
 import { installStampEditor } from './card-stamps.js';
 import { resolveCardDisplay } from './card-display-layout.js';

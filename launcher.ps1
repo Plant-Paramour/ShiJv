@@ -295,19 +295,18 @@ function Add-EnvironmentBox([int]$Y) {
 }
 $title = Add-Label '诗矩' 24 45; $title.Font = New-Object Drawing.Font('Microsoft YaHei UI', 24)
 $null = Add-Label '选择环境，检查兼容性，再开始创作。启动器无需 Python 即可打开。' 76 30
-$null = Add-Label '软件环境 · 用于界面、对话与作品管理' 124 28
+$null = Add-Label '运行环境 · 用于界面、对话、作品管理和本地生成' 124 28
 $appBox = Add-EnvironmentBox 156
 $localCheck = New-Object Windows.Forms.CheckBox; $localCheck.Text = '启用本地诗词生成（可选，需要兼容的 NVIDIA CUDA 环境）'
 $localCheck.Location = New-Object Drawing.Point(30, 212); $localCheck.Size = New-Object Drawing.Size(700, 30); $form.Controls.Add($localCheck)
-$null = Add-Label '推理环境 · 可与软件环境相同，也可单独选择' 252 28
-$modelBox = Add-EnvironmentBox 284
+$modelBox = $appBox
 $poetryButton = New-Object Windows.Forms.Button; $poetryButton.Text = '选择本地模型 / 分项测试（实际调用、输出、约束生成）'
-$poetryButton.Location = New-Object Drawing.Point(30, 326); $poetryButton.Size = New-Object Drawing.Size(700, 32)
+$poetryButton.Location = New-Object Drawing.Point(30, 252); $poetryButton.Size = New-Object Drawing.Size(700, 32)
 $form.Controls.Add($poetryButton)
 . (Join-Path $root 'scripts\launcher-models.ps1')
 $poetryButton.Add_Click({ try { $appBox.Text = Resolve-PythonPath $appBox.Text; $modelBox.Text = Resolve-PythonPath $modelBox.Text; Show-ModelSelection } catch { $statusBox.Text = Write-LauncherFailure $_.Exception.Message } })
 $statusBox = New-Object Windows.Forms.TextBox; $statusBox.Multiline = $true; $statusBox.ReadOnly = $true; $statusBox.ScrollBars = 'Vertical'
-$statusBox.Location = New-Object Drawing.Point(30, 368); $statusBox.Size = New-Object Drawing.Size(700, 112)
+$statusBox.Location = New-Object Drawing.Point(30, 294); $statusBox.Size = New-Object Drawing.Size(700, 150)
 $statusBox.BackColor = [Drawing.Color]::FromArgb(255, 254, 250)
 $statusBox.Text = "尚未检查。`r`n依赖不足时会列出缺失项；不启用本地生成，也可使用远程或本机模型服务对话。"; $form.Controls.Add($statusBox)
 $pairLabel = Add-Label '已记住的环境—模型配对（选择后直接启动）' 484 24
@@ -335,7 +334,7 @@ $startupDiagnosticsButton.Add_Click({
 $form.Controls.Add($startupDiagnosticsButton)
 $savedPath = Join-Path $dataRoot 'launcher.json'
 if (Test-Path -LiteralPath $savedPath) {
-    try { $c = Get-Content -LiteralPath $savedPath -Raw -Encoding UTF8 | ConvertFrom-Json; $appBox.Text = $c.application_python; $modelBox.Text = $c.inference_python; $localCheck.Checked = [bool]$c.local_enabled; if (-not $PSBoundParameters.ContainsKey("Port") -and $c.port) { if ([int]$c.port -eq 8000) { $script:Port = 18763 } else { $script:Port = [int]$c.port } } } catch { }
+    try { $c = Get-Content -LiteralPath $savedPath -Raw -Encoding UTF8 | ConvertFrom-Json; $appBox.Text = if ($c.application_python) { $c.application_python } else { $c.inference_python }; $modelBox.Text = $appBox.Text; $localCheck.Checked = [bool]$c.local_enabled; if (-not $PSBoundParameters.ContainsKey("Port") -and $c.port) { if ([int]$c.port -eq 8000) { $script:Port = 18763 } else { $script:Port = [int]$c.port } } } catch { }
 }
 # With local generation disabled there is no independent inference choice yet.
 # Follow the software environment until the user explicitly chooses a different one.
@@ -354,10 +353,8 @@ function Set-EnvironmentControls([bool]$Enabled) {
     $appBox.Enabled = $Enabled; $localCheck.Enabled = $Enabled
     $pairBox.Enabled = $Enabled
     $poetryButton.Enabled = ($Enabled -and $localCheck.Checked)
-    $modelBox.Enabled = ($Enabled -and $localCheck.Checked)
     foreach ($control in $form.Controls) {
         if ([object]::ReferenceEquals($control.Tag, $appBox)) { $control.Enabled = $Enabled }
-        if ([object]::ReferenceEquals($control.Tag, $modelBox)) { $control.Enabled = ($Enabled -and $localCheck.Checked) }
     }
 }
 $localCheck.Add_CheckedChanged({ Set-EnvironmentControls $true })
@@ -473,7 +470,7 @@ $pairBox.Add_SelectedIndexChanged({
         $pair = $script:rememberedPairs[$index]
         $appBox.Text = $pair.application_python
         $localCheck.Checked = [bool]$pair.local_enabled
-        $modelBox.Text = $pair.inference_python
+        $modelBox.Text = if ($pair.application_python) { $pair.application_python } else { $pair.inference_python }
         $script:selectedPoetryModel = $pair.model_path
         $poetryButton.Text = if ($pair.model_path) { $(if ($pair.valid) { '已验证模型：' } else { '未验证模型：' }) + (Split-Path $pair.model_path -Leaf) + '（点击可测试或更换）' } else { '选择本地模型 / 分项测试' }
         $statusBox.Text = if ($pair.valid) { '已选择已验证配对，可以直接启动。需要重新验收时点击“重新检测配对”。' } else { '此配对已保存，但文件或环境已变化，请点击“重新检测配对”。' }

@@ -19,12 +19,13 @@ TREES = {
     'web/prosody-checker': {'.js', '.mjs', '.cjs', '.html', '.css', '.svg', '.json', '.md', '.woff2'},
 }
 FILES = {
+    'web/prosody-checker/assets/cards/backgrounds/willow-poet.png',
+    'web/prosody-checker/vendor/html-to-image.LICENSE',
     'README.md', '.gitignore', 'pyproject.toml', 'requirements-api.txt', 'requirements-gpu.txt',
     'launcher.ps1', 'start-single-player.ps1', '使用说明.md', '推荐配置.md',
     'scripts/launcher-instance.ps1', 'scripts/launcher-memory.ps1', 'scripts/launcher-models.ps1',
     'scripts/data-directory.ps1',
     'scripts/export-startup-diagnostics.ps1',
-    '诗矩环境部署v2.bat', '旧版入口/诗矩环境部署.bat',
     'tools/environment-tool.ps1', 'tools/environment-tool-v2.ps1', 'tools/installer-bootstrap.ps1', 'tools/installer_bootstrap.py', 'tools/installer_protocol.py', 'tools/SetupBootstrap.cs', 'tools/probe_managed_candidate.py',
     'tools/build_environment_tool.py', 'tools/EnvironmentDeployer.cs',
     'tools/build_single_player_source.py',
@@ -75,6 +76,14 @@ def export_content(name: str, data: bytes) -> bytes:
 
 def inspect_content(name: str, data: bytes) -> list[dict]:
     """Fail closed on unreviewed destinations; report locations without secret values."""
+    if Path(name).suffix.lower() == '.exe':
+        if not data.startswith(b'MZ'):
+            raise ValueError(f'无效的 Windows 可执行文件：{name}')
+        return []
+    if Path(name).suffix == '.png':
+        if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+            raise ValueError(f'无效的 PNG 图片文件：{name}')
+        return []
     if Path(name).suffix == '.woff2':
         if not data.startswith(b'wOF2'):
             raise ValueError(f'无效的 WOFF2 字体文件：{name}')

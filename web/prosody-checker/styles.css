@@ -5274,13 +5274,26 @@ body[data-han-scope] .chat-welcome::before,body[data-han-scope] .chat-welcome::a
 .chat-welcome__epigraph blockquote { display: flex; flex-wrap: wrap; column-gap: .5em; margin: 0; padding: 0; border: 0; background: none; color: var(--site-ink); font: 400 clamp(23px, 2.4vw, 29px)/1.8 "汇文仿宋", "FangSong", serif; text-align: left; }
 .chat-welcome__epigraph blockquote span { flex: 0 0 auto; white-space: nowrap; }
 .chat-welcome__epigraph--classic blockquote span { flex: 0 1 auto; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
-.chat-welcome__epigraph--classic figcaption { overflow-wrap: anywhere; }
 .chat-welcome__epigraph figcaption { margin: 16px 0 0; color: var(--site-ink-soft); font: 400 15px/1.7 "汇文仿宋", "FangSong", serif; text-align: right; }
+.chat-welcome__epigraph--classic figcaption { margin-top: 5px; line-height: 1.35; overflow-wrap: anywhere; }
 .chat-welcome__message { margin: 28px 0 0; color: var(--site-ink-soft); font: 400 clamp(17px, calc(2.4vw - 6px), 23px)/1.9 "汇文仿宋", "FangSong", serif; overflow-wrap: anywhere; }
 .chat-welcome__message strong { font-size: calc(1em + 8px); font-weight: 600; white-space: nowrap; }
+/* 卡利弗斯欢迎语：收紧三层关系，并用轻量线性元素建立整体感。 */
+.chat-welcome[data-welcome-kind="califus"] .chat-welcome__note { position: relative; padding-left: clamp(18px, 3vw, 32px); }
+.chat-welcome[data-welcome-kind="califus"] .chat-welcome__note::before { content: ""; position: absolute; top: .05em; bottom: .05em; left: 0; width: 3px; background: var(--site-red); }
+.chat-welcome[data-welcome-kind="classic"] .chat-welcome__note { padding-left: 0; }
+.chat-welcome[data-welcome-kind="classic"] .chat-welcome__note::before { content: none; }
+.chat-welcome__epigraph--califus { position: relative; }
+.chat-welcome__epigraph--califus blockquote { row-gap: .08em; column-gap: .32em; line-height: 1.35; }
+.chat-welcome__epigraph--califus figcaption { margin-top: 5px; padding-right: .1em; font-size: 14px; line-height: 1.35; }
+.chat-welcome[data-welcome-kind="califus"] .chat-welcome__message { position: relative; margin-top: 0; line-height: 1.45; }
+.chat-welcome[data-welcome-kind="classic"] .chat-welcome__message { display: none !important; }
+.chat-welcome__epigraph--classic ~ .chat-welcome__message { display: none !important; }
+.chat-welcome[data-welcome-kind="califus"] .chat-welcome__message strong { display: inline-block; margin: 0 .08em; color: var(--site-ink); font-size: calc(1em + 13px); line-height: .95; letter-spacing: .04em; }
 @media (max-width: 600px) {
   body[data-han-scope] .chat-welcome { margin-top: clamp(32px, 8vh, 64px); padding: 20px 8px; }
   .chat-welcome__epigraph blockquote { font-size: 23px; }
+  .chat-welcome[data-welcome-kind="califus"] .chat-welcome__message strong { font-size: calc(1em + 9px); }
 }
 .scroll-export-dialog { width: min(480px, calc(100vw - 32px)); max-height: calc(100svh - 32px); box-sizing: border-box; padding: 9px; overflow: auto; border: 1px solid var(--site-line-strong); border-radius: 3px; background: var(--site-paper); color: var(--site-ink); box-shadow: 0 16px 48px rgba(43, 39, 31, .2); }
 .scroll-export-dialog::backdrop { background: rgba(35, 32, 27, .46); backdrop-filter: blur(3px); }
@@ -5300,3 +5313,6 @@ body[data-han-scope] .chat-welcome::before,body[data-han-scope] .chat-welcome::a
 .poem-handscroll.poem-handscroll--ci-display .poem-handscroll__line { text-indent: 0; text-align: center; }
 .poem-handscroll--ci-display .poem-handscroll__stanza + .poem-handscroll__stanza { margin-top: .8em; }
 body[data-han-scope] .poem-handscroll .poem-score__inspect[aria-pressed="true"] { background: #ad352b12; }
+.meter-book-repeat-box { position: relative; display: grid; margin: 10px 0; padding: 12px 10px 8px; border: 1px solid color-mix(in srgb, var(--site-red) 58%, var(--site-line-strong)); border-radius: 3px; background: color-mix(in srgb, var(--site-paper) 86%, var(--site-red) 4%); }
+.meter-book-repeat-box__label { position: absolute; top: -10px; left: 10px; padding: 1px 7px; border: 1px solid color-mix(in srgb, var(--site-red) 58%, var(--site-line-strong)); border-radius: 2px; background: var(--site-paper); color: var(--site-red-dark); font-size: 11px; line-height: 1.5; }
+.meter-book-repeat-box .meter-book-line { margin: 0; border: 0; }

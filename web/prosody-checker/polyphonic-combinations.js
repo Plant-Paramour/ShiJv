@@ -1,4 +1,4 @@
-import {evaluateTang,evaluatePailv,evaluateSongci,evaluateHaiku} from './core.js?v=22';
+import {evaluateTang,evaluatePailv,evaluateSongci,evaluateHaiku} from './core.js?v=23';
 
 // 每个字位使用独立的汉字占位，允许同一个字在一句中分别取不同声调。
 export async function evaluateCombinations(result,type,variant,lexicon,options) {

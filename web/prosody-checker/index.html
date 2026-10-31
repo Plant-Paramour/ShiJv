@@ -95,8 +95,8 @@
   <title>诗矩 · 中文诗词创作空间</title>
   <link rel="stylesheet" href="./han/han-scoped.css">
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="./styles.css?v=126">
-  <link rel="stylesheet" href="./prosody-workbook.css?v=33">
+  <link rel="stylesheet" href="./styles.css?v=130">
+  <link rel="stylesheet" href="./prosody-workbook.css?v=36">
   <link rel="stylesheet" href="./card-studio.css?v=2">
 </head>
 <body data-han-scope data-theme="song" data-han-intensity="1" data-han-accent-families="vermilion">
@@ -202,13 +202,13 @@
 
           <div class="chat-thread-scroll" id="chat-thread-scroll">
             <div class="chat-thread" id="chat-thread" aria-live="polite">
-              <section class="chat-welcome" id="chat-welcome" aria-labelledby="chat-welcome-title">
+              <section class="chat-welcome" id="chat-welcome" data-welcome-kind="califus" aria-labelledby="chat-welcome-title">
                 <div class="chat-welcome__note" style="visibility: hidden">
                 <figure class="chat-welcome__epigraph">
                   <blockquote id="chat-welcome-title"><span>「不必等到精通格律</span><span>才开始创作自己的诗词 」</span></blockquote>
                   <figcaption>——卡利弗斯</figcaption>
                 </figure>
-                <p class="chat-welcome__message" id="chat-welcome-message">读过许多人的诗，也写一首<strong>自己的</strong>。</p>
+                <p class="chat-welcome__message" id="chat-welcome-message" hidden>读过许多人的诗，也写一首<strong>自己的</strong>。</p>
                 </div>
               </section>
             </div>
@@ -452,9 +452,21 @@
             <label><span>作品标题</span><input id="poem-editor-name" maxlength="200" autocomplete="off"></label>
             <label id="poem-editor-variant-field" hidden><span>词牌变体</span><select id="poem-editor-variant"><option value="">未记录</option></select></label>
             <label><span>题序</span><textarea id="poem-editor-sequence" maxlength="10000" rows="4" placeholder="填写作品背景或创作缘由"></textarea></label>
-            <div class="poem-sentence-heading">诗词正文<span>选择一句，查询或修改</span></div>
+            <div class="poem-sentence-heading">诗词修改<span>选择一句，实时修改并检查格律</span></div>
+            <div id="poem-editor-prosody" class="poem-editor-prosody">
+              <div class="scores">
+                <div class="score"><span>结构</span><strong data-prosody="structureScore">--</strong><small>分</small></div>
+                <div class="score"><span>平仄</span><strong data-prosody="tonalScore">--</strong><small>分</small></div>
+                <div class="score"><span>押韵</span><strong data-prosody="rhymeScore">--</strong><small>分</small></div>
+              </div>
+              <p id="poem-editor-check-state" role="status"></p>
+              <div class="legend"><span><b>黑体</b> 多音字</span><span><b class="error-sample">红色</b> 格律错误</span><span><b class="conditional-sample">灰色</b> 受多音字影响</span><span data-prosody="aoJiuLegend" hidden><b class="ao-sample">拗</b><b class="rescue-sample">救</b> 拗救字</span></div>
+              <div class="issues" data-prosody="issues" hidden></div>
             <textarea id="poem-editor-content" hidden maxlength="20000" spellcheck="false" aria-label="诗词正文草稿"></textarea>
-            <div id="poem-editor-sentences"></div>
+            <div id="poem-editor-sentences" class="line-results" data-prosody="lineResults"></div>
+              <div class="rhyme-results" data-prosody="rhymeResults"></div>
+              <section class="detection-summary" data-prosody="detectionSummary" aria-live="polite" hidden></section>
+            </div>
             <section class="poem-editor-changes" id="poem-editor-changes" hidden><h2>与来源版本的变化</h2><div id="poem-editor-change-list"></div></section>
           </section>
           <button type="button" class="poem-review-drawer-scrim" id="poem-review-drawer-scrim" aria-label="关闭句子查询面板" hidden></button>
@@ -463,7 +475,6 @@
             <div class="poem-editor-review-head"><span>句子变体</span></div>
             <p id="poem-sentence-query-state" role="status">选择一句后，这里会显示森林中的不同写法。</p>
             <div id="poem-sentence-variations"></div>
-            <div hidden><strong id="poem-editor-score">--</strong><dl id="poem-editor-score-grid"></dl><p id="poem-editor-score-state"></p><div id="poem-editor-issues"></div></div>
           </aside>
         </div>
       </div>
@@ -614,7 +625,7 @@
     </div>
   </dialog>
 
-  <dialog class="confirm-dialog" id="archive-dialog" aria-labelledby="archive-dialog-title"><form method="dialog"><h2 id="archive-dialog-title">归档这段对话？</h2><p>归档后将从聊天侧栏移除，可在个人中心的“归档对话”中查看和恢复。</p><div class="dialog-actions"><button type="submit" value="cancel" class="quiet-button">取消</button><button type="submit" value="confirm" class="primary-button" id="archive-confirm">确认归档</button></div></form></dialog>
+  <dialog class="confirm-dialog" id="archive-dialog" aria-labelledby="archive-dialog-title"><form method="dialog"><h2 id="archive-dialog-title">归档这段对话？</h2><p>归档后将从聊天侧栏移除，可在个人中心的“归档对话”中查看和恢复。</p><div class="dialog-actions"><button type="submit" value="cancel" class="quiet-button">取消</button><button type="submit" value="confirm" class="primary-button" id="archive-confirm" autofocus>确认归档</button></div></form></dialog>
   <dialog class="confirm-dialog" id="backup-restart-dialog" aria-labelledby="backup-restart-title" aria-describedby="backup-restart-description"><form method="dialog"><h2 id="backup-restart-title">备份已恢复</h2><p id="backup-restart-description">重启诗矩后，恢复的数据才能完整生效。是否立即重启？</p><div class="dialog-actions"><button type="submit" value="later" class="quiet-button">稍后重启</button><button type="submit" value="restart" class="primary-button">立即重启</button></div></form></dialog>
 
   <dialog class="avatar-crop-dialog" id="avatar-crop-dialog" aria-labelledby="avatar-crop-title">
@@ -628,12 +639,12 @@
   </dialog>
 
   <div id="site-status" class="site-status" role="status" aria-live="polite"></div>
-  <script type="module" src="./site.js?v=168"></script>
-  <script type="module" src="./app.js?v=39"></script>
-  <script type="module" src="./sentence-search.js?v=20"></script>
-  <link rel="stylesheet" href="./meter-book.css?v=27">
+  <script type="module" src="./site.js?v=172"></script>
+  <script type="module" src="./app.js?v=42"></script>
+  <script type="module" src="./sentence-search.js?v=21"></script>
+  <link rel="stylesheet" href="./meter-book.css?v=28">
   <link rel="stylesheet" href="./poem-editor.css?v=5">
-  <script type="module" src="./meter-book.js?v=18"></script>
-  <script type="module" src="./card-studio.js?v=2"></script>
+  <script type="module" src="./meter-book.js?v=19"></script>
+  <script type="module" src="./card-studio.js?v=3"></script>
 </body>
 </html>

@@ -84,6 +84,40 @@ export function parsePoem(text) {
     .filter(Boolean);
 }
 
+/**
+ * 宋词输入允许末尾叠句连写，例如“惜惜惜。”；当词谱明确给出三个
+ * 一字句时，按词谱句长拆开，避免把叠句误判成一个三字句。
+ */
+export function parseSongciPoem(text, variant) {
+  const raw = parsePoem(text);
+  const lengths = flattenMeter(variant).clauses.map(clause => clause.pattern.length);
+  const lines = [];
+  let cursor = 0;
+  for (const segment of raw) {
+    const chars = [...segment];
+    if (chars.length === lengths[cursor]) {
+      lines.push(segment);
+      cursor += 1;
+      continue;
+    }
+    let total = 0;
+    let end = cursor;
+    while (end < lengths.length && total < chars.length) total += lengths[end++];
+    if (total === chars.length && end > cursor + 1) {
+      let offset = 0;
+      for (let index = cursor; index < end; index += 1) {
+        lines.push(chars.slice(offset, offset + lengths[index]).join(""));
+        offset += lengths[index];
+      }
+      cursor = end;
+    } else {
+      lines.push(segment);
+      cursor += 1;
+    }
+  }
+  return lines;
+}
+
 function percentage(value) {
   return Math.round(value * 10000) / 100;
 }
@@ -417,7 +451,7 @@ export function formatMeterTemplate(variant) {
 
 export function evaluateSongci(text, variant, lexicon, options = {}) {
   const strictPolyphonic = isStrictPolyphonic(options);
-  const lines = parsePoem(text);
+  const lines = parseSongciPoem(text, variant);
   const meter = flattenMeter(variant);
   const errors = new Set();
   const expected = new Map();

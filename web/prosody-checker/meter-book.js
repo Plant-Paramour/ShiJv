@@ -136,6 +136,7 @@ function render(data, examples, variant, preview=null) {
     const sn=Number(key.slice(6)), section=node('section',null,'meter-book-stanza');
     if(stanzas.length>1)section.append(node('h4',stanzas.length===2?(sn===1?'上阙':'下阙'):`第${chineseNumber(sn)}叠`));
     let row=node('div',null,'meter-book-line'); section.append(row);
+    const rowByLine = new Map();
     s.lines.forEach((raw,li)=>{
       const tones=chars(raw), words=chars(example?.[key]?.lines?.[li]);const aligned=words.length===tones.length;
       const sentence=node('span',null,'meter-book-sentence');
@@ -153,8 +154,26 @@ function render(data, examples, variant, preview=null) {
       const punctuationText=layout?(punctuationByLine.get(li+1)??''):(endsPhrase?'。':'，');
       punctuation.append(node('span',punctuationText),node('span',punctuationText,'meter-book-tone'));
       if(punctuationText)sentence.append(punctuation); row.append(sentence);
+      rowByLine.set(li + 1, row);
       if(endsPhrase&&li<s.lines.length-1){row=node('div',null,'meter-book-line');section.append(row);}
-    });content.append(section);
+    });
+    // 将词谱定义的叠韵行收进同一个框，框内同时保留原文和格律模板。
+    (variant.repetition_groups || []).forEach((group, groupIndex) => {
+      const positions = (group.positions || []).filter(position => position.stanza === sn);
+      const rows = [...new Set(positions.flatMap(position => {
+        const first = position.start?.[0];
+        const last = position.end?.[0] || first;
+        return Array.from({ length: Math.max(0, last - first + 1) }, (_, offset) => rowByLine.get(first + offset));
+      }).filter(Boolean))];
+      if (rows.length < 2) return;
+      const box = node('div', null, 'meter-book-repeat-box');
+      box.dataset.repeatGroup = String(group.id ?? groupIndex + 1);
+      box.append(node('span', `叠 ${group.id ?? groupIndex + 1}`, 'meter-book-repeat-box__label'));
+      const firstRow = rows[0];
+      firstRow.parentNode.insertBefore(box, firstRow);
+      rows.forEach(item => box.append(item));
+    });
+    content.append(section);
   }
   if(variant.variants_description){const description=node('section',null,'meter-book-description');description.append(node('h4','体式说明'),node('p',variant.variants_description));content.append(description);}
 }

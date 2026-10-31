@@ -1,5 +1,5 @@
-import { renderMeterPreview, openMeterBook } from "./meter-book.js?v=18";
-import { buildLexicon, formatMeterTemplate, evaluateBestTangForm, evaluatePailv } from "./core.js?v=22";
+import { renderMeterPreview, openMeterBook } from "./meter-book.js?v=19";
+import { buildLexicon, formatMeterTemplate, evaluateBestTangForm, evaluatePailv } from "./core.js?v=23";
 import { getDatasetJson, getMeterBundle } from "./dataset-cache.js?v=4";
 
 const books = { Xinyun: "Xinyun.json", Pinshui: "Pinshui.json", Cilin: "Cilin.json", Tongyun: "Tongyun.json" };

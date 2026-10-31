@@ -38,8 +38,14 @@ def download_sources(item, preference='auto'):
     mirror = None
     if parsed.hostname in {'download.pytorch.org', 'download-r2.pytorch.org'} and parsed.path.startswith('/whl/'):
         mirror = urlunsplit(('https', 'mirror.sjtu.edu.cn', '/pytorch-wheels/' + parsed.path[5:], '', ''))
+        # Alibaba Cloud also mirrors the PyTorch wheel tree and is often faster
+        # on mainland networks than a single fixed mirror.
+        aliyun = urlunsplit(('https', 'mirrors.aliyun.com', '/pytorch-wheels/' + parsed.path[5:], '', ''))
     elif parsed.hostname == 'files.pythonhosted.org' and parsed.path.startswith('/packages/'):
         mirror = urlunsplit(('https', 'mirrors.tuna.tsinghua.edu.cn', '/pypi/web' + parsed.path, '', ''))
+        aliyun = None
+    else:
+        aliyun = None
     if preference == 'official' or not mirror:
         return [official]
-    return [mirror, official]
+    return [mirror, aliyun, official] if aliyun else [mirror, official]

@@ -1,3 +1,6 @@
+import { renderProsodyResult } from "./prosody-result.js";
+import { evaluateCombinations } from "./polyphonic-combinations.js";
+import { getLexicon } from "./prosody-evaluation.js?v=17";
 function missingToneMessages(result) {
   return (result.lines||[]).flatMap((line,li)=>(line.characters||[]).flatMap((c,ci)=>{
     if(!(c.missingTone||Array.isArray(c.tones)&&c.tones.length===0))return [];
@@ -7,7 +10,7 @@ function missingToneMessages(result) {
   }));
 }
 import { evaluateGeneratedPoem, getSongciStanzaEnds } from "./prosody-evaluation.js?v=17";
-import { flattenMeter } from "./core.js?v=22";
+import { flattenMeter } from "./core.js?v=23";
 import { getLocalMeterCatalog, getLocalRhymeOptions, lookupLocalRhymeParts, validateLocalFixedLines } from "./local-rhyme.js?v=3";
 import { getDatasetJson } from "./dataset-cache.js?v=4";
 import { renderChatMarkdown } from "./chat-markdown.js?v=3";
@@ -40,28 +43,42 @@ const welcomeClassics = [
   ['吟安一个字，捻断数茎须。', '卢延让《苦吟》'],
   ['别裁伪体亲风雅，转益多师是汝师。', '杜甫《戏为六绝句·其六》'],
 ];
-const welcomeEpigraph = document.querySelector('.chat-welcome__epigraph');
-// 先决定版本，再在版本内部均匀选择；避免 A 版小句数量影响版本权重。
-const useWelcomeA = Math.random() < 0.3;
-if (welcomeMessage && useWelcomeA) {
-  const message = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-  welcomeMessage.replaceChildren(...message.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map(part => {
-    if (!part.startsWith('**')) return document.createTextNode(part);
-    const emphasis = document.createElement('strong');
-    emphasis.textContent = part.slice(2, -2);
-    return emphasis;
-  }));
-} else if (welcomeMessage && welcomeEpigraph) {
-  const [quote, attribution] = welcomeClassics[Math.floor(Math.random() * welcomeClassics.length)];
-  welcomeEpigraph.classList.add('chat-welcome__epigraph--classic');
-  welcomeEpigraph.querySelector('blockquote').replaceChildren(...`「${quote}」`.split(/(?<=，)/u).map(text => {
-    const phrase = document.createElement('span');
-    phrase.textContent = text;
-    return phrase;
-  }));
-  welcomeEpigraph.querySelector('figcaption').textContent = `——${attribution}`;
-  welcomeMessage.hidden = true;
+function randomizeWelcome(root = document) {
+  const messageNode = root.querySelector('#chat-welcome-message');
+  const epigraph = root.querySelector('.chat-welcome__epigraph');
+  const welcome = root.querySelector('#chat-welcome');
+  if (!messageNode || !epigraph || !welcome) return;
+  const useA = Math.random() < 0.3;
+  welcome.dataset.welcomeKind = useA ? 'califus' : 'classic';
+  epigraph.classList.toggle('chat-welcome__epigraph--classic', !useA);
+  epigraph.classList.toggle('chat-welcome__epigraph--califus', useA);
+  if (useA) {
+    epigraph.querySelector('blockquote').replaceChildren(...['「不必等到精通格律', '才开始创作自己的诗词 」'].map(text => {
+      const phrase = document.createElement('span');
+      phrase.textContent = text;
+      return phrase;
+    }));
+    epigraph.querySelector('figcaption').textContent = '——卡利弗斯';
+    const message = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    messageNode.hidden = false;
+    messageNode.replaceChildren(...message.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map(part => {
+      if (!part.startsWith('**')) return document.createTextNode(part);
+      const emphasis = document.createElement('strong');
+      emphasis.textContent = part.slice(2, -2);
+      return emphasis;
+    }));
+  } else {
+    const [quote, attribution] = welcomeClassics[Math.floor(Math.random() * welcomeClassics.length)];
+    epigraph.querySelector('blockquote').replaceChildren(...`「${quote}」`.split(/(?<=，)/u).map(text => {
+      const phrase = document.createElement('span');
+      phrase.textContent = text;
+      return phrase;
+    }));
+    epigraph.querySelector('figcaption').textContent = `——${attribution}`;
+    messageNode.hidden = true;
+  }
 }
+randomizeWelcome();
 
 // 首屏保留布局但隐藏默认文案，选定最终版本并等待字体就绪后一次显示。
 const welcomeNote = document.querySelector('.chat-welcome__note');
@@ -98,6 +115,7 @@ let statusTimer;
 let currentUser = null;
 const chatImagePreviews = new Map();
 let currentConversationId = null;
+let pendingArchiveId = null;
 let currentConversationReadOnly = false;
 const poemPageState = { source: null, evaluation: null, evaluatedContent: "", version: 0, timer: null, returnHash: "#profile" };
 let editingMessageId = null;
@@ -434,9 +452,9 @@ function openChatPromptChooser() {
           <button type="submit" class="icon-button" aria-label="关闭">×</button>
         </header>
         <div class="chat-prompt-chooser__options">
-          <button type="button" data-prompt-mode="full"><strong>完整生成</strong><span>写下创作要求，选择体裁和格律，生成完整作品。</span></button>
-          <button type="button" data-prompt-mode="partial"><strong>诗词补完</strong><span>补完残稿，或指定原诗中的句子进行改写。</span></button>
-          <button type="button" data-prompt-mode="rewrite"><strong>局部重写</strong><span>导入作品ID，选择需要重写的句子，保留其余上下文。</span></button>
+          <button type="button" data-prompt-mode="full"><strong>整首创作</strong><span>输入主题和创作要求，从零生成一首完整诗词。</span></button>
+          <button type="button" data-prompt-mode="partial"><strong>残稿补全</strong><span>输入已有诗句，保留这些句子，补齐其余内容。</span></button>
+          <button type="button" data-prompt-mode="rewrite"><strong>诗词改写</strong><span>导入已有作品，选择要改写的诗句，其余诗句保持不变。</span></button>
         </div>
       </form>`;
     dialog.querySelectorAll("[data-prompt-mode]").forEach((button) => {
@@ -461,7 +479,7 @@ async function openDirectGenerationEditor(mode) {
     announce("当前对话为只读，无法在其中创建创作面板。");
     return;
   }
-  const title = isRewrite ? "局部重写" : isPartial ? "部分生成" : "整首创作";
+  const title = isRewrite ? "诗词改写" : isPartial ? "部分生成" : "整首创作";
   if (!currentConversationId) setChatTitle(title);
   document.querySelector("#chat-form").hidden = false;
   chatSessionId = currentConversationId;
@@ -1172,9 +1190,7 @@ function editorLines(content) {
 }
 
 let poemSentenceSelection = null;
-let poemSentencePatterns = [];
 let poemSentenceCommaPositions = [];
-let poemSentenceStanzaEnds = [];
 let poemSentenceQueryVersion = 0;
 let poemSentenceQueryCacheKey = null;
 let poemSentenceQueryPendingKey = null;
@@ -1214,91 +1230,39 @@ document.addEventListener("keydown", (event) => {
 function poemSentenceParts() {
   return [...document.querySelector("#poem-editor-content").value.matchAll(/[^，,。.？！；;!?\r\n]+[，,。.？！；;!?]?/gu)].filter((part) => part[0].trim());
 }
-let poemSentenceDisplayEnds = new Set();
-function renderPoemSentences() {
-  const list = document.querySelector("#poem-editor-sentences");
-  list.replaceChildren();
-  const isSongci=poemPageState.source?.meter_type === "宋词";
-  list.classList.toggle("poem-editor-songci",isSongci);
-  const parts = poemSentenceParts();
-  if (!parts.length) return;
-  const stanzaEnds = poemSentenceStanzaEnds.length ? poemSentenceStanzaEnds : [parts.length - 1];
-  const stanzas = [];
-  let cursor = 0;
-  for (const stanzaEnd of stanzaEnds) {
-    if (cursor >= parts.length) break;
-    const limit = Math.min(stanzaEnd + 1, parts.length);
-    stanzas.push(parts.slice(cursor, limit).map((part, offset) => ({ part, index: cursor + offset })));
-    cursor = limit;
-  }
-  if (cursor < parts.length) stanzas.push(parts.slice(cursor).map((part, offset) => ({ part, index: cursor + offset })));
-  stanzas.forEach((stanza, stanzaIndex) => {
-    const line = document.createElement("div"); line.className = "poem-stanza"; line.setAttribute("role", "group");
-    line.setAttribute("aria-label", `第 ${stanzaIndex + 1} 阕`);
-    if(isSongci){
-      line.classList.add("meter-book-stanza");
-      if(stanzas.length>1){const label=document.createElement("h4");label.textContent=stanzas.length===2?(stanzaIndex===0?"上阕":"下阕"):`第${stanzaIndex+1}阕`;line.append(label);}
-    }
-    let displayRow=null;
-    stanza.forEach(({ part, index }) => {
-    if(isSongci&&(!displayRow||poemSentenceDisplayEnds.has(index-1))){displayRow=document.createElement("div");displayRow.className="meter-book-line";line.append(displayRow);}
-    const row = document.createElement("div"); row.className = "poem-sentence";
-    row.classList.toggle("is-selected", index === poemSentenceSelection);
-    const sentenceText = part[0].trim();
-    const pick = document.createElement("button"); pick.type = "button"; pick.className = "poem-sentence-text";
-    pick.setAttribute("aria-pressed", String(index === poemSentenceSelection));
-    pick.setAttribute("aria-label", `选择第 ${index + 1} 句：${sentenceText}`);
-    const patternText = poemSentencePatterns[index] || "格律模板未提供";
-    const punctuation = /[，,。.？！；;!?]$/u.test(sentenceText) ? sentenceText.slice(-1) : "";
-    const body = punctuation ? sentenceText.slice(0, -1) : sentenceText;
-    const patternBody = patternText.length === sentenceText.length && punctuation ? patternText.slice(0, -1) : patternText;
-    const alignLength = Math.max(body.length, patternBody.length);
-    const alignedBody = body.padEnd(alignLength, "　");
-    const alignedPattern = patternBody.padEnd(alignLength, " ");
-    const makeAlignedText = (target, text, pattern = false) => {
-      [...text].forEach((character) => {
-        const cell = document.createElement("span"); cell.className = "poem-sentence-cell";
-        if (pattern && character === "中") cell.classList.add("is-neutral");
-        cell.textContent = character;
-        target.append(cell);
-      });
+let poemEditorVariant = null;
+let poemLineEditor = null;
+function poemProsodyElements() {
+  const root = document.querySelector('#poem-editor-prosody');
+  return Object.fromEntries(['structureScore','tonalScore','rhymeScore','issues','aoJiuLegend','detectionSummary','lineResults','rhymeResults'].map(key => [key, root.querySelector(`[data-prosody="${key}"]`)]));
+}
+function makePoemLineEditable(row, index) {
+  row.dataset.lineIndex = index;
+  const poem = row.querySelector('.poem-line');
+  poem.tabIndex = 0; poem.setAttribute('role', 'button');
+  poem.setAttribute('aria-label', `选择或修改第 ${index + 1} 句：${poem.textContent}`);
+  row.classList.toggle('is-selected', index === poemSentenceSelection);
+  const edit = () => {
+    if (poemLineEditor && !poemLineEditor.finish()) return;
+    poemSentenceSelection = index; ++poemSentenceQueryVersion;
+    poemSentenceQueryCacheKey = null; poemSentenceQueryPendingKey = null;
+    clearPoemSentenceVariations(); updatePoemReviewToggle();
+    querySelectedPoemSentence();
+    document.querySelectorAll('#poem-editor-sentences .result-line').forEach(item => item.classList.toggle('is-selected', Number(item.dataset.lineIndex) === index));
+    const part = poemSentenceParts()[index]; if (!part) return;
+    const editor = document.createElement('div'); editor.className = 'line-editor';
+    const input = document.createElement('textarea'); input.className = 'poem-sentence-input'; input.rows = 2;
+    input.value = part[0].trim(); input.setAttribute('aria-label', `第 ${index + 1} 句草稿`);
+    const done = document.createElement('button'); done.type = 'button'; done.textContent = '完成编辑';
+    const finish = () => {
+      if (!input.reportValidity()) return false;
+      poemLineEditor = null; editor.remove(); return true;
     };
-    makeAlignedText(pick, alignedBody);
-    if (punctuation) { const cell = document.createElement("span"); cell.className = "poem-sentence-cell poem-sentence-punctuation"; cell.textContent = punctuation; pick.append(cell); }
-    pick.addEventListener("click", () => {
-      if (poemSentenceSelection === index) return;
-      poemSentenceSelection = index; ++poemSentenceQueryVersion;
-      poemSentenceQueryCacheKey = null;
-      poemSentenceQueryPendingKey = null;
-      document.querySelector("#poem-sentence-query-state").textContent = `正在查询第 ${index + 1} 句……`;
-      clearPoemSentenceVariations();
-      updatePoemReviewToggle();
-      if (window.matchMedia("(max-width: 780px)").matches) setPoemReviewDrawer(true);
-      querySelectedPoemSentence();
-      renderPoemSentences();
-      document.querySelectorAll(".poem-sentence-text")[index]?.focus({ preventScroll: true });
-    });
-    const pattern = document.createElement("div"); pattern.className = "poem-sentence-pattern";
-    pattern.setAttribute("aria-hidden", "true");
-    makeAlignedText(pattern, alignedPattern, true);
-    if (punctuation && patternBody.length + 1 === sentenceText.length) { const cell = document.createElement("span"); cell.className = "poem-sentence-cell poem-sentence-punctuation"; cell.textContent = punctuation; pattern.append(cell); }
-    row.append(pick, pattern);
-    if (index === poemSentenceSelection) {
-      const edit = document.createElement("button"); edit.type = "button"; edit.className = "poem-sentence-pen";
-      edit.setAttribute("aria-label", `修改第 ${index + 1} 句`); edit.title = "修改这一句";
-      edit.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
-      edit.addEventListener("click", () => {
-        const input = document.createElement("textarea"); input.className = "poem-sentence-input"; input.rows = 2;
-        input.value = part[0].trim(); input.setAttribute("aria-label", `第 ${index + 1} 句草稿`);
-        pick.hidden = true; edit.hidden = true; row.insertBefore(input, pattern);
-        let currentLength = part[0].length;
-        const done = document.createElement("button"); done.type = "button"; done.className = "quiet-button"; done.textContent = "完成编辑";
-        done.addEventListener("click", () => {
-          if (!input.reportValidity()) return;
-          renderPoemSentences();
-          document.querySelectorAll(".poem-sentence-text")[index]?.focus({ preventScroll: true });
-        }); row.append(done);
-        input.addEventListener("input", () => {
+    poemLineEditor = { index, editor, input, finish };
+    done.onclick = () => { if (finish()) document.querySelector(`#poem-editor-sentences [data-line-index="${index}"] .poem-line`)?.focus(); };
+    input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.isComposing && !event.shiftKey) { event.preventDefault(); done.click(); } });
+    let currentLength = part[0].length;
+    input.addEventListener('input', () => {
           // A sentence editor cannot introduce sentence boundaries; Songci separators follow its meter.
           const entered = input.value.trim();
           const enteredMark = entered.match(/[，,。.？！；;!?：:…、]$/u)?.[0] || "";
@@ -1325,41 +1289,51 @@ function renderPoemSentences() {
           content.value = content.value.slice(0, part.index) + text + content.value.slice(part.index + currentLength);
           currentLength = text.length;
           schedulePoemEditorScore();
-        });
-        input.focus();
-      }); row.append(edit);
-    }
-    if(isSongci){row.classList.add("meter-book-sentence");displayRow.append(row);}else line.append(row);
+
     });
-    list.append(line);
-  });
+    editor.append(input, done); row.append(editor); input.focus();
+  };
+  poem.addEventListener('click', edit);
+  poem.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); edit(); } });
+}
+function renderPoemSentences() {
+  const targets = poemProsodyElements();
+  const evaluation = poemPageState.evaluation;
+  const result = evaluation?.result || {
+    structureScore: 0, tonalScore: 0, rhymeScore: 0, issues: [], rhymeGroups: [],
+    lines: poemSentenceParts().map(part => ({characters: [...part[0].replace(/[，,。.？！；;!?\s]/gu, '')].map(char => ({char, tone: ''}))})),
+  };
+  const active = poemLineEditor;
+  const focused = active && document.activeElement === active.input;
+  const selection = active ? [active.input.selectionStart, active.input.selectionEnd] : null;
+  renderProsodyResult(targets, result, evaluation?.type || (poemPageState.source?.meter_type === '宋词' ? 'songci' : 'tang'), poemEditorVariant, { makeEditable: makePoemLineEditable, summaryOpen: true });
+  if (!evaluation) for (const key of ['structureScore', 'tonalScore', 'rhymeScore']) targets[key].textContent = '--';
+  if (active) {
+    const row = targets.lineResults.querySelector(`[data-line-index="${active.index}"]`);
+    if (row) { row.append(active.editor); if (focused) { active.input.focus({preventScroll:true}); active.input.setSelectionRange(...selection); } }
+    else poemLineEditor = null;
+  }
 }
 async function loadPoemSentencePatterns() {
   const source = poemPageState.source; if (!source) return;
   const variant = document.querySelector("#poem-editor-variant").value;
-  poemSentencePatterns = []; poemSentenceCommaPositions = []; poemSentenceStanzaEnds = []; poemSentenceDisplayEnds=new Set(); renderPoemSentences();
+  poemEditorVariant = null;
+  poemSentenceCommaPositions = []; renderPoemSentences();
   if (source.meter_type !== "宋词") return;
   try {
     const meter = await getDatasetJson("meter", `${source.form_name}.json`);
     if (source !== poemPageState.source || variant !== document.querySelector("#poem-editor-variant").value) return;
     const selected = meter.variants.find((item) => item.name === variant) || meter.variants[0];
+    poemEditorVariant = selected;
     const flattened = flattenMeter(selected);
-    poemSentencePatterns = flattened.clauses.map((line) => line.rawPattern.replace(/[\/\s]/gu, ""));
     let stanzaLineCount = 0;
-    poemSentenceStanzaEnds = Object.keys(selected).filter((key) => /^stanza\d+$/.test(key))
+    const stanzaEnds = Object.keys(selected).filter((key) => /^stanza\d+$/.test(key))
       .sort((left, right) => Number(left.slice(6)) - Number(right.slice(6)))
       .map((key) => { stanzaLineCount += selected[key].lines?.length || 0; return stanzaLineCount - 1; })
       .filter((end) => end >= 0);
     const terminalPositions = new Set(flattened.rhymeGroups.flatMap((group) => group.positions));
-    poemSentenceStanzaEnds.forEach((index) => terminalPositions.add(index));
+    stanzaEnds.forEach((index) => terminalPositions.add(index));
     poemSentenceCommaPositions = flattened.clauses.map((_, index) => !terminalPositions.has(index));
-    poemSentenceDisplayEnds=new Set(terminalPositions);
-    try{
-      const layouts=await getDatasetJson("meter","display-layouts.json");
-      if(source!==poemPageState.source||variant!==document.querySelector("#poem-editor-variant").value)return;
-      const stanzas=layouts.items?.[meter.name]?.[String(selected.source_id)]?.stanzas;
-      if(stanzas){let offset=0;const ends=new Set();for(const key of Object.keys(selected).filter(k=>/^stanza\d+$/.test(k)).sort((a,b)=>Number(a.slice(6))-Number(b.slice(6)))){for(const row of stanzas[key]||[])ends.add(offset+row.sentences.at(-1).line-1);offset+=selected[key].lines.length;}poemSentenceDisplayEnds=ends;}
-    }catch{}
     renderPoemSentences();
   } catch (_) { /* The poem remains editable when its template is unavailable. */ }
 }
@@ -1407,6 +1381,7 @@ function replacePoemSentenceVariation() {
   const selected = poemSentenceSelection;
   const text = poemSentenceVariationTexts[poemSentenceVariationSelection];
   if (!source || selected === null || typeof text !== "string") return;
+  if (poemLineEditor) { poemLineEditor.editor.remove(); poemLineEditor = null; }
   const part = poemSentenceParts()[selected];
   if (!part) return;
   const content = document.querySelector("#poem-editor-content");
@@ -1414,8 +1389,8 @@ function replacePoemSentenceVariation() {
   ++poemSentenceQueryVersion;
   clearPoemSentenceVariations();
   document.querySelector("#poem-sentence-query-state").textContent = `已替换第 ${selected + 1} 句；草稿已更新，保存后写入作品。`;
-  renderPoemSentences();
   schedulePoemEditorScore();
+  renderPoemSentences();
   if (window.matchMedia("(max-width: 780px)").matches) setPoemReviewDrawer(false);
 }
 
@@ -1449,40 +1424,12 @@ function renderPoemEditorChanges(poem, title, content, saved = false) {
 }
 
 function renderPoemEditorScore(evaluation, message = "") {
-  const score = document.querySelector("#poem-editor-score");
-  const grid = document.querySelector("#poem-editor-score-grid");
-  const state = document.querySelector("#poem-editor-score-state");
-  const issues = document.querySelector("#poem-editor-issues");
-  score.textContent = evaluation ? scoreText(evaluation.comprehensive_score) : "--";
-  score.style.color = evaluation && evaluation.comprehensive_score < 100 ? "var(--site-red-dark)" : "#446b50";
-  state.textContent = message || (evaluation ? `${evaluation.form_name} · ${evaluation.rhyme_book_name}` : "等待正文评分");
-  grid.replaceChildren(); issues.replaceChildren();
-  if (!evaluation) return;
-  for (const [label, value] of [["结构", evaluation.structure_score], ["平仄", evaluation.tonal_score], ["押韵", evaluation.rhyme_score]]) {
-    const item = document.createElement("div"); const term = document.createElement("dt"); const description = document.createElement("dd");
-    term.textContent = label; description.textContent = scoreText(value); item.append(term, description); grid.append(item);
-  }
-  const deductionMessages = scoreDeductionMessages(evaluation);
-  if (deductionMessages.length) {
-    const section = document.createElement("section");
-    const heading = document.createElement("h3"); heading.textContent = "平仄与押韵错误";
-    const list = document.createElement("ul");
-    deductionMessages.slice(0, 20).forEach((text) => { const item = document.createElement("li"); item.textContent = text; list.append(item); });
-    section.append(heading, list); issues.append(section);
-  }
-  const polyphonic = (evaluation.result?.polyphonicDecisions || []).map((item) => String(item.message || "").replaceAll("平/仄", "多"));
-  const aoJiu = (evaluation.result?.aoJiu?.details || []).map((item) => item.message);
-  for (const [heading, messages, empty] of [
-    ["多音字判定", polyphonic, "未发现需要单独判断的多音字。"],
-    ["拗救判定", aoJiu, evaluation.result?.aoJiu?.enabled ? "未识别到需要拗救的句式。" : "未启用拗救。"],
-  ]) {
-    const group = document.createElement("section");
-    const title = document.createElement("h3"); title.textContent = heading; group.append(title);
-    for (const message of messages.length ? messages : [empty]) {
-      const line = document.createElement("p"); line.textContent = message; group.append(line);
-    }
-    issues.append(group);
-  }
+  const panel = document.querySelector('#poem-editor-prosody');
+  panel.classList.toggle('is-pending', !evaluation);
+  panel.setAttribute('aria-busy', String(!evaluation && message === '正在检查格律……'));
+  document.querySelector('#poem-editor-check-state').textContent = message || (evaluation ? `${evaluation.form_name} · ${evaluation.rhyme_book_name}` : '等待正文评分');
+  if (evaluation) renderPoemSentences();
+  else for (const target of panel.querySelectorAll('.scores strong')) target.textContent = '--';
 }
 
 function refreshPoemEditorSaveState() {
@@ -1520,7 +1467,16 @@ function schedulePoemEditorScore() {
         strictPolyphonic: false,
         allowAoJiu: context.task_options?.allow_aojiu !== false,
       });
+      let variant = null;
+      if (evaluation.type === 'songci') {
+        const meter = await getDatasetJson('meter', `${context.form_name}.json`);
+        variant = meter.variants.find(item => item.name === (context.variant_name || meter.default_variant)) || meter.variants[0];
+      }
+      evaluation.result.polyphonicCombinations = await evaluateCombinations(evaluation.result, evaluation.type, variant, await getLexicon(evaluation.rhyme_book_id), {
+        polyphonicMode: 'automatic', strictPolyphonic: false, allowAoJiu: context.task_options?.allow_aojiu !== false,
+      });
       if (version !== poemPageState.version) return;
+      poemEditorVariant = variant;
       poemPageState.evaluation = evaluation;
       poemPageState.evaluatedContent = content;
       renderPoemEditorScore(evaluation);
@@ -1594,6 +1550,7 @@ async function loadPoemPage() {
     }
     layout.hidden = false;
     poemSentenceSelection = null;
+    poemLineEditor = null;
     ++poemSentenceQueryVersion;
     poemSentenceQueryCacheKey = null;
     poemSentenceQueryPendingKey = null;
@@ -3037,6 +2994,14 @@ function hideChatWelcome() {
   if (welcome) welcome.hidden = true;
 }
 
+function showChatWelcome() {
+  const welcome = chatThread.querySelector("#chat-welcome");
+  const note = welcome?.querySelector(".chat-welcome__note");
+  if (!welcome || !note) return;
+  welcome.hidden = false;
+  note.style.removeProperty("visibility");
+}
+
 function replaceMessage(article, text, state = "") {
   const shouldFollow = isChatScrollPinnedToBottom();
   const content = article.querySelector(".message-text");
@@ -3088,7 +3053,7 @@ function openProposalHelpDialog() {
             <div><dt>生成韵书</dt><dd>选择判定押韵时使用的韵书。</dd></div>
             <div><dt>押韵策略</dt><dd>自动选韵、固定韵部或随机选韵。选择固定韵部时，再填写“指定韵部”。</dd></div>
             <div><dt>指定韵部</dt><dd>选择韵组对应的韵部；留空的韵组由生成器自动选择。</dd></div>
-            <div><dt>其他创作配置（JSON）</dt><dd>填写额外选项对象；没有额外配置时填空对象。完整生成时可设 skip_planning 为 true，跳过可见构思，直接输出 [title] 和 [content]。局部重写时可设 omit_original_target_from_prompt 为 true，让提示词不包含目标句原文。</dd></div>
+            <div><dt>其他创作配置（JSON）</dt><dd>填写额外选项对象；没有额外配置时填空对象。完整生成时可设 skip_planning 为 true，跳过可见构思，直接输出 [title] 和 [content]。诗词改写时可设 omit_original_target_from_prompt 为 true，让提示词不包含目标句原文。</dd></div>
             <div><dt>诗句</dt><dd>勾选的句子会保留；未勾选的已有句子重写，空句补完。</dd></div>
             <div><dt>多音字</dt><dd>严格判定会保守处理多音字；放行多音会允许模型结合语境判断。</dd></div>
             <div><dt>句数</dt><dd>仅排律需要填写，使用不少于 10 的偶数。</dd></div>
@@ -4012,7 +3977,7 @@ function appendProposalEditor(prepared, anchor = null) {
          const conversation = await apiFetch("/v1/conversations", {
            method: "POST",
            headers: requestHeaders({ "Content-Type": "application/json" }),
-           body: JSON.stringify({ title: isLocalRewrite ? "局部重写" : isPartial ? "部分生成" : "整首创作" }),
+           body: JSON.stringify({ title: isLocalRewrite ? "诗词改写" : isPartial ? "部分生成" : "整首创作" }),
          });
          createdConversationId = conversation.id;
          submitConversationId = conversation.id;
@@ -4039,10 +4004,10 @@ function appendProposalEditor(prepared, anchor = null) {
       if (prepared.direct && createdConversationId) {
         setConversationLocation(createdConversationId);
         if (currentUser) localStorage.setItem(`shiju_conversation_${currentUser.id}`, createdConversationId);
-        setChatTitle(prepared.kind === "rewrite" ? "局部重写" : isPartial ? "部分生成" : "整首创作");
+        setChatTitle(prepared.kind === "rewrite" ? "诗词改写" : isPartial ? "部分生成" : "整首创作");
         loadConversations().catch(() => {});
         const titlePayload = [
-          isLocalRewrite ? "局部重写诗词" : isPartial ? "部分生成诗词" : "生成整首诗词",
+          isLocalRewrite ? "改写诗词" : isPartial ? "部分生成诗词" : "生成整首诗词",
           `${directPayload.meter_type}${directPayload.form_name ? ` ${directPayload.form_name}` : ""}`,
           requirement,
           isPartial && Object.keys(selectedFixedLines).length ? `指定句：${JSON.stringify(selectedFixedLines)}` : "",
@@ -4953,6 +4918,8 @@ document.querySelector("#new-chat").addEventListener("click", () => {
   localStorage.removeItem(`shiju_conversation_${currentUser.id}`);
   setChatBusy(false);
   chatThread.innerHTML = initialThreadMarkup;
+  randomizeWelcome(chatThread);
+  showChatWelcome();
   chatInput.value = "";
   chatInput.style.height = "";
   agentStatus.textContent = "待连接";
@@ -5035,6 +5002,29 @@ async function saveConversationRename(row, conversationId) {
     announce(`修改名称失败：${error.message}`);
   }
 }
+
+document.querySelector("#archive-dialog").addEventListener("close", () => {
+  pendingArchiveId = null;
+});
+document.querySelector("#archive-dialog form").addEventListener("submit", async (event) => {
+  if (event.submitter?.value !== "confirm") return;
+  event.preventDefault();
+  const id = pendingArchiveId;
+  const confirm = document.querySelector("#archive-confirm");
+  if (!id || confirm.disabled) return;
+  confirm.disabled = true;
+  try {
+    await apiFetch(`/v1/conversations/${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (currentConversationId === id) document.querySelector("#new-chat").click();
+    document.querySelector("#archive-dialog").close();
+    await loadConversations();
+    announce("对话已归档，可在个人中心恢复。");
+  } catch (error) {
+    announce(`归档失败：${error.message}`);
+  } finally {
+    confirm.disabled = false;
+  }
+});
 
 document.querySelector("#conversation-list").addEventListener("click", async (event) => {
   const rename = event.target.closest("[data-rename-conversation]");
