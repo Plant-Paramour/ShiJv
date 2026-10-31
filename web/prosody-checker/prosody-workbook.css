@@ -391,9 +391,10 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
 #poem-editor-check-state { font-size: 12px; color: var(--site-ink-soft); }
 .poem-editor-prosody.is-pending :is(.detection-summary,.rhyme-results,.issues) { display: none; }
 .poem-editor-prosody.is-pending .tone-line { opacity: .4; }
-#poem-editor-sentences .line-editor { display: flex; flex-direction: column; gap: 8px; max-width: min(100%, 25rem); }
-#poem-editor-sentences .line-editor textarea { width: 100%; box-sizing: border-box; font: inherit; }
-#poem-editor-sentences .result-line.is-selected { outline: 1px solid var(--site-line); outline-offset: 4px; }
+#poem-editor-sentences .line-editor { display: flex; flex-direction: column; gap: 6px; width: calc(var(--line-length, 7) * var(--meter-reading-cell)); max-width: none; min-width: 0; }
+#poem-editor-sentences .line-editor textarea { width: 100%; min-width: 0; min-height: 0; height: calc(1.9em + 18px); padding: 8px; box-sizing: border-box; font: inherit; resize: none; overflow: hidden; }
+#poem-editor-sentences .line-editor button { align-self: flex-end; padding: 4px 10px; }
+#poem-editor-sentences .result-line.is-selected { outline: 2px solid var(--site-red-dark); outline-offset: 4px; border-radius: 3px; background: color-mix(in srgb, var(--site-paper) 92%, var(--site-red-dark) 8%); }
 
 .poem-editor-view .poem-editor-writing { grid-template-columns: minmax(0, 1fr); }
 .poem-editor-prosody { min-width: 0; max-width: 100%; }
@@ -404,3 +405,6 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
   .poem-editor-view .poem-editor-writing :is(input,textarea,select) { box-sizing: border-box; }
   .poem-editor-prosody .detection-summary { overflow-wrap: anywhere; }
 }
+
+#poem-editor-sentences .result-line { margin-right: 32px; align-self: start; justify-self: start; }
+#poem-editor-sentences .result-line > .poem-sentence-pen { right: -28px; top: auto; bottom: 2px; }

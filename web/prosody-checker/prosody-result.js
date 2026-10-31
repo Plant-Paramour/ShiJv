@@ -247,6 +247,13 @@ export function renderProsodyResult(elements, result, type, variant, { makeEdita
         row.style.setProperty('--line-length',Math.max(characters.length,template.length,1));
         row.querySelector('.tone-line').setAttribute('aria-label','标准格律模板');
       }else appendCharacterRow(row,characters,"tone");
+    }else if(type==='tang'||type==='pailv'){
+      const template=characters.map(character=>({
+        char:'',tone:character.expected||character.tone,
+        rhymeGroup:character.rhymeGroup,repeatGroup:character.repeatGroup,
+      }));
+      appendCharacterRow(row,template,"tone");
+      row.querySelector('.tone-line').setAttribute('aria-label','标准格律模板');
     }else appendCharacterRow(row,characters,"tone");
     makeEditable(row, lineIndex);
     elements.lineResults.append(row);

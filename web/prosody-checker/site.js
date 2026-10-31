@@ -1240,29 +1240,67 @@ function makePoemLineEditable(row, index) {
   row.dataset.lineIndex = index;
   const poem = row.querySelector('.poem-line');
   poem.tabIndex = 0; poem.setAttribute('role', 'button');
-  poem.setAttribute('aria-label', `选择或修改第 ${index + 1} 句：${poem.textContent}`);
+  poem.setAttribute('aria-label', `选择第 ${index + 1} 句：${poem.textContent}`);
   row.classList.toggle('is-selected', index === poemSentenceSelection);
+  const pen = document.createElement('button');
+  pen.type = 'button'; pen.className = 'poem-sentence-pen';
+  pen.hidden = index !== poemSentenceSelection;
+  pen.setAttribute('aria-label', `修改第 ${index + 1} 句`); pen.title = '修改这一句';
+  pen.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+  row.append(pen);
+  poem.setAttribute('aria-pressed', String(index === poemSentenceSelection));
+  const select = () => {
+    if (poemLineEditor && !poemLineEditor.finish()) return;
+    const changed = poemSentenceSelection !== index;
+    poemSentenceSelection = index;
+    if (changed) {
+      ++poemSentenceQueryVersion;
+      poemSentenceQueryCacheKey = null; poemSentenceQueryPendingKey = null;
+      clearPoemSentenceVariations();
+    }
+    updatePoemReviewToggle();
+    if (window.matchMedia('(max-width: 780px)').matches) setPoemReviewDrawer(true);
+    querySelectedPoemSentence();
+    document.querySelectorAll('#poem-editor-sentences .result-line').forEach(item => {
+      const selected = Number(item.dataset.lineIndex) === index;
+      item.classList.toggle('is-selected', selected);
+      item.querySelector('.poem-line').setAttribute('aria-pressed', String(selected));
+      item.querySelector('.poem-sentence-pen').hidden = !selected;
+    });
+  };
   const edit = () => {
     if (poemLineEditor && !poemLineEditor.finish()) return;
-    poemSentenceSelection = index; ++poemSentenceQueryVersion;
-    poemSentenceQueryCacheKey = null; poemSentenceQueryPendingKey = null;
-    clearPoemSentenceVariations(); updatePoemReviewToggle();
-    querySelectedPoemSentence();
-    document.querySelectorAll('#poem-editor-sentences .result-line').forEach(item => item.classList.toggle('is-selected', Number(item.dataset.lineIndex) === index));
+    setPoemReviewDrawer(false);
     const part = poemSentenceParts()[index]; if (!part) return;
     const editor = document.createElement('div'); editor.className = 'line-editor';
     const input = document.createElement('textarea'); input.className = 'poem-sentence-input'; input.rows = 2;
     input.value = part[0].trim(); input.setAttribute('aria-label', `第 ${index + 1} 句草稿`);
     const done = document.createElement('button'); done.type = 'button'; done.textContent = '完成编辑';
+    const measure = document.createElement('canvas').getContext('2d');
+    const resize = () => {
+      if (!input.isConnected) return;
+      const style = getComputedStyle(input);
+      measure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const horizontal = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((sum, key) => sum + (parseFloat(style[key]) || 0), 0);
+      const textWidth = Math.max(...input.value.split(/\r?\n/u).map(line => measure.measureText(line || '　').width));
+      const poemWidth = input.closest('.result-line').querySelector('.poem-line').getBoundingClientRect().width;
+      const available = Math.max(1, document.querySelector('#poem-editor-prosody').clientWidth - 36);
+      editor.style.width = `${Math.min(available, Math.ceil(Math.max(poemWidth, textWidth + horizontal + parseFloat(style.fontSize))))}px`;
+      input.style.height = 'auto';
+      input.style.height = `${input.scrollHeight + (parseFloat(style.borderTopWidth) || 0) + (parseFloat(style.borderBottomWidth) || 0)}px`;
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(document.querySelector('#poem-editor-prosody'));
     const finish = () => {
       if (!input.reportValidity()) return false;
-      poemLineEditor = null; editor.remove(); return true;
+      observer.disconnect(); poemLineEditor = null; editor.remove(); return true;
     };
-    poemLineEditor = { index, editor, input, finish };
+    poemLineEditor = { index, editor, input, finish, resize, dispose: () => observer.disconnect() };
     done.onclick = () => { if (finish()) document.querySelector(`#poem-editor-sentences [data-line-index="${index}"] .poem-line`)?.focus(); };
     input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.isComposing && !event.shiftKey) { event.preventDefault(); done.click(); } });
     let currentLength = part[0].length;
     input.addEventListener('input', () => {
+          resize();
           // A sentence editor cannot introduce sentence boundaries; Songci separators follow its meter.
           const entered = input.value.trim();
           const enteredMark = entered.match(/[，,。.？！；;!?：:…、]$/u)?.[0] || "";
@@ -1291,10 +1329,12 @@ function makePoemLineEditable(row, index) {
           schedulePoemEditorScore();
 
     });
-    editor.append(input, done); row.append(editor); input.focus();
+    editor.append(input, done); row.append(editor); resize(); input.focus();
+    document.fonts?.ready.then(resize);
   };
-  poem.addEventListener('click', edit);
-  poem.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); edit(); } });
+  pen.addEventListener('click', edit);
+  poem.addEventListener('click', select);
+  poem.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(); } });
 }
 function renderPoemSentences() {
   const targets = poemProsodyElements();
@@ -1310,8 +1350,8 @@ function renderPoemSentences() {
   if (!evaluation) for (const key of ['structureScore', 'tonalScore', 'rhymeScore']) targets[key].textContent = '--';
   if (active) {
     const row = targets.lineResults.querySelector(`[data-line-index="${active.index}"]`);
-    if (row) { row.append(active.editor); if (focused) { active.input.focus({preventScroll:true}); active.input.setSelectionRange(...selection); } }
-    else poemLineEditor = null;
+    if (row) { row.append(active.editor); active.resize(); if (focused) { active.input.focus({preventScroll:true}); active.input.setSelectionRange(...selection); } }
+    else { active.dispose(); poemLineEditor = null; }
   }
 }
 async function loadPoemSentencePatterns() {
@@ -1381,7 +1421,7 @@ function replacePoemSentenceVariation() {
   const selected = poemSentenceSelection;
   const text = poemSentenceVariationTexts[poemSentenceVariationSelection];
   if (!source || selected === null || typeof text !== "string") return;
-  if (poemLineEditor) { poemLineEditor.editor.remove(); poemLineEditor = null; }
+  if (poemLineEditor) { poemLineEditor.dispose(); poemLineEditor.editor.remove(); poemLineEditor = null; }
   const part = poemSentenceParts()[selected];
   if (!part) return;
   const content = document.querySelector("#poem-editor-content");
@@ -1550,6 +1590,7 @@ async function loadPoemPage() {
     }
     layout.hidden = false;
     poemSentenceSelection = null;
+    poemLineEditor?.dispose();
     poemLineEditor = null;
     ++poemSentenceQueryVersion;
     poemSentenceQueryCacheKey = null;
