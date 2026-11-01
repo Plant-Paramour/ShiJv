@@ -184,35 +184,68 @@ function createSentenceScorer(text, bookLexicon, options) {
   const prepared = { inputParts, chars, inputIsTemplate: isToneTemplate(chars), userBreaks: userBreakPositions(text) };
   const cache = new Map();
   return expected => {
-    if (!cache.has(expected)) cache.set(expected, scoreSentence(text, expected, bookLexicon, options, prepared));
+    if (!cache.has(expected)) cache.set(expected, scoreBestExpected(text, expected, bookLexicon, options, prepared));
     return cache.get(expected);
   };
 }
 function scoreSentence(text, expected, bookLexicon, options = {}, prepared = null) {
-  const inputParts = prepared?.inputParts ?? splitSentences(text); const expectedParts = expected.split(/[、\/]/u).map((part) => part.replace(/\s/g, "")).filter(Boolean);
-  const chars = prepared?.chars ?? [...inputParts.join("")]; const target = [...expectedParts.join("")];
-  const compared = Math.min(chars.length, target.length); let matched = 0; const mismatches = new Set();
+  const inputParts = prepared?.inputParts ?? splitSentences(text);
+  // / 是句内节奏；| 是词谱中不可合并的原始句界；、由上层展开。
+  const expectedParts = expected.replaceAll("/", "").split(/[、|]/u).map(part => part.replace(/\s/gu, "")).filter(Boolean);
+  const chars = prepared?.chars ?? [...inputParts.join("")];
+  const target = [...expectedParts.join("")];
   const inputIsTemplate = prepared?.inputIsTemplate ?? isToneTemplate(chars);
-  for (let i = 0; i < compared; i += 1) {
-    const toneMatches = inputIsTemplate
-      ? templateToneMatches(chars[i], target[i])
-      : (() => {
-        const tones = bookLexicon.lookup(chars[i]).tones;
-        if (target[i] === "中") return true;
-        return options.polyphonic === "strict" ? tones.size === 1 && tones.has(target[i]) : tones.has(target[i]);
-      })();
-    if (toneMatches) matched += 1; else mismatches.add(i);
+  let matching = 0, total = 0, structurallyCorrect = 0, offset = 0;
+  const mismatches = new Set();
+  for (let lineIndex = 0; lineIndex < expectedParts.length; lineIndex += 1) {
+    const pattern = [...expectedParts[lineIndex]];
+    const line = [...(inputParts[lineIndex] || "")];
+    // 与 evaluateSongci 一致：字数不合的分句不参与平仄评分。
+    if (line.length === pattern.length) {
+      structurallyCorrect += 1;
+      for (let i = 0; i < pattern.length; i += 1) {
+        const tones = inputIsTemplate ? null : bookLexicon.lookup(line[i]).tones;
+        const matches = inputIsTemplate ? templateToneMatches(line[i], pattern[i])
+          : pattern[i] === "中" || (options.polyphonic === "strict"
+            ? tones.size > 0 && [...tones].every(tone => tone === pattern[i])
+            : tones.has(pattern[i]));
+        total += 1;
+        if (matches) matching += 1; else mismatches.add(offset + i);
+      }
+    }
+    offset += pattern.length;
   }
-  const lengthScore = chars.length === target.length ? 1 : Math.max(0, 1 - Math.abs(chars.length - target.length) / Math.max(chars.length, target.length, 1));
-  const shapeExact = inputParts.length === expectedParts.length && inputParts.every((part, index) => part.length === expectedParts[index].length);
-  const expectedBreaks = []; let offset = 0;
-  for (const part of expectedParts) { offset += [...part].length; expectedBreaks.push(offset); }
-  expectedBreaks.pop();
+  const shapeExact = inputParts.length === expectedParts.length && structurallyCorrect === expectedParts.length;
+  const structureScore = structurallyCorrect / Math.max(inputParts.length, expectedParts.length, 1);
+  const tonalScore = total ? matching / total : 0;
+  const expectedBreaks = [];
+  let position = 0;
+  for (const char of expected) {
+    if ("/、|".includes(char)) expectedBreaks.push(position);
+    else if (toneSymbols.has(char)) position += 1;
+  }
   const userBreaks = prepared?.userBreaks ?? userBreakPositions(text);
-  const breakErrors = options.respectBreaks === false ? 0 : userBreaks.filter((position) => !expectedBreaks.includes(position)).length;
-  const baseScore = (matched / Math.max(target.length, 1)) * 0.85 + lengthScore * 0.15;
-  const score = Math.max(0, baseScore - breakErrors * 0.1);
-  return { chars, target, matched, total: target.length, mismatches, shapeExact, breakCount: (expected.match(/[、\/]/gu) || []).length, breakErrors, score };
+  const breakErrors = options.respectBreaks === false ? 0 : userBreaks.filter(position => !expectedBreaks.includes(position)).length;
+  // 片段匹配取结构、平仄两项均值，不添加全文押韵分。
+  const score = (structureScore + Math.max(0, tonalScore - breakErrors / Math.max(target.length, 1))) / 2;
+  return { chars, target, matched: matching, total: target.length, mismatches, shapeExact,
+    breakCount: (expected.match(/[、/]/gu) || []).length, breakErrors, structureScore, tonalScore, score };
+}
+function expandExpectedForms(expected) {
+  let forms = [""];
+  for (const char of expected) {
+    forms = char === "、" ? forms.flatMap(form => [form, form + char]) : forms.map(form => form + char);
+  }
+  return forms;
+}
+function scoreBestExpected(text, expected, bookLexicon, options, prepared = null) {
+  let best = null;
+  const inputs = expandExpectedForms(text).map(form => form.replaceAll("、", "，"));
+  for (const input of inputs) for (const form of expandExpectedForms(expected)) {
+    const scored = scoreSentence(input, form, bookLexicon, options, input === text ? prepared : null);
+    if (!best || scored.score > best.score || (scored.score === best.score && scored.shapeExact && !best.shapeExact)) best = scored;
+  }
+  return best;
 }
 function renderVerdict(result, expected) {
   const box = $("#sentence-verdict"); box.hidden = false; box.className = "sentence-verdict " + (result.score >= 0.99 ? "is-pass" : "is-warn");
@@ -300,7 +333,7 @@ document.addEventListener("click", async (event) => {
           const expected = lines[i]; const scored = score(expected);
           if (parts.length === 1) results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "句", expected, displayExpected: (i === 0 ? "" : punctuationFor(i)) + expected + punctuationFor(i + 1), score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: false, meterData: data, stanzaKey: key, lineIndex: i, partCount: 1 });
           if (parts.length === 2 && i + 1 < lines.length) {
-            const combined = lines[i] + "、" + lines[i + 1]; const combinedScore = score(combined);
+            const combined = lines[i] + "|" + lines[i + 1]; const combinedScore = score(combined);
             results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: (key === "stanza1" ? "上阙" : "下阙") + "第" + (i + 1) + "-" + (i + 2) + "句", expected: combined, displayExpected: (i === 0 ? "" : punctuationFor(i)) + lines[i] + punctuationFor(i + 1) + lines[i + 1] + punctuationFor(i + 2), score: combinedScore.score, breaks: combinedScore.breakCount, shape: combinedScore.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: 2 });
           }
         }
@@ -414,8 +447,8 @@ document.addEventListener("click", async (event) => {
     const score = createSentenceScorer(text, book, options);
     if (!query.isCurrent()) { query.fail(); return; }
     $("#inferred-template").hidden = false; $("#inferred-template strong").textContent = inferTemplate(text, book, options.polyphonic);
-    for (const result of loaded) { if (result.status !== "fulfilled") continue; const { data } = result.value; for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\d+$/.test(name))) { const lines = v[key].lines || []; const rhymePositions = Object.keys(v[key]).filter((name) => /^rhyme_\d+_positions$/.test(name)).flatMap((name) => v[key][name] || []); for (let i = 0; i + parts.length <= lines.length; i += 1) { const expected = lines.slice(i, i + parts.length).join("、"); const scored = score(expected); results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + parts.length}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: parts.length }); } } }
+    for (const result of loaded) { if (result.status !== "fulfilled") continue; const { data } = result.value; for (const v of data.variants || []) for (const key of Object.keys(v).filter((name) => /^stanza\d+$/.test(name))) { const lines = v[key].lines || []; const rhymePositions = Object.keys(v[key]).filter((name) => /^rhyme_\d+_positions$/.test(name)).flatMap((name) => v[key][name] || []); for (let i = 0; i + parts.length <= lines.length; i += 1) { const expected = lines.slice(i, i + parts.length).join("|"); const scored = score(expected); results.push({ name: data.name, variant: v.name, variantSourceId: v.source_id, place: `${key === "stanza1" ? "上阙" : "下阙"}第${i + 1}-${i + parts.length}句`, expected, score: scored.score, breaks: scored.breakCount, shape: scored.shapeExact, intra: i > 0 && rhymePositions.includes(i), meterData: data, stanzaKey: key, lineIndex: i, partCount: parts.length }); } } }
     if (!query.isCurrent()) { query.fail(); return; }
-    const { filtered, shown } = applyMatchFilters(results, filters); const exact = filtered.filter((item) => item.score >= 0.999); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.tabIndex=0; row.setAttribute("role","button"); row.addEventListener("click",()=>openMeterDrawer(item)); row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openMeterDrawer(item);}}); row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${item.expected}</code>`; output.append(row); }); output.hidden = false; status.textContent = `筛选后 ${filtered.length} 条，当前显示 ${shown.length} 条`; query.complete();
+    const { filtered, shown } = applyMatchFilters(results, filters); const exact = filtered.filter((item) => item.score >= 0.999); output.replaceChildren(); const heading = document.createElement("p"); heading.className = "match-summary"; heading.textContent = exact.length ? `找到 ${exact.length} 个 100% 匹配结果` : "没有 100% 匹配，以下为最接近的句式"; output.append(heading); shown.forEach((item) => { const row = document.createElement("article"); row.className = "match-item"; row.tabIndex=0; row.setAttribute("role","button"); row.addEventListener("click",()=>openMeterDrawer(item)); row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openMeterDrawer(item);}}); row.innerHTML = `<div><strong>${item.name}</strong><span>${item.variant} · ${item.place}</span></div><b>${Math.round(item.score * 100)}%</b><code>${item.expected.replaceAll("|", "，")}</code>`; output.append(row); }); output.hidden = false; status.textContent = `筛选后 ${filtered.length} 条，当前显示 ${shown.length} 条`; query.complete();
   } catch (error) { if (query.isCurrent()) status.textContent = error.message; query.fail(); }
 }, true);

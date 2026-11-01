@@ -150,6 +150,13 @@ def create_poem_forest_root(forest_id: str, body: PoemRevisionCreateModel, reque
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
+@router.delete('/poems/{poem_id}/forest')
+def delete_poem_forest(poem_id: str, request: Request):
+    user = local_user(request)
+    if not request.app.state.users.delete_poem_forest(poem_id, user['id']):
+        raise HTTPException(status_code=404, detail='作品森林不存在或无权删除')
+    return {'status': 'deleted'}
+
 @router.delete('/poems/{poem_id}')
 def delete_poem(poem_id: str, request: Request):
     user = local_user(request)

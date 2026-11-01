@@ -339,7 +339,8 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
 /* 检测状态用背景标记，字与平仄均保持清晰可辨。 */
 :is(#workspace #line-results, #poem-editor-sentences) mark{border-radius:3px;color:#302e28!important;text-decoration:none;font-weight:inherit}
 :is(#workspace #line-results, #poem-editor-sentences) :is(.polyphonic,.conditional-affected){background:#d8d8d5;color:#242424!important;text-decoration:none}
-:is(#workspace #line-results, #poem-editor-sentences) :is(.ao,.rescue){background:#f1dfae;color:#302e28!important;text-decoration:none}
+:is(#workspace #line-results, #poem-editor-sentences) .missing-tone{background:#3f403d!important;color:#fff!important;text-decoration:none}
+:is(#workspace #line-results, #poem-editor-sentences) .rescue{background:#f1dfae;color:#302e28!important;text-decoration:none}
 :is(#workspace #line-results, #poem-editor-sentences) :is(.error,.conditional-error,.conditional-trigger){background:#d52b3f!important;color:#fff!important;text-decoration:none}
 :is(#workspace #line-results, #poem-editor-sentences) .meter-book-repeat{position:relative;z-index:2;border-width:0 0 2px;border-color:#343d48;box-sizing:border-box}
 :is(#workspace #line-results, #poem-editor-sentences) .poem-line .meter-book-repeat{border-top-width:2px;border-bottom:0}
@@ -350,16 +351,20 @@ body[data-han-scope] .settings-view .model-endpoint::after { display: none; }
 
 /* 检测标记跨原字与模板两行；韵组背景仍只留在模板字位。 */
 :is(#workspace #line-results, #poem-editor-sentences) .poem-line{position:relative;overflow:visible;z-index:1}
-:is(#workspace #line-results, #poem-editor-sentences) .poem-line :is(.char.error,.char.polyphonic,.char.conditional-affected,.char.conditional-trigger,.char.conditional-error){position:relative;border-radius:3px 3px 0 0}
+:is(#workspace #line-results, #poem-editor-sentences) .poem-line :is(.char.error,.char.polyphonic,.char.missing-tone,.char.ao,.char.conditional-affected,.char.conditional-trigger,.char.conditional-error){position:relative;border-radius:3px 3px 0 0}
 :is(#workspace #line-results, #poem-editor-sentences) .poem-line :is(.char.error,.char.polyphonic,.char.conditional-affected,.char.conditional-trigger,.char.conditional-error)::after{content:"";position:absolute;inset:0 0 auto;height:calc(2em * var(--meter-reading-leading));box-sizing:border-box;border:1px solid #858580;border-radius:3px;pointer-events:none}
 :is(#workspace #line-results, #poem-editor-sentences) .poem-line :is(.char.error,.char.conditional-trigger,.char.conditional-error)::after{border:2px solid #d52b3f}
 :is(#workspace #line-results, #poem-editor-sentences) .tone-line :is(.error,.polyphonic,.conditional-affected,.conditional-trigger,.conditional-error){border-radius:0 0 3px 3px}
 .prosody-rhyme-legend .prosody-legend-error{padding:0 5px;border:2px solid #d52b3f;border-radius:3px;background:#d52b3f;color:#fff}
 .prosody-rhyme-legend .prosody-legend-polyphonic{padding:0 5px;border:1px solid #858580;border-radius:3px;background:#d8d8d5;color:#242424}
+.prosody-rhyme-legend .prosody-legend-missing{padding:0 5px;border:1px solid #3f403d;border-radius:3px;background:#3f403d;color:#fff}
 .prosody-rhyme-legend .prosody-legend-pair{display:inline-flex;align-items:stretch;gap:0;white-space:nowrap;border:1px solid #858580;border-radius:3px;overflow:hidden}
 .prosody-rhyme-legend .prosody-legend-pair--error{border:2px solid #d52b3f}
 .prosody-rhyme-legend .prosody-legend-pair>mark{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;margin:0;border:0;border-radius:0;padding:2px 6px;font:inherit;line-height:1.6;text-align:center}
 .prosody-rhyme-legend .prosody-legend-outline{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;margin:0;padding:2px 6px;border:0;border-radius:0;background:transparent;color:#302e28;font:inherit;line-height:1.6;text-align:center}
+:is(#workspace #line-results, #poem-editor-sentences) .poem-line .char.missing-tone{position:relative;border-radius:3px 3px 0 0}
+:is(#workspace #line-results, #poem-editor-sentences) .poem-line .char.missing-tone::after{content:"";position:absolute;inset:0 0 auto;height:calc(2em * var(--meter-reading-leading));box-sizing:border-box;border:2px solid #3f403d;border-radius:3px;pointer-events:none}
+:is(#workspace #line-results, #poem-editor-sentences) .poem-line .char.ao::after{content:"";position:absolute;inset:0 0 auto;height:calc(2em * var(--meter-reading-leading));box-sizing:border-box;border:2px solid #d52b3f;border-radius:3px;pointer-events:none}
 :is(#workspace #line-results, #poem-editor-sentences) .meter-book-rhyme,.prosody-rhyme-legend .meter-book-rhyme{position:relative;overflow:visible}
 /* 原句与模板共享层叠空间，使模板角标可以盖过上一行的 mark。 */
 :is(#workspace #line-results, #poem-editor-sentences) .poem-line{z-index:auto}

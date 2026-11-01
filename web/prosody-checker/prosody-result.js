@@ -1,6 +1,14 @@
 import { paintRhyme } from "./meter-book.js?v=19";
 import { getDatasetJson } from "./dataset-cache.js?v=4";
 
+function plainTone(character) {
+  return character.missingTone || character.tones?.length === 0 ? '缺' : character.polyphonic ? '多' : character.tone;
+}
+
+function plainTones(characters) {
+  return characters.map(character=>({char:'',tone:plainTone(character),rhymeGroup:character.rhymeGroup,repeatGroup:character.repeatGroup}));
+}
+
 function missingToneMessages(result) {
   return (result.lines||[]).flatMap((line,li)=>(line.characters||[]).flatMap((c,ci)=>{
     if(!(c.missingTone||Array.isArray(c.tones)&&c.tones.length===0))return [];
@@ -14,8 +22,11 @@ export function appendCharacterRow(container, characters, property) {
   const row = document.createElement("div");
   row.className = property === "char" ? "poem-line" : "tone-line";
   for (const item of characters) {
-    const span = document.createElement(item.error || item.polyphonic || item.conditionalError || item.roles?.length ? "mark" : "span");
+    const missing = item.missingTone || item.tones?.length === 0;
+    const needsMark = item.error || item.polyphonic || missing || item.conditionalError || item.roles?.includes("rescue");
+    const span = document.createElement(needsMark ? "mark" : "span");
     span.className = property;
+    if (missing) span.classList.add("missing-tone");
     if (item.polyphonic) span.classList.add("polyphonic");
     if (item.roles?.includes("ao")) span.classList.add("ao");
     if (item.roles?.includes("rescue")) span.classList.add("rescue");
@@ -77,12 +88,19 @@ function appendSummaryGroup(container, title, items, emptyText, className) {
   container.append(group);
 }
 
-function polyphonicSummaryMessages(result) {
+export function polyphonicSummaryMessages(result) {
   const decisions=result.polyphonicDecisions||[];
+  const combinations=result.kind==='songci'?[]:(result.polyphonicCombinations||[]);
   const messages=[];
   for(const [lineIndex,line] of (result.lines||[]).entries())for(const [charIndex,character] of (line.characters||[]).entries()){
     if(!character.polyphonic)continue;
-    if((result.polyphonicCombinations||[]).some(message=>message.startsWith(`第 ${lineIndex+1} 句：`)))continue;
+    if(character.tones?.length===1){
+      const group=(result.rhymeGroups||[]).find(group=>charIndex===line.characters.length-1&&(group.endings||[]).some(ending=>ending.lineIndex===lineIndex));
+      if(group?.dominantPart)messages.push(`第 ${lineIndex+1} 句第 ${charIndex+1} 字“${character.char}”：若属${group.dominantPart}韵部，则符合本组押韵要求。`);
+      continue;
+    }
+    if(result.kind==='songci'&&character.expected==='中')continue;
+    if(combinations.some(message=>message.startsWith(`第 ${lineIndex+1} 句：`)))continue;
     const decision=decisions.find(item=>item.lineIndex===lineIndex&&item.charIndex===charIndex);
     const required=character.expected;
     const prefix=`第 ${lineIndex+1} 句第 ${charIndex+1} 字“${character.char}”：`;
@@ -90,7 +108,7 @@ function polyphonicSummaryMessages(result) {
     else if(decision?.message?.includes('若为'))messages.push(decision.message);
     else messages.push(prefix+'此处平仄不拘，请根据语境自行核对读音。');
   }
-  messages.push(...(result.polyphonicCombinations||[]));
+  messages.push(...combinations);
   return messages.map(message=>String(message).replaceAll('平/仄','多'));
 }
 
@@ -216,12 +234,17 @@ export function renderProsodyResult(elements, result, type, variant, { makeEdita
   const polyphonicLegend=document.createElement('span');polyphonicLegend.className='prosody-legend-pair';
   const polyphonicLabel=document.createElement('mark');polyphonicLabel.className='prosody-legend-polyphonic';polyphonicLabel.textContent='多音字';
   const polyphonicRequirement=document.createElement('span');polyphonicRequirement.className='prosody-legend-outline';polyphonicRequirement.textContent='自行核对';polyphonicLegend.append(polyphonicLabel,polyphonicRequirement);rhymeLegend.append(polyphonicLegend);
+  const missingLegend=document.createElement('span');missingLegend.className='prosody-legend-pair';
+  const missingLabel=document.createElement('mark');missingLabel.className='prosody-legend-missing';missingLabel.textContent='缺失';
+  const missingRequirement=document.createElement('span');missingRequirement.className='prosody-legend-outline';missingRequirement.textContent='自行核对';missingLegend.append(missingLabel,missingRequirement);rhymeLegend.append(missingLegend);
   (variant?.repetition_groups||[]).forEach((group,index)=>{const label=document.createElement('span');label.className='meter-book-repeat-key';label.textContent='叠 '+(index+1);label.style.borderStyle=['solid','double','dashed','dotted'][index%4];rhymeLegend.append(label);});
   elements.lineResults.before(rhymeLegend);
+  const missingPositions = new Set(result.lines.flatMap((line, lineIndex) => (line.characters || []).map((character, charIndex) =>
+    (character.missingTone || character.tones?.length === 0) ? `${lineIndex}:${charIndex}` : null).filter(Boolean)));
   const errorPositions = new Set([
     ...(result.violations ?? []),
     ...(result.rhymeViolations ?? []),
-  ].map((item) => `${item.lineIndex}:${item.charIndex}`));
+  ].map((item) => `${item.lineIndex}:${item.charIndex}`).filter((position) => !missingPositions.has(position)));
   result.lines.forEach((line, lineIndex) => {
     const row = document.createElement("div");
     row.className = "result-line";
@@ -246,15 +269,15 @@ export function renderProsodyResult(elements, result, type, variant, { makeEdita
         appendCharacterRow(row,template,"tone");
         row.style.setProperty('--line-length',Math.max(characters.length,template.length,1));
         row.querySelector('.tone-line').setAttribute('aria-label','标准格律模板');
-      }else appendCharacterRow(row,characters,"tone");
-    }else if(type==='tang'||type==='pailv'){
+      }else appendCharacterRow(row,plainTones(characters),"tone");
+    }else{
       const template=characters.map(character=>({
-        char:'',tone:character.expected||character.tone,
+        char:'',tone:plainTone(character),roles:character.roles||[],
         rhymeGroup:character.rhymeGroup,repeatGroup:character.repeatGroup,
       }));
       appendCharacterRow(row,template,"tone");
-      row.querySelector('.tone-line').setAttribute('aria-label','标准格律模板');
-    }else appendCharacterRow(row,characters,"tone");
+      row.querySelector('.tone-line').setAttribute('aria-label',type==='haiku'?'实际平仄':'标准格律模板');
+    }
     makeEditable(row, lineIndex);
     elements.lineResults.append(row);
   });

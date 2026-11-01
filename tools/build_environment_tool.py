@@ -58,7 +58,7 @@ def build(output):
     (output / 'RELEASE-MANIFEST.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     manifest['build'] = build_info(output)
     (output / 'RELEASE-MANIFEST.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
-    archive = output.with_suffix('.zip')
+    archive = Path(str(output) + '.zip')
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as stream:
         for path in sorted(output.rglob('*')):
             if path.is_file():
@@ -74,7 +74,7 @@ def build(output):
     report['profiles'] = {name: dict(wheel_count=len(profile_wheels(name)),
                                     download_bytes=sum(w['bytes'] for w in profile_wheels(name)))
                           for name in PROFILES}
-    output.with_suffix('.build.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+    Path(str(output) + '.build.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps(report))
 
 

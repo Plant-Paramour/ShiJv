@@ -2,9 +2,10 @@ import {evaluateTang,evaluatePailv,evaluateSongci,evaluateHaiku} from './core.js
 
 // 每个字位使用独立的汉字占位，允许同一个字在一句中分别取不同声调。
 export async function evaluateCombinations(result,type,variant,lexicon,options) {
+  if(type==='songci')return [];
   const output=[];
   for(const [li,line] of result.lines.entries()) {
-    const positions=line.characters.map((c,i)=>({c,i})).filter(({c})=>c.polyphonic&&c.tones.length>1);
+    const positions=line.characters.map((c,i)=>({c,i})).filter(({c})=>c.polyphonic&&c.tones.length>1&&!(type==='songci'&&c.expected==='中'));
     if(!positions.length)continue;
     const count=positions.reduce((n,{c})=>n*c.tones.length,1);
     if(count>1024){output.push(`第 ${li+1} 句多音字组合超过 1024 种，未展开，请逐字核对。`);continue;}

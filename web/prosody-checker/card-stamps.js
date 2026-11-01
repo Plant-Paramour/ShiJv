@@ -58,7 +58,8 @@ export function installStampEditor(state,commit){
    const choices=stamp.image?[['original','原图比例'],['square','方形'],['rounded','圆角方形'],['circle','圆形']]:[['solid','朱砂实印'],['outline','朱文线印'],['round','圆形印']];
    for(const [value,label] of choices){const option=document.createElement('option');option.value=value;option.textContent=label;style.append(option);}style.value=stamp.image?(stamp.crop||'original'):stamp.style;style.onchange=()=>change(stamp.image?'crop':'style',style.value);field(stamp.image?'形状裁剪':'式样',style);
    const upload=document.createElement('input');upload.type='file';upload.className='card-stamp-upload-input';upload.id=`stamp-upload-${index}`;upload.accept='image/png,image/jpeg,image/webp,image/gif';
-   const uploadLabel=document.createElement('label');uploadLabel.className='quiet-button card-stamp-upload';uploadLabel.htmlFor=upload.id;uploadLabel.textContent=stamp.image?'更换图案':'导入图案';section.append(uploadLabel,upload);
+   upload.hidden=true;
+   const uploadLabel=document.createElement('button');uploadLabel.type='button';uploadLabel.className='quiet-button card-stamp-upload';uploadLabel.textContent=stamp.image?'更换图案':'导入图案';uploadLabel.onclick=()=>upload.click();section.append(uploadLabel,upload);
    const status=document.createElement('p');status.className='field-hint';status.setAttribute('role','status');section.append(status);
    upload.onchange=async()=>{const f=upload.files[0];if(!f)return;if(f.size>5*1024*1024||!['image/png','image/jpeg','image/webp','image/gif'].includes(f.type)){status.textContent='请选择 5MB 以内的 PNG、JPG、WebP 或 GIF。';return;}try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f);});change('image',data);}catch{status.textContent='图案读取失败，请重试。';}};
    const action=(name,fn)=>{const b=document.createElement('button');b.type='button';b.className='quiet-button';b.textContent=name;b.onclick=fn;section.append(b);};

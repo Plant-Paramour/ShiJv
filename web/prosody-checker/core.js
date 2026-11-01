@@ -139,6 +139,7 @@ function annotateLines(
   expectedByPosition = new Map(),
   rolesByPosition = new Map(),
   readingDecisions = new Map(),
+  rhymeGroups = [],
 ) {
   return lines.map((text, lineIndex) => ({
     text,
@@ -151,7 +152,10 @@ function annotateLines(
         tone: decision?.tone ?? toneLabel(entry.tones),
         tones: [...entry.tones],
         missingTone: entry.tones.size === 0,
-        polyphonic: entry.tones.size > 0 && entry.polyphonic,
+        polyphonic: entry.polyphonic && (entry.tones.size > 1 || (
+          charIndex === [...text].length - 1
+          && rhymeGroups.some(group => group.endings.some(ending => ending.lineIndex === lineIndex))
+        )),
         error: errors.has(key(lineIndex, charIndex)),
         expected: expectedByPosition.get(key(lineIndex, charIndex)) ?? null,
         roles,
@@ -347,7 +351,8 @@ function scoreRhymeGroups(
           : entry.parts;
       }
       endings.push({ lineIndex, char, parts: [...parts], actualParts: [...entry.parts] });
-      for (const part of parts) counts.set(part, (counts.get(part) ?? 0) + 1);
+      // 韵书未收录的韵脚不参与主韵部统计，也不作为押韵错误。
+      if (parts.size) for (const part of parts) counts.set(part, (counts.get(part) ?? 0) + 1);
     }
     let dominantPart = null;
     let dominantCount = 0;
@@ -357,7 +362,8 @@ function scoreRhymeGroups(
         dominantCount = count;
       }
     }
-    const invalidEndings = endings.filter((ending) => dominantPart
+    const knownEndings = endings.filter((ending) => ending.parts.length > 0);
+    const invalidEndings = knownEndings.filter((ending) => dominantPart
       && !ending.parts.includes(dominantPart)).map((ending) => ({
       lineIndex: ending.lineIndex,
       charIndex: [...lines[ending.lineIndex]].length - 1,
@@ -381,8 +387,8 @@ function scoreRhymeGroups(
       endings,
       dominantPart,
       matchCount: dominantCount,
-      totalCount: endings.length,
-      score: endings.length ? dominantCount / endings.length : 0,
+      totalCount: knownEndings.length,
+      score: knownEndings.length ? dominantCount / knownEndings.length : 1,
       invalidEndings,
       rejectedEndings,
     });
@@ -474,8 +480,10 @@ export function evaluateSongci(text, variant, lexicon, options = {}) {
       const required = pattern[charIndex];
       const positionKey = key(lineIndex, charIndex);
       expected.set(positionKey, required);
-      total += 1;
       const tones = lexicon.lookup(line[charIndex]).tones;
+      // 韵书未收录的字不判为平仄错误，交由结果页的“韵书缺字说明”提示。
+      if (tones.size === 0) continue;
+      total += 1;
       const toneMatches = strictPolyphonic
         ? tones.size > 0 && [...tones].every((tone) => tone === required)
         : tones.has(required);
@@ -504,6 +512,7 @@ export function evaluateSongci(text, variant, lexicon, options = {}) {
     for (let charIndex = 0; charIndex < line.length; charIndex += 1) {
       const required = pattern[charIndex];
       const tones = lexicon.lookup(line[charIndex]).tones;
+      if (tones.size === 0) continue;
       const toneMatches = strictPolyphonic
         ? tones.size > 0 && [...tones].every((tone) => tone === required)
         : tones.has(required);
@@ -528,7 +537,7 @@ export function evaluateSongci(text, variant, lexicon, options = {}) {
       : 0),
     tonalScore: percentage(total ? matching / total : 0),
     rhymeScore: percentage(rhyme.score),
-    lines: annotateLines(lines, lexicon, errors, expected, new Map(), readingDecisions),
+    lines: annotateLines(lines, lexicon, errors, expected, new Map(), readingDecisions, rhyme.details),
     errors,
     issues,
     rhymeGroups: rhyme.details,
@@ -551,6 +560,11 @@ function opposite(tone) {
 }
 
 function forcedTone(entry, tone) {
+  return entry.tones.size === 1 && entry.tones.has(tone);
+}
+
+// 拗救必须基于韵书明确的实际声调，不能把“可能读作某声”当成已经发生拗救。
+function actualForcedTone(entry, tone) {
   return entry.tones.size === 1 && entry.tones.has(tone);
 }
 
@@ -660,8 +674,8 @@ export function scoreTangTones(lines, charCount, globalBase, rhymeTone, lexicon,
       const keyEntry = lexicon.lookup(chars[keyIndex]);
       const rescueEntry = lexicon.lookup(chars[rescueIndex]);
       if (keyExpected === TONE_PING
-        && ruleCanUseTone(keyEntry, TONE_ZE, strictPolyphonic)
-        && rescueHasTone(rescueEntry, TONE_PING, strictPolyphonic)) {
+        && actualForcedTone(keyEntry, TONE_ZE)
+        && actualForcedTone(rescueEntry, TONE_PING)) {
         const rule = charCount === 5 ? "四拗三救" : "六拗五救";
         recordAoJiu(
           rule,
@@ -675,8 +689,8 @@ export function scoreTangTones(lines, charCount, globalBase, rhymeTone, lexicon,
             + chars[rescueIndex] + "”救，符合" + rule + "。",
         );
       } else if (keyExpected === TONE_ZE
-        && ruleCanUseTone(keyEntry, TONE_PING, strictPolyphonic)
-        && ruleCanUseTone(rescueEntry, TONE_ZE, strictPolyphonic)
+        && actualForcedTone(keyEntry, TONE_PING)
+        && actualForcedTone(rescueEntry, TONE_ZE)
         && rescueHasTone(
           lexicon.lookup(chars[rescueIndex - 2]),
           TONE_PING,
@@ -1053,6 +1067,7 @@ function evaluateTangLike(text, charCount, expectedLineCount, lexicon, kind, opt
       tonal.expected,
       tonal.roles,
       readingDecisions,
+      rhyme.details,
     ),
     errors: tonal.errors,
     issues,
@@ -1194,7 +1209,7 @@ export function evaluateHaiku(text, lexicon, options = {}) {
     structureScore: percentage(structurallyCorrect / expectedLengths.length),
     tonalScore: percentage(total ? (total - errors.size) / total : 0),
     rhymeScore: percentage(rhyme.score),
-    lines: annotateLines(lines, lexicon, errors, new Map(), new Map(), readingDecisions),
+    lines: annotateLines(lines, lexicon, errors, new Map(), new Map(), readingDecisions, rhyme.details),
     errors,
     issues,
     rhymeGroups: rhyme.details,

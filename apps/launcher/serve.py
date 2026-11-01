@@ -9,6 +9,16 @@ import uuid
 from datetime import datetime
 
 
+def reload_application_modules():
+    """A stopped server must not reuse cached routes and repository classes."""
+    import importlib
+    for name in list(sys.modules):
+        if any(name == prefix or name.startswith(prefix + '.')
+               for prefix in ('apps.api', 'apps.agent', 'shiju')):
+            del sys.modules[name]
+    importlib.invalidate_caches()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=18763)
@@ -32,8 +42,8 @@ def main():
         write_report(snapshot, dict(record, state='starting'))
         try:
             import uvicorn
-            from apps.api.main import create_app
             while True:
+                from apps.api.main import create_app
                 app = create_app()
                 app.router.on_startup.append(lambda: write_report(snapshot, dict(record, state='running')))
                 server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.port,
@@ -51,6 +61,7 @@ def main():
                 server.run()
                 if not restart[0]:
                     break
+                reload_application_modules()
                 instance_id = uuid.uuid4().hex
                 os.environ["SHIJU_INSTANCE_ID"] = instance_id
                 record.update(instance_id=instance_id, started_at=datetime.now().isoformat())

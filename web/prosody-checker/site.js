@@ -862,10 +862,15 @@ function insertChatTimelineNode(node, createdAt, anchor = null) {
     && Number(anchor.dataset.createdAt) === Number(node.dataset.createdAt)) anchor.after(node);
   else chatThread.append(node);
 }
-function confirmAction(message, { title = "确认操作", confirmLabel = "确认" } = {}) {
+function confirmAction(message, { title = "确认操作", confirmLabel = "确认", emphasize = "" } = {}) {
   const modal = document.querySelector("#confirm-modal");
   modal.querySelector("#confirm-modal-title").textContent = title;
   modal.querySelector("#confirm-modal-message").textContent = message;
+  if (emphasize && message.includes(emphasize)) {
+    const offset = message.indexOf(emphasize);
+    const strong = document.createElement('strong'); strong.textContent = emphasize;
+    modal.querySelector('#confirm-modal-message').replaceChildren(message.slice(0, offset), strong, message.slice(offset + emphasize.length));
+  }
   modal.querySelector("#confirm-modal-submit").textContent = confirmLabel;
   modal.hidden = false;
   return new Promise((resolve) => {
@@ -2408,7 +2413,7 @@ async function handleProfileAction(event) {
   const card = button.closest("[data-poem-id]"); const poemId = card?.dataset.poemId; if (!poemId) return;
   try {
     if (button.dataset.poemAction === "favorite") await setPoemFavorite(poemId, button.textContent !== "★");
-    if (button.dataset.poemAction === "delete") { if (!await confirmAction("删除这首作品？", { confirmLabel: "删除" })) return; await apiFetch(`/v1/profile/poems/${poemId}`, { method: "DELETE" }); }
+    if (button.dataset.poemAction === "delete") { if (!await confirmAction("删除森林中的作品？（如果只想删除森林中某一首作品，请在修改中进行）", { confirmLabel: "删除", emphasize: "修改" })) return; await apiFetch(`/v1/profile/poems/${encodeURIComponent(poemId)}/forest`, { method: "DELETE" }); }
     if (button.dataset.poemAction === "collect") { await openCollectionPicker("poem", poemId, async (choice) => {
       const collection = profileCollections.find((item) => item.name === choice);
       if (collection) {
